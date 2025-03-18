@@ -134,3 +134,7 @@
 | Temp                    | –                         |
 | UsuariosHorasFinalAnio  | –                         |
 | UsuariosParametros      | –                         |
+
+## Imagen del Modelo Físico (Faltan algunas tablas)
+![Imagen Modelo Físico](Modelo%20Físico%20-%20DB%20GestionTareas%20CTISur%20(PK).jpg)
+
