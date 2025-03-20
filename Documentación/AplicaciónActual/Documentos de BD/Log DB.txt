@@ -1,0 +1,23 @@
+1 - En la imagen Modelo Físico - DB hay dos entidades no registradas en la base de datos  GestionTareasCTISur_Pruebas:
+
+- Temp
+- Estaciones_1
+
+
+2 - Tambien hay entidades que le faltan el paso a tabla con relaciones, no tienen claves primarias señaladas o les faltan atributos:
+
+- Usuario areas: Le falta un atributo.
+- Ausencias: Aparte de no tener claves primaria u foráneas no tiene el paso a tabla y sus relaciones con  TipoAusencia.
+- TipoAusencia: No tiene el paso a tabla y relación con Ausencia.
+
+ItemsUsuarios: Le falta un atributo.
+
+2 - Sobre las Herramientas que puedan crear un modelo fisico de base de datos a partir de un modelo guardado(en mi caso en access) Por ahora he probado 2 aplicaciones que pueden servir... mas o menos:
+
+- Toad Data Modele: Si funciona siempre y cuando compres uno de sus productos, ellos registran tu cuenta, te dan acceso a descargar la aplicación ya activada con tu condigo.
+   - Intente probar con una version EJEM... no legal para version por lo menos 	menos me deja ver si reconoce los archivos de access (.accdb) s los reconoce pero no me deja cargarlos 😔. 
+
+-  DbSchema: es funcional pero siento que le falta algo... tendre que verificar con diego si las funciones que ofrece son suficientes, La app tambien es de paga aunque no creo que su oferta premium nos sirva por ahora...aparte que para que la tabla se pueda cargar hay que cambiar el formato de guardado en access en vez de .accdb debe guardarse como mdb.
+	- Su exportacion del modelo fisico es... Genial por ahora es recomendable 	usar esta aun asi seguire buscando mas opciones.
+
+
