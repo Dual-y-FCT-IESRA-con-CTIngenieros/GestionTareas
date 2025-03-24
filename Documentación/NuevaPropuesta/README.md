@@ -2,7 +2,7 @@
 
 ### Notas reunión CTIngenieros (24/03/25)
 
-#### Tema: Nueva Base de datos
+#### Tema 1: Nueva Base de datos
 
 Se plantea la simplificación de la base de datos original. Debido al uso actual de la aplicación, es necesario una actualización de las tablas, tanto a nivel de nomenclatura, como a su contenido y las relaciones entre ellas.
 
@@ -98,4 +98,38 @@ Parámetros comunes del Sistema.
 - Campos:
    * clave
    * valor
+
+#### Tema 2: Pantallas App Móvil
+
+Después de analizar la nueva base de datos y la funcionalidad de la aplicación original, a modo de resumen debemos realizar las siguientes pantallas:
+
+**IMPORTANTE:** ***Todas las pantallas con elementos muy visuales***
+
+- **Login**
+Autenticación del empleado.
+
+- **ResumenInicial**
+Resumen horas hasta el día actual:
+   * Horas por códigos de TimeCode/Activity
+   * Horas positivas/negativas
+   * ...
+   * Menú, Botones y/o elementos de acceso al resto de pantallas de la app.
+
+- **DetalleHorasMes**
+   * Calendario por mes y codificación de color diaria.
+   * Gráfico de colores *(barra horizontal apilada o similar... al hacer clic en ella nos podría llevar a otra pantalla con la info desglosada)*
+
+- **ResumenHorasAnio**
+  * Mostrar por meses un gráfico de colores de las horas realizadas.
+  * Contador anual de horas realizadas en los distintos conceptos.
+  * Teórico de horas productivas y las horas previstas a realizar según la info hasta el día actual.
+
+- **GeneradorInformes** *(ADMIN)*
+   * Ver con el responsable de CTIngenieros Cádiz los informes que necesita y el formato en el que generarlos.
+
+- **GestionUsuarios** *(ADMIN)*
+  * Mantenimiento de usuarios.
+
+- **GestionTablasBase** *(ADMIN)*
+   * Mantenimiento de tablas base (Project, WorkOrder, ...)
 
