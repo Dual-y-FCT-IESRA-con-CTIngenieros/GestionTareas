@@ -1,0 +1,4 @@
+Dudas:
+
+Como empezar a plantear: MtoCalendarioLaboral.vb
+MtoParámetros = MtoAviones??
