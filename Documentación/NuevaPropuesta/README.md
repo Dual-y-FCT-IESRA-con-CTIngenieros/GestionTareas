@@ -17,6 +17,7 @@ Contiene los diferentes proyectos en los que está trabajando CTIngenieros.
    * idProject
    * desc
    * idManager
+   * idAircraft *(FK Aircraft)*
 
 **WorkOrder**  
 Contiene las órdenes de trabajo de cada proyecto.  
@@ -43,6 +44,7 @@ Códigos resumen parar imputar en horas. Cada entrada de esta tabla estará dire
    * idTimeCode
    * desc
    * chkProd
+   * color
 
 **Activity**
 Detalle de las actividades que cada empleado debe utilizar al imputar horas.
@@ -58,21 +60,21 @@ Detalle de las actividades que cada empleado debe utilizar al imputar horas.
 Tabla que relaciona la info de las tablas `Project` y `TimeCode`, es decir, los códigos que se pueden imputar para cada proyecto.
 
 - Campos:
-   * idProject
-   * idTimeCode
+   * idProject *(FK Project)*
+   * idTimeCode *(FK TimeCode)*
  
 **Employee**
 Empleados que van a utilizar la aplicación y registrar la información.
 
 - Campos:
-   * idEmployee
+   * idEmployee 
    * nombre
    * apellidos
    * email
    * dateFrom
    * dateTo *(null o 2999-12-01)*
-   * idArea
-   * idRol
+   * idArea *(FK Area)*
+   * idRol *(FK Rol)*
  
 **Area**
 Diferentes áreas o departamentees de trabajo a los que pertenecen los empleados.
@@ -85,11 +87,12 @@ Diferentes áreas o departamentees de trabajo a los que pertenecen los empleados
 Registro de horas en actividades de cada empleado.
 
 - Campos:
-   * idEmployee
-   * idWorkOrder
-   * idTimeCode
-   * idActivity
+   * idEmployee *(FK Employee)*
+   * idWorkOrder *(FK WorkOrder)*
+   * idTimeCode *(FK Activity)*
+   * idActivity *(FK Activity)*
    * time
+   * dateActivity
    * comment
 
 **Config**
@@ -98,6 +101,26 @@ Parámetros comunes del Sistema.
 - Campos:
    * clave
    * valor
+
+**Rol**
+
+- Campos:
+    * idRol
+    * rol
+
+**Aircraft**
+
+- Campos:
+    * idAircraft
+    * desc
+
+**Employee WorkHours**
+
+-Campos: 
+    * dateFrom
+    * dateTo
+    * idEmployee *(FK Employee)*
+    * hours
 
 #### Tema 2: Pantallas App Móvil
 
