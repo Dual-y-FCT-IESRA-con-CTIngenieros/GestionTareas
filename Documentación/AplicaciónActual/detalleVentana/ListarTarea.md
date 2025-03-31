@@ -1,13 +1,14 @@
 |                   | **Respuestas**                          |
 |-------------------|-----------------------------------------|
-|**Nombre**         | "Nombre del archivo con extensión"      |
-|**Descripción**    | "Descripción del extracto"              |
-|**Funcionalidad**  | "Funcionalidades que posee"             |
+|**Nombre**         | "CargaInicialVentana.vb"     |
+|**Descripción**    | Inicializa y configura la interfaz de usuario para la gestión de tareas, cargando listas de datos desde la base de datos y estableciendo filtros predeterminados.   |
+|**Funcionalidad**  | CargarTareas() ConstruirFiltro() logForm.AbrirBaseDatos() logForm.CerrarBaseDatos() logForm.CargarListaDeTareas() logForm.CargarDatosTareaRefrescarLista() logForm.DatosCalAniosTareas() logForm.DatosCalSemanas() logForm.DatosSemana() logForm.DataTiposEstado() logForm.DataPeticionarios() logForm.DataTiposTarea() logForm.DataAviones() logForm.DataProyectos() logForm.DataEstaciones() logForm.DataUsuarios() logForm.DataMaquinas() logForm.CargarPartNumbersTarea() MessageBox.Show()
+             |
 |**Otros**          | "Otros datos de importancia"            |
-|**Acceso a BD**    | ✅                               |
-|*TablaN*           | "Nombre de la tabla a la que se accede" |
-|*Consulta*         | ✅ or ❌ |
-|*Modificación*     | ✅ or ❌ |
-|*Inserción*        | ✅ or ❌ |
-|*Borrado*          | ✅ or ❌ |
-|**Imagen**           | ![Captura_de_pantalla](gatofuete2.jpg)|
+|**Acceso a BD**    | ✅ |
+|*TablaN*           |  tareas, estados, usuarios y proyectos |
+|*Consulta*         | ✅ |
+|*Modificación*     | ✅ |
+|*Inserción*        | ❌ |
+|*Borrado*          | ❌ |
+|**Imagen**           | ![Nombre_Imagen](ListarTareas.PNG)|
