@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.1.20"
 }
 
 kotlin {
@@ -43,8 +44,17 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            // Extensión para los iconos
+            implementation(compose.materialIconsExtended)
+            // Librería voyager para la navegación
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
+            // Librería para supabase
+            implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
+            implementation("io.github.jan-tennert.supabase:postgrest-kt")
+            implementation("io.github.jan-tennert.supabase:auth-kt")
+            implementation("io.github.jan-tennert.supabase:realtime-kt")
+            implementation("io.ktor:ktor-client-cio:3.1.2")
         }
     }
 }
