@@ -55,6 +55,10 @@ kotlin {
             implementation("io.github.jan-tennert.supabase:auth-kt")
             implementation("io.github.jan-tennert.supabase:realtime-kt")
             implementation("io.ktor:ktor-client-cio:3.1.2")
+            // Libreria para graficos
+            implementation ("io.github.ehsannarmani:compose-charts:0.1.2")
+
+
         }
     }
 }
@@ -87,6 +91,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
 }
 
