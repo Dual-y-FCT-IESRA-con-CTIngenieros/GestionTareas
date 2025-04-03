@@ -21,11 +21,15 @@ class UserViewmodel {
 
     // Contraseña del usuario con la que iniciará sesión.
     private var _password = MutableStateFlow("")
-    val password: StateFlow<String> = _password
+    val passwordText: StateFlow<String> = _password
 
     // Contraseña del usuario con la que iniciará sesión.
     private var _visibility = MutableStateFlow(false)
     val visibility: StateFlow<Boolean> = _visibility
+
+    // Contraseña del usuario con la que iniciará sesión.
+    private var _login = MutableStateFlow(false)
+    val login: StateFlow<Boolean> = _login
 
     // Actualiza las variables para que se reflejen en la pantalla.
     fun onChangeValue(name:String, pass:String) {
@@ -37,9 +41,9 @@ class UserViewmodel {
         _visibility.value = !_visibility.value
     }
 
-    fun checkLogin():Boolean {
+    fun checkLogin() {
         // Comprueba que los datos no estén vacíos
-        return if (username.value.isNotBlank() && password.value.isNotBlank()) {
+        if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
             try {
                 CoroutineScope(Dispatchers.IO).launch {
                     // Intenta iniciar sesión en la base de datos
@@ -47,14 +51,20 @@ class UserViewmodel {
                         email = _username.value
                         password = _password.value
                     }
+                    _login.value = true
                 }
-                _password.value = ""
-                true
             } catch (e:Exception) { // Si da error no ha podido iniciar sesión
                 false
             }
-        } else false
+        }
 
         //return username.value.isNotBlank() && password.value.isNotBlank()
+    }
+
+    fun resetVar() {
+        _visibility.value = false
+        _login.value = false
+        _username.value = ""
+        _password.value = ""
     }
 }

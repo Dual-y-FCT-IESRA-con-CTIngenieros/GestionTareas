@@ -45,8 +45,9 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         val navigator = LocalNavigator.current
         // Creamos las variables necesarias desde el viewmodel
         val username by userViewmodel.username.collectAsState("")
-        val password by userViewmodel.password.collectAsState("")
+        val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
+        val login by userViewmodel.login.collectAsState(false)
 
         // Montamos la estructura
         Column(
@@ -76,7 +77,13 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             // comprueba los campos
             if (navigator != null) {
                 Botones(navigator) {userViewmodel.checkLogin()}
+                if (login) {
+                    navigator.push(CalendarScreen())
+                    userViewmodel.resetVar()
+                }
             }
+
+
 
         }
     }
@@ -137,7 +144,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
     @Composable
     fun Botones(
         navigator: Navigator,
-        onCheckLogin:() -> Boolean
+        onCheckLogin: () -> Unit
     ) {
         // Fila para poner los dos botones
         Row(
@@ -145,11 +152,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(onClick = {
-                if (onCheckLogin()) {
-                    navigator.push(CalendarScreen())
-                }
-            }) {
+            Button(onClick = { onCheckLogin() }) {
                 Text("Iniciar sesión")
             }
         }
