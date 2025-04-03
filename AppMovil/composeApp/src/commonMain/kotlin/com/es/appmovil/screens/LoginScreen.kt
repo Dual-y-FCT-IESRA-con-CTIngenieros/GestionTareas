@@ -78,7 +78,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             if (navigator != null) {
                 Botones(navigator) {userViewmodel.checkLogin()}
                 if (login) {
-                    navigator.push(CalendarScreen())
+                    navigator.push(ResumeScreen())
                     userViewmodel.resetVar()
                 }
             }
