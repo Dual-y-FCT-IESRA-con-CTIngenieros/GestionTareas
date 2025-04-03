@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             // Extensión para los iconos
             implementation(compose.materialIconsExtended)
+            implementation(compose.material3)
             // Librería voyager para la navegación
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
