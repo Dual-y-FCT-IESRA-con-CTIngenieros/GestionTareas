@@ -3,10 +3,15 @@ package com.es.appmovil.widgets
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
@@ -45,9 +51,19 @@ fun ResumenHorasMensual() {
         )
     }
     Column {
-        Text("Resumen mensual")
+        Row{
+            Text("Resumen mensual", fontWeight = FontWeight.SemiBold)
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ArrowForward")
+        }
 
-        Box{
+        ElevatedCard(
+            colors = CardColors(
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                disabledContainerColor = Color.Gray,
+                disabledContentColor = Color.Black
+            )
+        ){
             PieChart(
                 modifier = Modifier.size(200.dp),
                 data = data,

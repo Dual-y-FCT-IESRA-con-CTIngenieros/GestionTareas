@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.cos
@@ -26,7 +30,7 @@ import kotlin.math.sin
 @Composable
 fun ConteoHoras(){
     Column(Modifier.width(200.dp)) {
-        Text("Horas realizadas")
+        Text("Horas realizadas", fontWeight = FontWeight.SemiBold)
         ProtectionMeter(
             inputValue = 100,
             progressColors = listOf(Color.Red, Color.Yellow, Color.Green),
@@ -42,7 +46,7 @@ fun ProtectionMeter(
     trackColor: Color = Color(0xFFE0E0E0),
     progressColors: List<Color>,
     innerGradient: Color,
-    percentageColor: Color = Color.White
+    percentageColor: Color = Color.Black
 ) {
 
     val meterValue = getMeterValue(inputValue)
@@ -85,14 +89,14 @@ fun ProtectionMeter(
             )
             drawCircle(Color.White, 24f, centerOffset)
 
-            // Calculate needle angle based on inputValue
+            // Calculo del angulo de la aguja utilizando el inputValue introducido
             val needleAngle = (meterValue / 100f) * sweepAngle + startAngle
-            val needleLength = 160f // Adjust this value to control needle length
-            val needleBaseWidth = 10f // Adjust this value to control the base width
+            val needleLength = 160f // Este valor ajusta la longitud de la aguja
+            val needleBaseWidth = 10f // Este valor ajusta el grosor de la base de la aguja
 
-
+            // Ruta de la aguja
             val needlePath = Path().apply {
-                // Calculate the top point of the needle
+                // Calculo de la punta de la aguja
                 val topX = centerOffset.x + needleLength * cos(
                     needleAngle.toDouble().toFloat()
                 )
@@ -100,7 +104,7 @@ fun ProtectionMeter(
                     needleAngle.toDouble().toFloat()
                 )
 
-                // Calculate the base points of the needle
+                // Calculo de la base de la aguja
                 val baseLeftX = centerOffset.x + needleBaseWidth * cos(
                     (needleAngle - 90).toDouble().toFloat()
                 )
@@ -121,18 +125,18 @@ fun ProtectionMeter(
             }
 
             drawPath(
-                color = Color.White,
+                color = Color.Black,
                 path = needlePath
             )
         }
-
+        // Textos debajo de la barra de progreso
         Column(
             modifier = Modifier
                 .padding(bottom = 5.dp)
                 .align(Alignment.BottomCenter), horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "$inputValue %", fontSize = 20.sp, lineHeight = 28.sp, color = percentageColor)
-            Text(text = "Percentage", fontSize = 16.sp, lineHeight = 24.sp, color = Color(0xFFB0B4CD))
+            Text(text = "$inputValue", fontSize = 20.sp, lineHeight = 28.sp, color = percentageColor)
+            Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
         }
 
     }

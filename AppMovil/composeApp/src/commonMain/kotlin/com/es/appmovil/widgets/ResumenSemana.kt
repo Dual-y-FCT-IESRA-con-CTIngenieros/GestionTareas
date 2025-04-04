@@ -2,14 +2,20 @@ package com.es.appmovil.widgets
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -32,31 +39,41 @@ import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun ResumenSemana() {
-    Text("Semana")
-    Row(Modifier.background(Color.White).clip(RoundedCornerShape(5.dp)).shadow(15.dp)) {
-        val fechaActual by remember {
-            mutableStateOf(
-                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    var dayModifier = Modifier.padding(end = 5.dp, start = 5.dp).background(Color.White)
+    .width(70.dp).height(50.dp)
+
+    Text("Semana", fontWeight = FontWeight.SemiBold)
+    ElevatedCard(Modifier.background(Color.White).fillMaxWidth()){
+        Row {
+            val fechaActual by remember {
+                mutableStateOf(
+                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                )
+            }
+            val semana = getWeekDaysWithNeighbors(
+                fechaActual.year,
+                fechaActual.monthNumber,
+                fechaActual.dayOfMonth
             )
-        }
-        val semana = getWeekDaysWithNeighbors(
-            fechaActual.year,
-            fechaActual.monthNumber,
-            fechaActual.dayOfMonth
-        )
 
 
+            // Generamos las celdas de la semana
+            semana.forEach {
+                if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
 
-        semana.forEach {
-            if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-                Column(
-                    Modifier.padding(end = 5.dp, start = 5.dp).background(Color.Gray)
-                        .width(70.dp).height(50.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(it.dayOfMonth.toString())
-                    Text(it.month.toString())
+                    if (it.dayOfMonth == fechaActual.dayOfMonth) {
+                        dayModifier = dayModifier.border(width = 2.dp, color = Color.Yellow)
+                    }
 
+                    Column(
+                        dayModifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(it.dayOfMonth.toString())
+                        Text(it.month.toString())
+
+                    }
                 }
             }
         }
