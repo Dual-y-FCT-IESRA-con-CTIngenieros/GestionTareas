@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -11,6 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +52,8 @@ fun ProtectionMeter(
 ) {
 
     val meterValue = getMeterValue(inputValue)
-    Box(modifier = modifier.size(196.dp)) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
+    ElevatedCard(modifier = modifier.size(200.dp)) {
+        Canvas(modifier = Modifier.fillMaxSize().padding(20.dp)) {
             val sweepAngle = 240f
             val fillSwipeAngle = (meterValue / 100f) * sweepAngle
             val height = size.height
@@ -132,8 +134,7 @@ fun ProtectionMeter(
         // Textos debajo de la barra de progreso
         Column(
             modifier = Modifier
-                .padding(bottom = 5.dp)
-                .align(Alignment.BottomCenter), horizontalAlignment = Alignment.CenterHorizontally
+                .padding(bottom = 5.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "$inputValue", fontSize = 20.sp, lineHeight = 28.sp, color = percentageColor)
             Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
