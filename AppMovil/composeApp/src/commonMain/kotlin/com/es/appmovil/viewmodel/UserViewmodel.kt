@@ -2,6 +2,7 @@ package com.es.appmovil.viewmodel
 
 import com.es.appmovil.database.Database
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,14 @@ class UserViewmodel {
     private var _login = MutableStateFlow(false)
     val login: StateFlow<Boolean> = _login
 
+    // Guarda el mensaje del error al fallar el login.
+    private var _loginErrorMessage = MutableStateFlow("")
+    val loginErrorMessage: StateFlow<String> = _loginErrorMessage
+
+    // Indica si ha habido error o no en el login.
+    private var _loginError = MutableStateFlow(false)
+    val loginError: StateFlow<Boolean> = _loginError
+
     // Actualiza las variables para que se reflejen en la pantalla.
     fun onChangeValue(name:String, pass:String) {
         _username.value = name
@@ -44,18 +53,26 @@ class UserViewmodel {
     fun checkLogin() {
         // Comprueba que los datos no estén vacíos
         if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
-            try {
                 CoroutineScope(Dispatchers.IO).launch {
-                    // Intenta iniciar sesión en la base de datos
-                    Database.supabase.auth.signInWith(Email){
-                        email = _username.value
-                        password = _password.value
+                    try {
+
+                        // Intenta iniciar sesión en la base de datos
+                        Database.supabase.auth.signInWith(Email){
+                            email = _username.value
+                            password = _password.value
+                        }
+                        _login.value = true
+                    } catch (e:AuthRestException) { // Si da error no ha podido iniciar sesión
+                        _loginError.value = true
+                        _loginErrorMessage.value = "Error -- Credenciales incorrectas"
+                        _password.value = ""
+                    } catch (e:Exception) { // Si da error no ha podido iniciar sesión
+                        _loginError.value = true
+                        _loginErrorMessage.value = "Error -- No se ha podido conectar con la base de datos"
+                        _password.value = ""
                     }
-                    _login.value = true
+
                 }
-            } catch (e:Exception) { // Si da error no ha podido iniciar sesión
-                false
-            }
         }
 
         //return username.value.isNotBlank() && password.value.isNotBlank()
@@ -66,5 +83,10 @@ class UserViewmodel {
         _login.value = false
         _username.value = ""
         _password.value = ""
+    }
+
+    fun resetError() {
+        _loginError.value = false
+        _loginErrorMessage.value = ""
     }
 }

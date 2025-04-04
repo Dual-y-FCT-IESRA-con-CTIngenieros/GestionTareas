@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -48,6 +50,12 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
+        val loginError by userViewmodel.loginError.collectAsState(false)
+        val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
+
+        if (loginError) {
+            DialogError(loginErrorMesssage) {userViewmodel.resetError()}
+        }
 
         // Montamos la estructura
         Column(
@@ -80,6 +88,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
                 if (login) {
                     navigator.push(ResumeScreen())
                     userViewmodel.resetVar()
+                    userViewmodel.resetError()
                 }
             }
 
@@ -131,6 +140,15 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
                 }
             }
         )
+    }
+
+    @Composable
+    fun DialogError(errorMessage:String,onDimiss:() -> Unit) {
+        Dialog(onDismissRequest = onDimiss) {
+            Card {
+                Text(errorMessage)
+            }
+        }
     }
 
     /**
