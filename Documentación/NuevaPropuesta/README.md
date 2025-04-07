@@ -29,11 +29,11 @@ NOTA: *Confirmar con CTI si es una por cada trabajador que imputará horas en la
    * desc
    * idProject *(FK Project)*
 
-**EmployWorkOrder**  
+**EmployeeWorkOrder**  
 Contiene las órdenes de trabajo de cada Empleado.  
 
 - Campos:
-   * idEmployWorkOrder
+   * idEmployeeWorkOrder
    * desc
    * projectManager *(FK Manager)*
    * idAircraft *(FK AirCraft)*
