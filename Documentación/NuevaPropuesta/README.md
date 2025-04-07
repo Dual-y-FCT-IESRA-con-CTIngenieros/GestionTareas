@@ -27,18 +27,20 @@ NOTA: *Confirmar con CTI si es una por cada trabajador que imputará horas en la
 - Campos:
    * idWorkOrder
    * desc
+   * projectManager *(FK Manager)*
    * idProject *(FK Project)*
+   * idEmployeeWO *(FK EmployeeWO)*
 
-**EmployeeWorkOrder**  
+**EmployeeWO**  
 Contiene las órdenes de trabajo de cada Empleado.  
 
 - Campos:
    * idEmployeeWorkOrder
    * desc
-   * projectManager *(FK Manager)*
    * idAircraft *(FK AirCraft)*
-   * idWorkOrder *(FK WorkOrder)*
-
+   * dateFrom
+   * dateTo
+   
 **Manager**
 Responsables de las `Work Orders`.
 
@@ -85,7 +87,6 @@ Empleados que van a utilizar la aplicación y registrar la información.
    * dateTo *(null o 2999-12-01)*
    * idRol *(FK Rol)*
 
- 
 **Cliente**
 Nombre de los clientes con los que se van a trabajar.
 
