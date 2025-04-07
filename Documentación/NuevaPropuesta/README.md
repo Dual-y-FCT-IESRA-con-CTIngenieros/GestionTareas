@@ -83,7 +83,6 @@ Empleados que van a utilizar la aplicación y registrar la información.
    * email
    * dateFrom
    * dateTo *(null o 2999-12-01)*
-   * idArea *(FK Area)*
    * idRol *(FK Rol)*
 
  
