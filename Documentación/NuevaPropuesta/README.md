@@ -16,7 +16,8 @@ Contiene los diferentes proyectos en los que está trabajando CTIngenieros.
 - Campos
    * idProject
    * desc
-   * idManager *(FK Manager)*
+   * idCliente *(FK Cliente)*
+   * idArea *(FK Area)*
    * idAircraft *(FK Aircraft)*
 
 **WorkOrder**  
@@ -26,8 +27,17 @@ NOTA: *Confirmar con CTI si es una por cada trabajador que imputará horas en la
 - Campos:
    * idWorkOrder
    * desc
-   * projectManager *(FK Manager)*
    * idProject *(FK Project)*
+
+**EmployWorkOrder**  
+Contiene las órdenes de trabajo de cada Empleado.  
+
+- Campos:
+   * idEmployWorkOrder
+   * desc
+   * projectManager *(FK Manager)*
+   * idAircraft *(FK AirCraft)*
+   * idWorkOrder *(FK WorkOrder)*
 
 **Manager**
 Responsables de las `Work Orders`.
@@ -75,6 +85,14 @@ Empleados que van a utilizar la aplicación y registrar la información.
    * dateTo *(null o 2999-12-01)*
    * idArea *(FK Area)*
    * idRol *(FK Rol)*
+
+ 
+**Cliente**
+Nombre de los clientes con los que se van a trabajar.
+
+- Campos:
+   * idCliente
+   * nombre
  
 **Area**
 Diferentes áreas o departamentees de trabajo a los que pertenecen los empleados.
