@@ -3,7 +3,9 @@ package com.es.appmovil.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -31,18 +33,18 @@ class ResumeScreen: Screen{
         MaterialTheme {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
-            }) { innerPadding ->
-                Column(Modifier.padding(innerPadding)) {
+            }) {
+                Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)
                     Column (Modifier.padding(top = 30.dp)){
                         ResumenSemana()
-                        Spacer(Modifier.width(50.dp))
+                        Spacer(Modifier.size(50.dp))
                         Row {
                             Column(Modifier.weight(1f)){
                                 ConteoHoras()
+                                Spacer(Modifier.size(20.dp))
                                 ResumenHorasAnual()
                             }
-                            Spacer(Modifier.width(20.dp))
                             ResumenHorasMensual()
                         }
                     }

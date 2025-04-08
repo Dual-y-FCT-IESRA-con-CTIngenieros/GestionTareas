@@ -20,7 +20,6 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +34,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.screens.CalendarScreen
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ResumenHorasMensual() {
@@ -52,18 +45,18 @@ fun ResumenHorasMensual() {
                     label = "Android",
                     data = 20.0,
                     color = Color.Red,
-                    selectedColor = Color.Green
+                    selectedColor = Color.Red
                 ),
                 Pie(
                     label = "Windows",
                     data = 45.0,
-                    color = Color.Cyan,
-                    selectedColor = Color.Blue
+                    color = Color.Green,
+                    selectedColor = Color.Green
                 ),
                 Pie(
                     label = "Linux",
                     data = 35.0,
-                    color = Color.Gray,
+                    color = Color.Yellow,
                     selectedColor = Color.Yellow,
                 ),
             )
@@ -91,7 +84,7 @@ fun ResumenHorasMensual() {
                 disabledContainerColor = Color.Gray,
                 disabledContentColor = Color.Black
             ),
-            modifier = Modifier.width(200.dp).align(Alignment.CenterHorizontally),
+            modifier = Modifier.width(180.dp).align(Alignment.CenterHorizontally),
             elevation = CardDefaults.elevatedCardElevation(5.dp)
 
         ) {
@@ -130,7 +123,7 @@ fun ResumenHorasMensual() {
                             imageVector = Icons.Filled.Circle,
                             contentDescription = "",
                             Modifier.size(16.dp),
-                            tint = Color.Cyan
+                            tint = Color.Green
                         )
                         Text("Producción - 100", modifier = Modifier.padding(start = 5.dp))
                     }
@@ -148,7 +141,7 @@ fun ResumenHorasMensual() {
                             imageVector = Icons.Filled.Circle,
                             contentDescription = "",
                             Modifier.size(16.dp),
-                            tint = Color.Gray
+                            tint = Color.Yellow
                         )
                         Text("Producción - 100", modifier = Modifier.padding(start = 5.dp))
                     }

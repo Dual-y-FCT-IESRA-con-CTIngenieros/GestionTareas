@@ -3,18 +3,25 @@ package com.es.appmovil.widgets
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,87 +47,102 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun ResumenSemana() {
 
-    var dayModifier = Modifier.padding(end = 5.dp, start = 5.dp).background(Color.White)
-    .width(70.dp).height(50.dp)
+    val dayModifier = Modifier.padding(end = 5.dp, start = 5.dp).background(Color.White)
+    .width(70.dp).height(70.dp)
 
     Text("Semana", fontWeight = FontWeight.SemiBold)
-    ElevatedCard(Modifier.background(Color.White).fillMaxWidth()){
-        Row {
-            val fechaActual by remember {
-                mutableStateOf(
-                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-                )
-            }
+    Spacer(Modifier.size(10.dp))
+    ElevatedCard(
+        colors = CardColors(
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Black
+        ),
+        modifier = Modifier.fillMaxWidth().height(70.dp),
+        elevation = CardDefaults.elevatedCardElevation(5.dp)
+
+    ){
+        val fechaActual by remember {
+            mutableStateOf(
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+            )
+        }
+        LazyRow(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+
             val semana = getWeekDaysWithNeighbors(
                 fechaActual.year,
                 fechaActual.monthNumber,
                 fechaActual.dayOfMonth
             )
 
-
-            // Generamos las celdas de la semana
-            semana.forEach {
-                if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
-
-                    val todayModifier = if (it.dayOfMonth == fechaActual.dayOfMonth) {
-                        dayModifier.border(width = 2.dp, color = Color.Yellow)
-                    }else{
-                        dayModifier
-                    }
-
-                    Column(
-                        todayModifier,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(it.dayOfMonth.toString())
-                        Text(it.month.toString())
-
-                    }
-                }
+            items(semana.size) {
+                Days(semana[it], fechaActual, dayModifier)
             }
         }
     }
-        Leyenda()
+    Spacer(Modifier.size(10.dp))
+    Leyenda()
+}
+
+@Composable
+fun Days(day:LocalDate, fechaActual:LocalDate, dayModifier: Modifier) {
+    val todayModifier = if (day.dayOfMonth == fechaActual.dayOfMonth) {
+        dayModifier.border(width = 2.dp, color = Color.Yellow)
+    }else{
+        dayModifier
+    }
+
+    Column(
+        todayModifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(day.dayOfMonth.toString())
+        Text(day.month.toString())
+
+    }
+
 }
 
 @Composable
 fun Leyenda(){
-    Row {
-        Row(Modifier.padding(end = 10.dp)) {
+    Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
             Canvas(
                 modifier = Modifier
                     .size(16.dp)
             ) {
                 drawCircle(Color.Green)
             }
-            Text("Produccion")
+            Text("Prod", modifier = Modifier.padding(start = 5.dp))
         }
-        Row(Modifier.padding(end = 10.dp)) {
+        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
             Canvas(
                 modifier = Modifier
                     .size(16.dp)
             ) {
                 drawCircle(Color.Red)
             }
-            Text("No ha ido")
+            Text("Ausencia", modifier = Modifier.padding(start = 5.dp))
         }
-        Row(Modifier.padding(end = 10.dp)) {
+        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
             Canvas(
                 modifier = Modifier
                     .size(16.dp)
             ) {
                 drawCircle(Color.Yellow)
             }
-            Text("En espera")
+            Text("En espera", modifier = Modifier.padding(start = 5.dp))
         }
-        Row(Modifier.padding(end = 10.dp)) {
+        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
             Canvas(
                 modifier = Modifier
                     .size(16.dp)
             ) {
                 drawCircle(Color.Gray)
             }
-            Text("No hay")
+            Text("Nada", modifier = Modifier.padding(start = 5.dp))
         }
     }
 }

@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,8 +36,18 @@ fun ResumenHorasAnual() {
         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "ArrowForward")
     }
 
+    Spacer(Modifier.size(20.dp))
+
     // Generamos la estructura
-    ElevatedCard(Modifier.height(100.dp).width(200.dp).background(Color.White)) {
+    ElevatedCard(
+        colors = CardColors(
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Black),
+        modifier = Modifier.height(100.dp).width(180.dp),
+        elevation = CardDefaults.elevatedCardElevation(5.dp)
+    ) {
         Row(
             Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
