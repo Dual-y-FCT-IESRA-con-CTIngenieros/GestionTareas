@@ -64,11 +64,11 @@ class UserViewmodel {
                         _login.value = true
                     } catch (e:AuthRestException) { // Si da error no ha podido iniciar sesión
                         _loginError.value = true
-                        _loginErrorMessage.value = "Error -- Credenciales incorrectas"
+                        _loginErrorMessage.value = "Credenciales incorrectas"
                         _password.value = ""
                     } catch (e:Exception) { // Si da error no ha podido iniciar sesión
                         _loginError.value = true
-                        _loginErrorMessage.value = "Error -- No se ha podido conectar con la base de datos"
+                        _loginErrorMessage.value = "No se ha podido conectar con la base de datos"
                         _password.value = ""
                     }
 

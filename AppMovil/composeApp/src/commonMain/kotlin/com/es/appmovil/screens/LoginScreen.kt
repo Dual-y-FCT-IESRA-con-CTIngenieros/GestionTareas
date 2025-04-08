@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -16,8 +18,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,11 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.viewmodel.UserViewmodel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
@@ -84,7 +88,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Botones(navigator) {userViewmodel.checkLogin()}
+                Botones {userViewmodel.checkLogin()}
                 if (login) {
                     navigator.push(ResumeScreen())
                     userViewmodel.resetVar()
@@ -142,11 +146,58 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         )
     }
 
+    /**
+     * Dialog de error que nos indica el error al iniciar sesión
+     *
+     * @param errorMessage:String mensaje con el error.
+     * @param onDismiss:() -> Unit función lambda que cierra el dialog
+     */
     @Composable
-    fun DialogError(errorMessage:String,onDimiss:() -> Unit) {
-        Dialog(onDismissRequest = onDimiss) {
-            Card {
-                Text(errorMessage)
+    fun DialogError(errorMessage:String,onDismiss:() -> Unit) {
+        Dialog(onDismissRequest = onDismiss) { // Creamos el Dialog con la funcionalidad de cerrase
+            Card( // Creamos y le damos un estilo bonito a la card
+                shape = RoundedCornerShape(16.dp),
+                elevation = 8.dp,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Column( // Creamos la columna donde irán el icono y el mensaje del texto
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon( // Icono de error
+                        imageVector = Icons.Default.ErrorOutline,
+                        contentDescription = "Error",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text( // Texto de título de error
+                        text = "Error al iniciar sesión",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text( // Texto con el mensaje de error
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(onClick = onDismiss) { // Botón para cerrar el Dialog
+                        Text("Aceptar")
+                    }
+                }
             }
         }
     }
@@ -155,15 +206,11 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
      * Muestra el botón de iniciar sesión y ejecuta la lógica para la comprobación
      * de los campos rellenados.
      *
-     * @param navigator: Navigator navegación actual que nos permite cambiar de pantallas.
-     * @param onCheckLogin: () -> Boolean función lamda para comprobar los campos y
+     * @param onCheckLogin: () -> Boolean función lambda para comprobar los campos y
      * que devuelve true o false.
      */
     @Composable
-    fun Botones(
-        navigator: Navigator,
-        onCheckLogin: () -> Unit
-    ) {
+    fun Botones(onCheckLogin: () -> Unit) {
         // Fila para poner los dos botones
         Row(
             Modifier.fillMaxWidth(),
