@@ -62,12 +62,14 @@ fun ResumenSemana() {
             semana.forEach {
                 if (it.dayOfWeek !in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
 
-                    if (it.dayOfMonth == fechaActual.dayOfMonth) {
-                        dayModifier = dayModifier.border(width = 2.dp, color = Color.Yellow)
+                    val todayModifier = if (it.dayOfMonth == fechaActual.dayOfMonth) {
+                        dayModifier.border(width = 2.dp, color = Color.Yellow)
+                    }else{
+                        dayModifier
                     }
 
                     Column(
-                        dayModifier,
+                        todayModifier,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(it.dayOfMonth.toString())
