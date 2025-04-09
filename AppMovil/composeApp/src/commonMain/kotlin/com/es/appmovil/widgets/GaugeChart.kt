@@ -24,17 +24,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.http.HttpHeaders.Date
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -84,110 +81,85 @@ fun ProtectionMeter(
         elevation = CardDefaults.elevatedCardElevation(5.dp)
     ) {
         Box(modifier = modifier.size(180.dp)) {
-            Canvas(modifier = Modifier.fillMaxSize().padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
-                val sweepAngle = 180f
-                val height = size.height
-                val width = size.width
-                val startAngle = 180f // Angulo donde empieza
-                val arcHeight = height - 20.dp.toPx()
-                val centerOffset = Offset(width / 1.96f, height / 2f) // Centro del gráfico
 
-                // Calculo del angulo de la aguja utilizando el inputValue introducido
-                //val totalDays = 1
-                //val totalHours = dailyHours * currentDay
-                val needleAngle = (meterValue / (maxValue.toFloat() * 2)) * sweepAngle + startAngle
-                val needleLength = 183f // Este valor ajusta la longitud de la aguja
-                val needleBaseWidth = 10f // Este valor ajusta el grosor de la base de la aguja
-                // Ruta de la aguja
-                val needlePath = getPath(centerOffset, needleAngle, needleLength, needleBaseWidth)
-                val angleRad = needleAngle.toRadians()
+            ShowCanvas(meterValue, maxValue, progressColors)
 
-                val circleX = centerOffset.x + needleLength * cos(angleRad)
-                val circleY = centerOffset.y + needleLength * sin(angleRad)
-
-                drawArc(
-                    brush = Brush.horizontalGradient(progressColors),
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle,
-                    useCenter = false,
-                    topLeft = Offset((width - height + 60f) / 2f, (height - arcHeight) / 2),
-                    size = Size(arcHeight, arcHeight),
-                    style = Stroke(width = 50f, cap = StrokeCap.Round)
-                )
-
-//               drawCircle(
-//                   Brush.radialGradient(
-//                       listOf(
-//                           innerGradient.copy(alpha = 0.2f),
-//                           Color.Transparent
-//                       )
-//                   ), width / 2f
-//               )
-//               drawCircle(Color.White, 24f, centerOffset)
-//               drawPath(
-//                   color = Color.Black,
-//                   path = needlePath
-//               )
-
-                drawCircle(
-                    color = Color.Black,
-                    radius = 33f,
-                    center = Offset(circleX, circleY),
-                )
-
-                drawCircle(
-                    color = Color.White,
-                    radius = 20f,
-                    center = Offset(circleX, circleY),
-                )
-
-                drawCircle(
-                    color = if(meterValue >= maxValue) Color.Green else Color.Red,
-                    radius = 24f,
-                    center = Offset(circleX, circleY),
-                    style = Stroke(width = 16f)
-                )
-            }
-            Box(modifier = modifier.fillMaxWidth().height(163.dp),contentAlignment = Alignment.BottomCenter) {
-                // Textos debajo de la barra de progreso
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = if(meterValue >= maxValue) Color.Green else Color.Red)) {
-                            append(meterValue.toString())
-                        }
-                        withStyle(style = SpanStyle(color = Color.Gray)) {
-                            append("/$maxValue")
-                        }
-                    }, fontSize = 32.sp, lineHeight = 28.sp)
-                    Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
-                    Text(text = "$fechaActual", fontSize = 14.sp)
-                }
-            }
+            HorasRealizadas(modifier, meterValue, maxValue, fechaActual)
         }
     }
 }
 
-private fun getPath(centerOffset: Offset, needleAngle:Float, needleLength:Float, needleBaseWidth:Float):Path {
-    return Path().apply {
+@Composable
+fun ShowCanvas(meterValue: Int, maxValue: Int, progressColors: List<Color>) {
+    Canvas(modifier = Modifier.fillMaxSize().padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
+        val sweepAngle = 180f
+        val height = size.height
+        val width = size.width
+        val startAngle = 180f // Angulo donde empieza
+        val arcHeight = height - 20.dp.toPx()
+        val centerOffset = Offset(width / 1.96f, height / 2f) // Centro del gráfico
+
+        // Falta mejorar el calculo de días
+
+        //val totalDays = 1
+        //val totalHours = dailyHours * currentDay
+        val needleAngle = (meterValue / (maxValue.toFloat() * 2)) * sweepAngle + startAngle
+        val needleLength = 183f // Este valor ajusta la posición del circulo
+
         val angleRad = needleAngle.toRadians()
-        val baseLeftRad = (needleAngle - 90).toRadians()
-        val baseRightRad = (needleAngle + 90).toRadians()
+        val circleX = centerOffset.x + needleLength * cos(angleRad)
+        val circleY = centerOffset.y + needleLength * sin(angleRad)
 
-        val topX = centerOffset.x + needleLength * cos(angleRad)
-        val topY = centerOffset.y + needleLength * sin(angleRad)
+        drawArc(
+            brush = Brush.horizontalGradient(progressColors),
+            startAngle = startAngle,
+            sweepAngle = sweepAngle,
+            useCenter = false,
+            topLeft = Offset((width - height + 60f) / 2f, (height - arcHeight) / 2),
+            size = Size(arcHeight, arcHeight),
+            style = Stroke(width = 50f, cap = StrokeCap.Round)
+        )
 
-        val baseLeftX = centerOffset.x + needleBaseWidth * cos(baseLeftRad)
-        val baseLeftY = centerOffset.y + needleBaseWidth * sin(baseLeftRad)
-        val baseRightX = centerOffset.x + needleBaseWidth * cos(baseRightRad)
-        val baseRightY = centerOffset.y + needleBaseWidth * sin(baseRightRad)
+        drawCircle(
+            color = Color.Black,
+            radius = 33f,
+            center = Offset(circleX, circleY),
+        )
 
-        moveTo(topX, topY)
-        lineTo(baseLeftX, baseLeftY)
-        lineTo(baseRightX, baseRightY)
-        close()
+        drawCircle(
+            color = Color.White,
+            radius = 20f,
+            center = Offset(circleX, circleY),
+        )
+
+        drawCircle(
+            color = if(meterValue >= maxValue) Color.Green else Color.Red,
+            radius = 24f,
+            center = Offset(circleX, circleY),
+            style = Stroke(width = 16f)
+        )
+    }
+}
+
+@Composable
+fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActual:LocalDate) {
+    Box(modifier = modifier.fillMaxWidth().height(163.dp),contentAlignment = Alignment.BottomCenter) {
+        // Textos debajo de la barra de progreso
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = if(meterValue >= maxValue) Color.Green else Color.Red)) {
+                    append(meterValue.toString())
+                }
+                withStyle(style = SpanStyle(color = Color.Gray)) {
+                    append("/$maxValue")
+                }
+            }, fontSize = 32.sp, lineHeight = 28.sp)
+            Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
+            Text(text = "$fechaActual", fontSize = 14.sp)
+        }
     }
 }
 
