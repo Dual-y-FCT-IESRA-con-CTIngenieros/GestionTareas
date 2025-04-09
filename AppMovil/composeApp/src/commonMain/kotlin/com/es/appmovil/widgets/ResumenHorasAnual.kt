@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -25,11 +27,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ResumenHorasAnual() {
     // Creamos la variable de modificador base de los box
     val boxModifier = Modifier.height(20.dp).clip(shape = RoundedCornerShape(5.dp))
+
+    val timeCodes = mapOf(
+        Color.Green to 90,
+        Color.Yellow to 30,
+        Color.Red to 30
+    )
 
     Row {
         Text("Resumen anual", fontWeight = FontWeight.SemiBold)
@@ -45,27 +54,41 @@ fun ResumenHorasAnual() {
             contentColor = Color.Black,
             disabledContainerColor = Color.Gray,
             disabledContentColor = Color.Black),
-        modifier = Modifier.height(100.dp).width(180.dp),
+        modifier = Modifier.size(180.dp, 63.dp),
         elevation = CardDefaults.elevatedCardElevation(5.dp)
     ) {
+        Spacer(Modifier.size(10.dp))
         Row(
-            Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 20.dp),
+            Modifier.padding(start = 10.dp, end = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Generamos las barras de color
-            Box(
-                boxModifier.background(color = Color.Red).weight(0.2f)
-            )
-            Spacer(Modifier.width(5.dp))
-            Box(
-                boxModifier.background(color = Color.Yellow).weight(0.5f)
-            )
-            Spacer(Modifier.width(5.dp))
-            Box(
-                boxModifier.background(color = Color.Green).weight(0.9f)
-            )
+
+            val totalHours = timeCodes.values.sum().toFloat()
+
+            timeCodes.forEach { (timeCode, hour) ->
+                Box(
+                    boxModifier.background(color = timeCode).weight(hour / totalHours)
+                )
+                Spacer(Modifier.width(5.dp))
+            }
+
         }
-        // Generamos la leyenda de colores
+        Spacer(Modifier.size(5.dp))
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
+            timeCodes.forEach { (timeCode, hour) ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier
+                            .size(10.dp)
+                            .background(timeCode, shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("$hour", fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+            }
+        }
+        Spacer(Modifier.size(10.dp))
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -24,6 +25,7 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
@@ -47,6 +53,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun ResumenSemana() {
 
+    val listState = rememberLazyListState()
     val dayModifier = Modifier.padding(end = 5.dp, start = 5.dp).background(Color.White)
     .width(70.dp).height(70.dp)
 
@@ -68,26 +75,32 @@ fun ResumenSemana() {
                 Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
             )
         }
-        LazyRow(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
 
-            val semana = getWeekDaysWithNeighbors(
-                fechaActual.year,
-                fechaActual.monthNumber,
-                fechaActual.dayOfMonth
-            )
+        val semana = getWeekDaysWithNeighbors(
+            fechaActual.year,
+            fechaActual.monthNumber,
+            fechaActual.dayOfMonth
+        )
 
+        val todayIndex = semana.indexOf(fechaActual)
+        val visibleItems = 4
+        val targetIndex = (todayIndex - visibleItems / 2).coerceIn(0, semana.size - visibleItems)
+
+        LaunchedEffect(Unit) {
+            listState.animateScrollToItem(targetIndex)
+        }
+
+        LazyRow(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, state = listState) {
             items(semana.size) {
                 Days(semana[it], fechaActual, dayModifier)
             }
         }
     }
-    Spacer(Modifier.size(10.dp))
-    Leyenda()
 }
 
 @Composable
 fun Days(day:LocalDate, fechaActual:LocalDate, dayModifier: Modifier) {
-    val todayModifier = if (day.dayOfMonth == fechaActual.dayOfMonth) {
+    val todayModifier = if (day == fechaActual) {
         dayModifier.border(width = 2.dp, color = Color.Yellow)
     }else{
         dayModifier
@@ -105,48 +118,6 @@ fun Days(day:LocalDate, fechaActual:LocalDate, dayModifier: Modifier) {
 
 }
 
-@Composable
-fun Leyenda(){
-    Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
-            Canvas(
-                modifier = Modifier
-                    .size(16.dp)
-            ) {
-                drawCircle(Color.Green)
-            }
-            Text("Prod", modifier = Modifier.padding(start = 5.dp))
-        }
-        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
-            Canvas(
-                modifier = Modifier
-                    .size(16.dp)
-            ) {
-                drawCircle(Color.Red)
-            }
-            Text("Ausencia", modifier = Modifier.padding(start = 5.dp))
-        }
-        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
-            Canvas(
-                modifier = Modifier
-                    .size(16.dp)
-            ) {
-                drawCircle(Color.Yellow)
-            }
-            Text("En espera", modifier = Modifier.padding(start = 5.dp))
-        }
-        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
-            Canvas(
-                modifier = Modifier
-                    .size(16.dp)
-            ) {
-                drawCircle(Color.Gray)
-            }
-            Text("Nada", modifier = Modifier.padding(start = 5.dp))
-        }
-    }
-}
-
 fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
     val selectedDate = LocalDate(year, month, day)
     val dayOfWeek = selectedDate.dayOfWeek.isoDayNumber // 1 (Lunes) a 7 (Domingo)
@@ -156,3 +127,47 @@ fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
 
     return (0..6).map { firstDayOfWeek.plus(it, DateTimeUnit.DAY) }
 }
+
+
+//@Composable
+//fun Leyenda(){
+//    Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
+//        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
+//            Canvas(
+//                modifier = Modifier
+//                    .size(16.dp)
+//            ) {
+//                drawCircle(Color.Green)
+//            }
+//            Text("Prod", modifier = Modifier.padding(start = 5.dp))
+//        }
+//        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
+//            Canvas(
+//                modifier = Modifier
+//                    .size(16.dp)
+//            ) {
+//                drawCircle(Color.Red)
+//            }
+//            Text("Ausencia", modifier = Modifier.padding(start = 5.dp))
+//        }
+//        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
+//            Canvas(
+//                modifier = Modifier
+//                    .size(16.dp)
+//            ) {
+//                drawCircle(Color.Yellow)
+//            }
+//            Text("En espera", modifier = Modifier.padding(start = 5.dp))
+//        }
+//        Row(Modifier.padding(end = 10.dp),verticalAlignment = Alignment.CenterVertically) {
+//            Canvas(
+//                modifier = Modifier
+//                    .size(16.dp)
+//            ) {
+//                drawCircle(Color.Gray)
+//            }
+//            Text("Nada", modifier = Modifier.padding(start = 5.dp))
+//        }
+//    }
+//}
+
