@@ -56,15 +56,6 @@ fun BottomNavigationBar(navigator: Navigator) {
             .background(Color.White)
             .graphicsLayer { shadowElevation = 10f }
     ) {
-        FloatingActionButton(onClick = {},
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-30).dp), // Posición del FAB sobre el hueco
-            shape = CircleShape,
-            contentColor = Color(0xFF7F57FF)
-        ){
-            Icon(Icons.Filled.Add, contentDescription = "Menu")
-        }
         Canvas(modifier = Modifier.matchParentSize()) {
             val width = size.width
             val height = size.height

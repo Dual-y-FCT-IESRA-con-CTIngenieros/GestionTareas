@@ -14,25 +14,28 @@ import androidx.compose.ui.unit.dp
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
+import ir.ehsannarmani.compose_charts.models.GridProperties
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.IndicatorCount
+import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
 
 @Composable
-fun ResumenHorasDia() {
+fun ResumenHorasDia(modifier: Modifier) {
     ColumnChart(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 22.dp),
+        modifier = modifier,
+        maxValue = 24.0,
+        minValue = 0.0,
+        indicatorProperties = HorizontalIndicatorProperties(
+            count = IndicatorCount.CountBased(7),
+        ),
         data = remember {
             listOf(
                 Bars(
                     label = "Jan",
                     values = listOf(
-                        Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Red)),
-                        Bars.Data(label = "Windows", value = 70.0, color = SolidColor(Color.Red))
-                    ),
-                ),
-                Bars(
-                    label = "Feb",
-                    values = listOf(
-                        Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Red)),
-                        Bars.Data(label = "Windows", value = 60.0, color = SolidColor(Color.Red))
+                        Bars.Data(label = "Linux", value = 8.0, color = SolidColor(Color.Red)),
+                        Bars.Data(label = "Windows", value = 20.0, color = SolidColor(Color.Red))
                     ),
                 )
             )

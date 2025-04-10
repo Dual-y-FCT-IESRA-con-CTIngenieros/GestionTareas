@@ -30,7 +30,7 @@ import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import com.es.appmovil.viewmodel.UserViewmodel
+import com.es.appmovil.viewmodel.LoginViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.painterResource
@@ -38,23 +38,23 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * Pantalla del login que permite iniciar sesion a los trabajadores.
  *
- * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
+ * @param loginViewModel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
-class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
+class LoginScreen(private val loginViewModel: LoginViewModel): Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual
         val navigator = LocalNavigator.current
         // Creamos las variables necesarias desde el viewmodel
-        val username by userViewmodel.username.collectAsState("")
-        val password by userViewmodel.passwordText.collectAsState("")
-        val visibility by userViewmodel.visibility.collectAsState(false)
-        val login by userViewmodel.login.collectAsState(false)
-        val loginError by userViewmodel.loginError.collectAsState(false)
-        val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
+        val username by loginViewModel.username.collectAsState("")
+        val password by loginViewModel.passwordText.collectAsState("")
+        val visibility by loginViewModel.visibility.collectAsState(false)
+        val login by loginViewModel.login.collectAsState(true)
+        val loginError by loginViewModel.loginError.collectAsState(false)
+        val loginErrorMesssage by loginViewModel.loginErrorMessage.collectAsState("")
 
         if (loginError) {
-            DialogError(loginErrorMesssage) {userViewmodel.resetError()}
+            DialogError(loginErrorMesssage) {loginViewModel.resetError()}
         }
 
         // Montamos la estructura
@@ -74,9 +74,9 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             // Añadimos los campos a rellenar del usuario y la contraseña
             PedirLogin(username, password, visibility,
                 onChangeValue = { user, pass ->
-                    userViewmodel.onChangeValue(user, pass)
+                    loginViewModel.onChangeValue(user, pass)
                 },
-                onClickIcon = {userViewmodel.onChangeVisibility()}
+                onClickIcon = {loginViewModel.onChangeVisibility()}
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -84,11 +84,11 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Botones(navigator) {userViewmodel.checkLogin()}
+                Botones(navigator) {loginViewModel.checkLogin()}
                 if (login) {
                     navigator.push(ResumeScreen())
-                    userViewmodel.resetVar()
-                    userViewmodel.resetError()
+                    loginViewModel.resetVar()
+                    loginViewModel.resetError()
                 }
             }
 
