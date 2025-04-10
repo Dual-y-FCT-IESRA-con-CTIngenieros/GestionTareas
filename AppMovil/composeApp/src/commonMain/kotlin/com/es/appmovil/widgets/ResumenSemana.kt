@@ -98,7 +98,7 @@ fun Days(day:LocalDate, fechaActual:LocalDate, dayModifier: Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(day.dayOfMonth.toString())
-        Text(day.month.toString())
+        Text(getMonth(day.month.toString()))
 
     }
 
@@ -112,6 +112,24 @@ fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
     //val lastDayOfWeek = firstDayOfWeek.plus(6, DateTimeUnit.DAY)
 
     return (0..6).map { firstDayOfWeek.plus(it, DateTimeUnit.DAY) }
+}
+
+fun getMonth(day:String):String {
+    return when(day) {
+        "JANUARY" -> "ENE"
+        "FEBRUARY" -> "FEB"
+        "MARCH" -> "MAR"
+        "APRIL" -> "ABR"
+        "MAY" -> "MAY"
+        "JUNE" -> "JUN"
+        "JULY" -> "JUL"
+        "AUGUST" -> "AUG"
+        "SEPTEMBER" -> "SEP"
+        "OCTOBER" -> "OCT"
+        "NOVEMBER" -> "NOV"
+        "DECEMBER" -> "DIC"
+        else -> ""
+    }
 }
 
 

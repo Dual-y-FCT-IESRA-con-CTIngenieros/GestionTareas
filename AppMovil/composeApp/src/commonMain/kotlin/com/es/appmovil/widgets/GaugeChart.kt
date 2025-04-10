@@ -41,15 +41,15 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun ConteoHoras(){
+fun ConteoHoras(currentHours: Int, dailyHours: Int, currentDay: Int){
     Column(Modifier.width(180.dp)) {
         Text("Horas realizadas", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.size(20.dp))
         ProtectionMeter(
-            inputValue = 24,
+            currentHours = currentHours,
             progressColors = listOf(Color.Red, Color.Green, Color.Green),
-            dailyHours = 8,
-            currentDay = 3
+            dailyHours = dailyHours,
+            currentDay = currentDay
         )
     }
 }
@@ -57,7 +57,7 @@ fun ConteoHoras(){
 @Composable
 fun ProtectionMeter(
     modifier: Modifier = Modifier,
-    inputValue: Int,
+    currentHours: Int,
     progressColors: List<Color>,
     dailyHours:Int,
     currentDay:Int
@@ -68,7 +68,7 @@ fun ProtectionMeter(
         )
     }
 
-    val meterValue = getMeterValue(inputValue)
+    val meterValue = getMeterValue(currentHours)
     val maxValue = dailyHours * currentDay
 
     ElevatedCard(
@@ -166,8 +166,6 @@ fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActua
 private fun getMeterValue(inputPercentage: Int): Int {
     return if (inputPercentage < 0) {
         0
-    } else if (inputPercentage > 1790) {
-        1790
     } else {
         inputPercentage
     }
