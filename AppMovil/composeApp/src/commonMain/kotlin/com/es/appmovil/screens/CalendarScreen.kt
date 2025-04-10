@@ -29,7 +29,7 @@ class CalendarScreen() : Screen {
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
 
-        val calendarViewmodel = CalendarViewModel
+        val calendarViewmodel = CalendarViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {

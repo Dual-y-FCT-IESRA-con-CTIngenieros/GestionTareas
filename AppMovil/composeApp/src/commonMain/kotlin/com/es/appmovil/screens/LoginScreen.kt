@@ -49,7 +49,7 @@ class LoginScreen(private val loginViewModel: LoginViewModel): Screen {
         val username by loginViewModel.username.collectAsState("")
         val password by loginViewModel.passwordText.collectAsState("")
         val visibility by loginViewModel.visibility.collectAsState(false)
-        val login by loginViewModel.login.collectAsState(true)
+        val login by loginViewModel.login.collectAsState(false)
         val loginError by loginViewModel.loginError.collectAsState(false)
         val loginErrorMesssage by loginViewModel.loginErrorMessage.collectAsState("")
 
