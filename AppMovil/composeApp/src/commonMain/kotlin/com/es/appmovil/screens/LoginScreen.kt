@@ -1,6 +1,8 @@
 package com.es.appmovil.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,20 +19,27 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldColors
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -65,15 +74,18 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             // Generamos la imagen del logo de CT
             Image(
                 painterResource(Res.drawable.LogoCT),
-                contentDescription = "Logo de la empresa"
+                contentDescription = "Logo de la empresa",
+                modifier = Modifier.size(128.dp)
             )
+
+            Spacer(Modifier.size(20.dp))
 
             // Añadimos los campos a rellenar del usuario y la contraseña
             PedirLogin(username, password, visibility,
@@ -83,21 +95,24 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
                 onClickIcon = {userViewmodel.onChangeVisibility()}
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Text("¿Olvidaste tu contraseña?", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFFF4A900), modifier = Modifier.clickable{} )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Botones {userViewmodel.checkLogin()}
+                Boton {userViewmodel.checkLogin()}
                 if (login) {
                     navigator.push(ResumeScreen())
                     userViewmodel.resetVar()
                     userViewmodel.resetError()
                 }
             }
-
-
-
         }
     }
 
@@ -122,11 +137,13 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         OutlinedTextField(
             value = username,
             onValueChange = { onChangeValue(it, password) },
-            label = { Text("Usuario") },
+            label = { Text("Correo") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            colors =  customTextFieldColors()
         )
-        Spacer(modifier = Modifier.height(16.dp)) // Separador entre ambos campos
+        Spacer(modifier = Modifier.height(2.dp)) // Separador entre ambos campos
         // TextField para la password
         OutlinedTextField(
             value = password,
@@ -134,6 +151,8 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            colors =  customTextFieldColors(),
             visualTransformation = if(!visibility) PasswordVisualTransformation() else VisualTransformation.None, // Ponemos los puntos o mostrarmos el texto
             trailingIcon = { // Dependiendo de si está visible o no cambia el icono
                 IconButton(onClick = onClickIcon) {
@@ -143,6 +162,56 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
                     )
                 }
             }
+        )
+    }
+
+    /**
+     * Muestra el botón de iniciar sesión y ejecuta la lógica para la comprobación
+     * de los campos rellenados.
+     *
+     * @param onCheckLogin: () -> Boolean función lambda para comprobar los campos y
+     * que devuelve true o false.
+     */
+    @Composable
+    fun Boton(onCheckLogin: () -> Unit) {
+        // Fila para poner los dos botones
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = { onCheckLogin() },
+                colors = customButtonColors(),
+                border = BorderStroke(0.5.dp, Color.Black),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("Iniciar Sesión", fontSize = 17.sp)
+            }
+        }
+    }
+
+    @Composable
+    fun customButtonColors():ButtonColors {
+        return ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFFF4A900),
+            contentColor = Color.Black,
+            disabledBackgroundColor = Color.Gray,
+            disabledContentColor = Color.Black
+        )
+    }
+
+    @Composable
+    fun customTextFieldColors(): TextFieldColors {
+        return TextFieldDefaults.outlinedTextFieldColors(
+            textColor = Color.Black,
+            backgroundColor = Color.Transparent,
+            focusedBorderColor = Color(0xFFF4A900),
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = Color(0xFFF4A900),
+            unfocusedLabelColor = Color.Gray,
+            cursorColor = Color(0xFFF4A900)
         )
     }
 
@@ -201,27 +270,5 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
             }
         }
     }
-
-    /**
-     * Muestra el botón de iniciar sesión y ejecuta la lógica para la comprobación
-     * de los campos rellenados.
-     *
-     * @param onCheckLogin: () -> Boolean función lambda para comprobar los campos y
-     * que devuelve true o false.
-     */
-    @Composable
-    fun Botones(onCheckLogin: () -> Unit) {
-        // Fila para poner los dos botones
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(onClick = { onCheckLogin() }) {
-                Text("Iniciar sesión")
-            }
-        }
-    }
-
 
 }
