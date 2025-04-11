@@ -1,7 +1,10 @@
 package com.es.appmovil.widgets
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,15 +13,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.PlusOne
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -29,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
@@ -57,11 +68,13 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
             modifier = Modifier.fillMaxHeight()
         ) {
 
-            DatePickerFieldToModal(Modifier.padding(16.dp))
+                DatePickerFieldToModal(Modifier.padding(16.dp))
 
-            NumberInputField(value = horas, onValueChange = { horas = it })
 
-            DropdownEjemplo()
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    NumberInputField(value = horas, onValueChange = { horas = it })
+                    DropdownEjemplo()
+                }
 
             OutlinedTextField(
                 value = comentario,
@@ -69,6 +82,10 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
                 label = { Text("Comentario") },
                 modifier = Modifier.fillMaxWidth().padding(16.dp).height(100.dp)
             )
+
+            Button(onClick = {}, modifier = Modifier.padding(16.dp).fillMaxWidth()){
+                Text("Guardar")
+            }
         }
     }
 }
@@ -118,7 +135,6 @@ fun NumberInputField(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
-
         // TextField numérico
         OutlinedTextField(
             value = value.toString(),
@@ -129,25 +145,31 @@ fun NumberInputField(
             label = { Text("Horas") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             singleLine = true,
-            modifier = Modifier.width(100.dp).padding(horizontal = 8.dp)
+            modifier = Modifier.width(100.dp).padding(start = 16.dp)
         )
         Column{
-            // Botón restar
-            Button(onClick = { if (value > 0) onValueChange(value - 1) }) {
+
+            Button(onClick = { onValueChange(value + 1) }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Black
+            ), modifier = Modifier.size(40.dp, 25.dp)) {
                 Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Plus"
+                )
+            }
+            Spacer(Modifier.size(5.dp))
+            Button(onClick = { if (value > 0) onValueChange(value - 1) }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Black
+            ), modifier = Modifier.size(40.dp, 25.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
                     contentDescription = "Minus",
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(25.dp)
                 )
             }
-            // Botón sumar
-            Button(onClick = { onValueChange(value + 1) }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropUp,
-                    contentDescription = "Plus",
-                    modifier = Modifier.size(14.dp)
-                )
-            }
+
         }
     }
 }
