@@ -114,7 +114,6 @@ fun DatePickerModal(
         DateRangePicker(
             state = dateRangePickerState,
             showModeToggle = false,
-            headline = null,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
