@@ -73,7 +73,15 @@ class ResumeScreen: Screen{
                         Column(Modifier.weight(1f)){
                             ConteoHoras(currentHours, dailyHours, currentDay)
                             Spacer(Modifier.size(20.dp))
-                            ResumenHorasAnual(resumeViewmodel)
+                            Column(Modifier.clickable {
+                                if (canClick) {
+                                    canClick = false
+                                    navigator.push(CalendarScreen())
+                                }
+                            }
+                            ) {
+                                ResumenHorasAnual(resumeViewmodel)
+                            }
                         }
 
                         Column(Modifier.clickable {
@@ -97,7 +105,7 @@ class ResumeScreen: Screen{
 
                     Spacer(Modifier.size(40.dp))
 
-                    Button(onClick = {},
+                    Button(onClick = {navigator.push(CalendarScreen())},
                         elevation = ButtonDefaults.elevation(5.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                         shape = RoundedCornerShape(10.dp),
