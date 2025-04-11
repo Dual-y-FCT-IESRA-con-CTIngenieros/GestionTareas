@@ -27,17 +27,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.es.appmovil.viewmodel.ResumeViewmodel
 
 @Composable
-fun ResumenHorasAnual() {
+fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
     // Creamos la variable de modificador base de los box
     val boxModifier = Modifier.height(20.dp).clip(shape = RoundedCornerShape(5.dp))
 
-    val timeCodes = mapOf(
-        Color.Green to 90,
-        Color.Yellow to 30,
-        Color.Red to 30
-    )
+    val timeActivity = resumeViewmodel.getTimeActivity()
 
     Row {
         Text("Resumen anual", fontWeight = FontWeight.SemiBold)
@@ -63,11 +60,11 @@ fun ResumenHorasAnual() {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val totalHours = timeCodes.values.sum().toFloat()
+            val totalHours = timeActivity.value.values.sum()
 
-            timeCodes.forEach { (timeCode, hour) ->
+            timeActivity.value.forEach { (color, hour) ->
                 Box(
-                    boxModifier.background(color = timeCode).weight(hour / totalHours)
+                    boxModifier.background(color = Color(color)).weight(hour / totalHours)
                 )
                 Spacer(Modifier.width(5.dp))
             }
@@ -75,12 +72,12 @@ fun ResumenHorasAnual() {
         }
         Spacer(Modifier.size(5.dp))
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-            timeCodes.forEach { (timeCode, hour) ->
+            timeActivity.value.forEach { (timeCode, hour) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier
                             .size(10.dp)
-                            .background(timeCode, shape = CircleShape)
+                            .background(Color(timeCode), shape = CircleShape)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("$hour", fontSize = 12.sp)

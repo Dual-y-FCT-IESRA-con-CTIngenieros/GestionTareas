@@ -12,7 +12,9 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LegendToggle
+import androidx.compose.material.icons.filled.PermDeviceInformation
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,27 +25,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.viewmodel.ResumeViewmodel
 
 @Composable
-fun LegendButton() {
+fun LegendButton(resumeViewmodel: ResumeViewmodel) {
     var expanded by remember { mutableStateOf(false) }
 
-    val colorMap = listOf(
-        "Producción" to Color.Green,
-        "Ausencia" to Color.Red,
-        "Vacaciones" to Color.Yellow
-    )
-
+    val colorMap = resumeViewmodel.getLegend()
     Box {
         IconButton({expanded = !expanded}) {
-            Icon(imageVector = Icons.Filled.LegendToggle, contentDescription = "Legend")
+            Icon(imageVector = Icons.Filled.Info, contentDescription = "Legend")
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            colorMap.forEach { (name, color) ->
+            colorMap.value.forEach { (name, color) ->
                 DropdownMenuItem({}) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -51,7 +49,7 @@ fun LegendButton() {
                         Box(
                             modifier = Modifier
                                 .size(16.dp)
-                                .background(color, shape = CircleShape)
+                                .background(Color(color), shape = CircleShape)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(name)

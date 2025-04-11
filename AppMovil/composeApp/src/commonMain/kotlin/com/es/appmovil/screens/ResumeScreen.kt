@@ -46,6 +46,7 @@ class ResumeScreen: Screen{
     @Composable
     override fun Content(){
         val resumeViewmodel = ResumeViewmodel()
+        resumeViewmodel.getHours()
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
         var canClick by remember { mutableStateOf(true) }
@@ -60,19 +61,19 @@ class ResumeScreen: Screen{
                 Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)
-                        LegendButton()
+                        LegendButton(resumeViewmodel)
                     }
 
                     Spacer(Modifier.size(30.dp))
 
-                    ResumenSemana()
+                    ResumenSemana(resumeViewmodel)
                     Spacer(Modifier.size(20.dp))
 
                     Row {
                         Column(Modifier.weight(1f)){
                             ConteoHoras(currentHours, dailyHours, currentDay)
                             Spacer(Modifier.size(20.dp))
-                            ResumenHorasAnual()
+                            ResumenHorasAnual(resumeViewmodel)
                         }
 
                         Column(Modifier.clickable {
@@ -90,7 +91,7 @@ class ResumeScreen: Screen{
                                 )
                             }
                             Spacer(Modifier.size(20.dp))
-                            ResumenHorasMensual()
+                            ResumenHorasMensual(resumeViewmodel)
                         }
                     }
 

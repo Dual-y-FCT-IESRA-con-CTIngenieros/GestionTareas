@@ -28,12 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.viewmodel.ResumeViewmodel
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
 @Composable
-fun ResumenHorasMensual() {
-    val dataGraphic by remember { getGraphic() }
+fun ResumenHorasMensual(resumeViewmodel: ResumeViewmodel) {
+    val dataGraphic by remember { resumeViewmodel.getPie() }
         Column {
             ElevatedCard(
                 colors = CardColors(
@@ -106,29 +107,4 @@ fun PieInfo(data: List<Pie>) {
             }
         }
     }
-}
-
-fun getGraphic():MutableState<List<Pie>> {
-    return mutableStateOf(
-        listOf(
-            Pie(
-                label = "Aus",
-                data = 20.0,
-                color = Color.Red,
-                selectedColor = Color.Red
-            ),
-            Pie(
-                label = "Prd",
-                data = 45.0,
-                color = Color.Green,
-                selectedColor = Color.Green
-            ),
-            Pie(
-                label = "Vac",
-                data = 35.0,
-                color = Color.Yellow,
-                selectedColor = Color.Yellow,
-            ),
-        )
-    )
 }
