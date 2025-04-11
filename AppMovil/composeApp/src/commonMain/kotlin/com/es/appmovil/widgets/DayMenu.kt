@@ -83,7 +83,10 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
                 modifier = Modifier.fillMaxWidth().padding(16.dp).height(100.dp)
             )
 
-            Button(onClick = {}, modifier = Modifier.padding(16.dp).fillMaxWidth()){
+            Button(onClick = {}, modifier = Modifier.padding(16.dp).fillMaxWidth(), colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFFF5B014),
+                contentColor = Color.Black
+            )){
                 Text("Guardar")
             }
         }
