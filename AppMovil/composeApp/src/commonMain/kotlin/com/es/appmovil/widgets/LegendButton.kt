@@ -13,8 +13,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LegendToggle
-import androidx.compose.material.icons.filled.PermDeviceInformation
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
