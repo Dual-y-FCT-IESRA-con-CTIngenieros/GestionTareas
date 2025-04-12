@@ -18,7 +18,6 @@ Contiene los diferentes proyectos en los que está trabajando CTIngenieros.
    * desc
    * idCliente *(FK Cliente)*
    * idArea *(FK Area)*
-   * idAircraft *(FK Aircraft)*
 
 **WorkOrder**  
 Contiene las órdenes de trabajo de cada proyecto.  
@@ -29,15 +28,15 @@ NOTA: *Confirmar con CTI si es una por cada trabajador que imputará horas en la
    * desc
    * projectManager *(FK Manager)*
    * idProject *(FK Project)*
-   * idEmployeeWO *(FK EmployeeWO)*
+   * idAircraft *(FK Aircraft)*
 
 **EmployeeWO**  
 Contiene las órdenes de trabajo de cada Empleado.  
 
 - Campos:
-   * idEmployeeWorkOrder
+   * idWorkOrder
+   * idEmployee
    * desc
-   * idAircraft *(FK AirCraft)*
    * dateFrom
    * dateTo
    
@@ -131,6 +130,7 @@ Parámetros comunes del Sistema.
 - Campos:
     * idCalendar
     * date
+    * idActivity *(FK Activity)*
 
 **Rol**
 
@@ -141,6 +141,7 @@ Parámetros comunes del Sistema.
 **Employee WorkHours**
 
 - Campos:
+    * idWorkHours
     * dateFrom
     * dateTo
     * idEmployee *(FK Employee)*
