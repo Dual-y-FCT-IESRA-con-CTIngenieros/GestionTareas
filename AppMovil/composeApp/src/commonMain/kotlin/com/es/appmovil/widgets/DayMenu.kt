@@ -33,15 +33,19 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.viewmodel.CalendarViewModel
 import kotlinx.datetime.LocalDate
 
 
@@ -53,10 +57,16 @@ import kotlinx.datetime.LocalDate
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> Unit) {
+fun DayDialog(
+    showDialog: Boolean,
+    day: LocalDate,
+    calendarViewModel: CalendarViewModel,
+    onChangeDialog: (Boolean) -> Unit
+) {
     val sheetState = rememberModalBottomSheetState()
     var comentario by remember { mutableStateOf("") }
-    var horas by remember { mutableStateOf(0) }
+    var horas by remember { mutableStateOf(8) }
+    var timeCode by rememberSaveable { mutableStateOf(100) }
 
 
     if (showDialog) {
@@ -68,13 +78,13 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
             modifier = Modifier.fillMaxHeight()
         ) {
 
-                DatePickerFieldToModal(Modifier.padding(16.dp))
+            DatePickerFieldToModal(Modifier.padding(16.dp), day)
 
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    NumberInputField(value = horas, onValueChange = { horas = it })
-                    DropdownEjemplo()
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                NumberInputField(value = horas, onValueChange = { horas = it })
+                DropdownEjemplo(calendarViewModel, onTimeCodeSelected = { timeCode = it })
+            }
 
             OutlinedTextField(
                 value = comentario,
@@ -83,10 +93,27 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
                 modifier = Modifier.fillMaxWidth().padding(16.dp).height(100.dp)
             )
 
-            Button(onClick = {}, modifier = Modifier.padding(16.dp).fillMaxWidth(), colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFFF5B014),
-                contentColor = Color.Black
-            )){
+            Button(
+                onClick = {
+                    println(calendarViewModel.employeeActivity.value)
+                    calendarViewModel.addEmployeeActivity(
+                        EmployeeActivity(
+                            1,
+                            1,
+                            timeCode,
+                            1,
+                            horas.toFloat(),
+                            day.toString(),
+                            comentario
+                        )
+                    )
+                },
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFFF5B014),
+                    contentColor = Color.Black
+                )
+            ) {
                 Text("Guardar")
             }
         }
@@ -95,9 +122,10 @@ fun DayDialog(showDialog: Boolean, day: LocalDate, onChangeDialog: (Boolean) -> 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownEjemplo() {
-    val opciones = listOf("Opción 1", "Opción 2", "Opción 3")
-    var seleccion by remember { mutableStateOf(opciones[0]) }
+fun DropdownEjemplo(calendarViewModel: CalendarViewModel, onTimeCodeSelected: (Int) -> Unit) {
+    val opciones by calendarViewModel.timeCode.collectAsState()
+    val valores = opciones.entries.toList()
+    var seleccion by remember { mutableStateOf(valores.firstOrNull()?.value ?: "") }
     var expandido by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -109,7 +137,7 @@ fun DropdownEjemplo() {
             value = seleccion,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Selecciona una opción") },
+            label = { Text("Seleccione time code") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
             modifier = Modifier.menuAnchor()
         )
@@ -118,11 +146,12 @@ fun DropdownEjemplo() {
             expanded = expandido,
             onDismissRequest = { expandido = false }
         ) {
-            opciones.forEach { opcion ->
+            valores.forEach { (codigo , descripcion) ->
                 DropdownMenuItem(
-                    text = { Text(opcion) },
+                    text = { Text(descripcion) },
                     onClick = {
-                        seleccion = opcion
+                        seleccion = descripcion
+                        onTimeCodeSelected(codigo)
                         expandido = false
                     }
                 )
@@ -143,29 +172,41 @@ fun NumberInputField(
             value = value.toString(),
             onValueChange = {
                 val num = it.toIntOrNull()
-                if (num != null) onValueChange(num)
+                if (num != null) {
+                    onValueChange(num)
+                    if (num > 24) onValueChange(24)
+                }
+                if (num == null) onValueChange(0)
             },
             label = { Text("Horas") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             singleLine = true,
             modifier = Modifier.width(100.dp).padding(start = 16.dp)
         )
-        Column{
+        Column {
 
-            Button(onClick = { onValueChange(value + 1) }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.White,
-                contentColor = Color.Black
-            ), modifier = Modifier.size(40.dp, 25.dp)) {
+            Button(
+                onClick = { if (value < 24) onValueChange(value + 1) },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                modifier = Modifier.size(40.dp, 25.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Plus"
                 )
             }
             Spacer(Modifier.size(5.dp))
-            Button(onClick = { if (value > 0) onValueChange(value - 1) }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.White,
-                contentColor = Color.Black
-            ), modifier = Modifier.size(40.dp, 25.dp)) {
+            Button(
+                onClick = { if (value > 0) onValueChange(value - 1) },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                modifier = Modifier.size(40.dp, 25.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Remove,
                     contentDescription = "Minus",

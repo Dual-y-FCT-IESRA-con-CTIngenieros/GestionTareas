@@ -44,6 +44,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
 
     // Creamos las variables necesarias desde el viewmodel
     val fechaActual by calendarViewmodel.today.collectAsState()
+    val actividades by calendarViewmodel.employeeActivity.collectAsState()
 
     // Creamos la variable que nos permite mostrar el dialogo
     var showDialog by remember { mutableStateOf(false) }
@@ -76,7 +77,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
         .graphicsLayer { alpha = 0.3f }
 
 
-    DayDialog(showDialog, date) {
+    DayDialog(showDialog, date, calendarViewmodel) {
         showDialog = false
     }
 
@@ -142,28 +143,33 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Días del mes
             items(diasDelMes) { dia ->
                 val dayActualMonth = dia + 1
+                val currentDate = LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
 
-                monthModifier = monthModifier.clickable {
-                    showDialog = true
-                    date = LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
-                }
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
 
-                // cambia el color del dia actual
-                if (dayActualMonth == fechaActual.dayOfMonth && fechaActual.monthNumber == fechaActual.monthNumber) {
-                    Box(
-                        modifier = monthModifier.border(5.dp, Color(0xFFF5B014)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = dayActualMonth.toString(), fontSize = 16.sp)
+                // Color por defecto o según actividad
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+
+                val modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(50))
+                    .padding(4.dp)
+                    .background(color)
+                    .clickable {
+                        showDialog = true
+                        date = currentDate
                     }
-                } else {
-                    // si no por defecto (gris)
-                    Box(
-                        modifier = monthModifier,
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = dayActualMonth.toString(), fontSize = 16.sp)
-                    }
+
+                val boxModifier = if (dayActualMonth == fechaActual.dayOfMonth) {
+                    modifier.border(3.dp, Color(0xFFF5B014))
+                } else modifier
+
+                Box(
+                    modifier = boxModifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = dayActualMonth.toString(), fontSize = 16.sp)
                 }
             }
 
@@ -209,6 +215,18 @@ fun monthNameInSpanish(monthNumber: String): String {
         else -> monthNumber
     }
 }
+
+fun colorPorTimeCode(code: Int): Color {
+    return when (code) {
+        100 -> Color.Green
+        200 -> Color.Red
+        555 -> Color.Blue
+        900 -> Color.Yellow
+        901 -> Color.Magenta
+        else -> Color.LightGray
+    }
+}
+
 
 /**
  * Función para obtener el número de días en un mes dado

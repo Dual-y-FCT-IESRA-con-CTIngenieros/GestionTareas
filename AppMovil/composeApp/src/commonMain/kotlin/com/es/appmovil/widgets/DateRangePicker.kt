@@ -31,13 +31,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
-fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
+fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate) {
     var selectedStartDate by remember { mutableStateOf<Long?>(null) }
     var selectedEndDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
+    val dateTime = day.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
 
     val displayText = when {
         selectedStartDate != null && selectedEndDate != null -> {
@@ -48,7 +53,7 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
             convertMillisToDate(selectedStartDate!!)
         }
 
-        else -> ""
+        else -> convertMillisToDate(dateTime)
     }
 
     OutlinedTextField(

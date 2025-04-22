@@ -1,18 +1,30 @@
 package com.es.appmovil
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.es.appmovil.screens.LoginScreen
-import com.es.appmovil.viewmodel.LoginViewModel
+import com.es.appmovil.viewmodel.UserViewmodel
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+import ctingenierosappmovil.composeapp.generated.resources.Res
+import ctingenierosappmovil.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        val loginViewModel = LoginViewModel()
+        val userViewmodel = UserViewmodel()
 //        var showContent by remember { mutableStateOf(false) }
 //        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 //            Button(onClick = { showContent = !showContent }) {
@@ -27,7 +39,7 @@ fun App() {
 //            }
 //        }
 
-        Navigator(screen = LoginScreen(loginViewModel)) { navigator: Navigator ->
+        Navigator(screen = LoginScreen(userViewmodel)) { navigator: Navigator ->
             SlideTransition(navigator)
         }
     }
