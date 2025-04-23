@@ -61,12 +61,6 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
     // Lista de dias de la semana abreviados
     val diasSemana = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
 
-    // Modificador del mes actual
-    var monthModifier = Modifier
-        .size(40.dp)
-        .clip(RoundedCornerShape(50))
-        .padding(4.dp)
-        .background(Color.LightGray)
 
     // Modificador del mes siguiente o anterior
     var otherMonthModifier = Modifier
@@ -121,6 +115,13 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Dias del mes anterior
             items(mesAnterior) { dia ->
                 val dayPrevMonth = mesAnterior - dia
+                val currentDate =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), dayPrevMonth)
+
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
+
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
 
                 val ultimoDiaMesAnterior =
                     LocalDate(fechaActual.year, fechaActual.monthNumber, 1)
@@ -133,7 +134,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                     date = LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), ultimoDia)
                 }
                 Box(
-                    modifier = otherMonthModifier,
+                    modifier = otherMonthModifier.background(color),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = ultimoDia.toString(), fontSize = 16.sp)
@@ -143,7 +144,8 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Días del mes
             items(diasDelMes) { dia ->
                 val dayActualMonth = dia + 1
-                val currentDate = LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
+                val currentDate =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
 
                 // Buscar si hay una actividad en esa fecha
                 val actividad = actividades.find { it.date == currentDate.toString() }
@@ -176,11 +178,20 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Dias del siguiente mes
             items(mesSiguiente) { dia ->
                 val dayNextMonth = dia + 1
+                val currentDate =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
+
+                // Color por defecto o según actividad
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
 
                 otherMonthModifier = otherMonthModifier.clickable {
                     showDialog = true
-                    date = LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
-                }
+                    date =
+                        LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                }.background(color)
 
                 Box(
                     modifier = otherMonthModifier,

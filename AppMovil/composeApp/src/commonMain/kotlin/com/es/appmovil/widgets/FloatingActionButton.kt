@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 fun ActionButton(pageFunc: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxSize(), // ocupa toda la pantalla
+            .fillMaxSize().padding(bottom = 20.dp), // ocupa toda la pantalla
         contentAlignment = Alignment.BottomCenter
     ) {
         FloatingActionButton(

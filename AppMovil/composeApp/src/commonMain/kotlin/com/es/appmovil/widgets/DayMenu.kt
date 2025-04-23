@@ -95,7 +95,7 @@ fun DayDialog(
 
             Button(
                 onClick = {
-                    println(calendarViewModel.employeeActivity.value)
+                    onChangeDialog(false)
                     calendarViewModel.addEmployeeActivity(
                         EmployeeActivity(
                             1,

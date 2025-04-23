@@ -5,11 +5,14 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.viewmodel.CalendarViewModel
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -17,7 +20,13 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 
 @Composable
-fun ResumenHorasDia() {
+fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
+
+    val actividades by calendarViewModel.employeeActivity.collectAsState()
+    val activity = actividades.find { it.date == calendarViewModel.today.value.toString() }
+    val hours = activity?.time?.toDouble() ?: 0.0
+    val color = activity?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+
     ColumnChart(
         modifier = Modifier.padding(16.dp).height(300.dp),
         maxValue = 24.0,
@@ -32,9 +41,9 @@ fun ResumenHorasDia() {
                     values = listOf(
                         Bars.Data(label = "Linux", value = 8.0, color = SolidColor(Color.Red)),
                         Bars.Data(
-                            label = "Windows",
-                            value = 20.0,
-                            color = SolidColor(Color.Red)
+                            label = activity?.idTimeCode.toString() ?: "",
+                            value = hours,
+                            color = SolidColor(color)
                         )
                     ),
                 )
