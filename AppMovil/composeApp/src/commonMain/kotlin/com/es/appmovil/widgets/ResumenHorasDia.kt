@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.viewmodel.CalendarViewModel
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -27,9 +28,32 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
     val hours = activity?.time?.toDouble() ?: 0.0
     val color = activity?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
 
+    val activiti = EmployeeActivity(
+        idEmployee = 1,
+        idWorkOrder = 101,
+        idTimeCode = 3,
+        idActivity = 45,
+        time = 7.5f,
+        date = "2025-04-25",
+        comment = "Trabajo en campo"
+    )
+
+    val bars = listOf(
+        Bars.Data(
+            label = activiti.idTimeCode.toString(),
+            value = activiti.time.toDouble(),
+            color = SolidColor(Color.Green)
+        ),
+        Bars.Data(
+            label = "900",
+            value = 10.0,
+            color = SolidColor(Color.Yellow)
+        ),
+    )
+
     ColumnChart(
         modifier = Modifier.padding(16.dp).height(300.dp),
-        maxValue = 24.0,
+        maxValue = 12.0,
         minValue = 0.0,
         indicatorProperties = HorizontalIndicatorProperties(
             count = IndicatorCount.CountBased(7),
@@ -37,15 +61,8 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
         data = remember {
             listOf(
                 Bars(
-                    label = "Jan",
-                    values = listOf(
-                        Bars.Data(label = "Linux", value = 8.0, color = SolidColor(Color.Red)),
-                        Bars.Data(
-                            label = activity?.idTimeCode.toString() ?: "",
-                            value = hours,
-                            color = SolidColor(color)
-                        )
-                    ),
+                    label = activiti.date,
+                    values = bars,
                 )
             )
         },
