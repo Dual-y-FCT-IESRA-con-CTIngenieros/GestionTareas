@@ -20,7 +20,9 @@ object DataViewModel {
     val timeCodes = listOf(
         TimeCode(100, "100", 0xFF00FFFF, false),
         TimeCode(200, "200", 0xFFFF0000, false),
-        TimeCode(900, "900", 0xFF00FF00, false)
+        TimeCode(555, "200", 0xFFFF00FF, false),
+        TimeCode(900, "900", 0xFF00FF00, false),
+        TimeCode(901, "900", 0xFFF0BB0F, false)
     )
 
     private var _currentHours = MutableStateFlow(0)

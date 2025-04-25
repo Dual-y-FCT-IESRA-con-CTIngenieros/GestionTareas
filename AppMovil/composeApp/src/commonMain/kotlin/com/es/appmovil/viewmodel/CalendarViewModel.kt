@@ -38,7 +38,7 @@ class CalendarViewModel {
     )
     val timeCode: StateFlow<Map<Int, String>> = _timeCode
 
-    private val timeCodes = MutableStateFlow(DataViewModel.timeCodes)
+    val timeCodes = MutableStateFlow(DataViewModel.timeCodes)
 
     private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
