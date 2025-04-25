@@ -42,6 +42,7 @@ import kotlinx.datetime.plus
 @Composable
 fun Calendar(calendarViewmodel: CalendarViewModel) {
 
+    var monthChangeFlag = true
     // Creamos las variables necesarias desde el viewmodel
     val fechaActual by calendarViewmodel.today.collectAsState()
     val actividades by calendarViewmodel.employeeActivity.collectAsState()
@@ -83,14 +84,24 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { calendarViewmodel.onMonthChangePrevious(DatePeriod(months = 1)) }) {
+            IconButton(onClick = {
+                if (monthChangeFlag){
+                    monthChangeFlag = false
+                    calendarViewmodel.onMonthChangePrevious(DatePeriod(months = 1))
+                }
+            }) {
                 Text("<", fontSize = 24.sp)
             }
             Text(
                 "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
                 fontSize = 20.sp,
                 modifier = Modifier.clickable { calendarViewmodel.resetMonth() })
-            IconButton(onClick = { calendarViewmodel.onMonthChangeFordward(DatePeriod(months = 1)) }) {
+            IconButton(onClick = {
+                if (monthChangeFlag){
+                    monthChangeFlag = false
+                    calendarViewmodel.onMonthChangeFordward(DatePeriod(months = 1))
+                }
+            }) {
                 Text(">", fontSize = 24.sp)
             }
         }
@@ -115,8 +126,12 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Dias del mes anterior
             items(mesAnterior) { dia ->
                 val dayPrevMonth = mesAnterior - dia
-                val currentDate =
+                val currentDate = if (fechaActual.monthNumber == 1) {
+                    LocalDate(fechaActual.year.minus(1), 12, dayPrevMonth)
+                } else {
                     LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), dayPrevMonth)
+                }
+
 
                 // Buscar si hay una actividad en esa fecha
                 val actividad = actividades.find { it.date == currentDate.toString() }
@@ -178,8 +193,12 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
             // Dias del siguiente mes
             items(mesSiguiente) { dia ->
                 val dayNextMonth = dia + 1
-                val currentDate =
+                val currentDate = if (fechaActual.monthNumber == 12) {
+                    LocalDate(fechaActual.year.plus(1), 1, dayNextMonth)
+                } else {
                     LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                }
+
 
                 // Buscar si hay una actividad en esa fecha
                 val actividad = actividades.find { it.date == currentDate.toString() }
