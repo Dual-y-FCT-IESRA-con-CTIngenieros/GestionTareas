@@ -43,7 +43,7 @@ class UserViewmodel {
     // Actualiza las variables para que se reflejen en la pantalla.
     fun onChangeValue(name:String, pass:String) {
         _username.value = name
-       _password.value = pass
+        _password.value = pass
     }
 
     fun onChangeVisibility() {
@@ -53,26 +53,26 @@ class UserViewmodel {
     fun checkLogin() {
         // Comprueba que los datos no estén vacíos
         if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
 
-                        // Intenta iniciar sesión en la base de datos
-                        Database.supabase.auth.signInWith(Email){
-                            email = _username.value
-                            password = _password.value
-                        }
-                        _login.value = true
-                    } catch (e:AuthRestException) { // Si da error no ha podido iniciar sesión
-                        _loginError.value = true
-                        _loginErrorMessage.value = "Credenciales incorrectas"
-                        _password.value = ""
-                    } catch (e:Exception) { // Si da error no ha podido iniciar sesión
-                        _loginError.value = true
-                        _loginErrorMessage.value = "No se ha podido conectar con la base de datos"
-                        _password.value = ""
+                    // Intenta iniciar sesión en la base de datos
+                    Database.supabase.auth.signInWith(Email){
+                        email = _username.value
+                        password = _password.value
                     }
-
+                    _login.value = true
+                } catch (e:AuthRestException) { // Si da error no ha podido iniciar sesión
+                    _loginError.value = true
+                    _loginErrorMessage.value = "Credenciales incorrectas"
+                    _password.value = ""
+                } catch (e:Exception) { // Si da error no ha podido iniciar sesión
+                    _loginError.value = true
+                    _loginErrorMessage.value = "No se ha podido conectar con la base de datos"
+                    _password.value = ""
                 }
+
+            }
         }
 
         //return username.value.isNotBlank() && password.value.isNotBlank()
