@@ -11,24 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ResumeViewmodel {
-
-    private val employee = Employee(1, "Pepe", "Pepito Pepe", "pepe@pepe.com", "2025-01-01", "2025-12-31", 1)
-
-    val employeeActivities = listOf(
-        EmployeeActivity(1, 1, 1, 1, 8f, "2025-04-11", "PERFEE"),
-        EmployeeActivity(1, 2, 2, 2, 6f, "2025-04-10", "OK"),
-        EmployeeActivity(1, 3, 3, 3, 7f, "2025-04-09", "REV"),
-        EmployeeActivity(1, 2, 2, 2, 7f, "2025-04-09", "REV")
-    )
-
-    val timeCodes = listOf(
-        TimeCode(1, "100", 0xFF00FFFF, false),
-        TimeCode(2, "200", 0xFFFF0000, false),
-        TimeCode(3, "300", 0xFF00FF00, false)
-    )
-
-    private var _currentHours = MutableStateFlow(0)
-    val currentHours: StateFlow<Int> = _currentHours
+    
+    private val employeeActivities = DataViewModel.employeeActivities
+    private val employee = DataViewModel.employee
+    private val timeCodes = DataViewModel.timeCodes
 
     private var _dailyHours = MutableStateFlow(8)
     val dailyHours: StateFlow<Int> = _dailyHours
@@ -36,9 +22,7 @@ class ResumeViewmodel {
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
 
-
-
-
+    
     private fun getDays():Int {
         var fc = ""
         var days = 0
@@ -51,14 +35,6 @@ class ResumeViewmodel {
                 }
             }
         return days
-    }
-
-    fun getHours() {
-        employeeActivities
-            .filter { employee.idEmployee == it.idEmployee }
-            .forEach {
-            _currentHours.value += it.time.toInt()
-        }
     }
 
     fun getPie() : MutableState<MutableList<Pie>> {

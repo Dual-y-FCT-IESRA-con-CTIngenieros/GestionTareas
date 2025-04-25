@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.es.appmovil.viewmodel.UserViewmodel
+import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.painterResource
@@ -53,7 +54,7 @@ import org.jetbrains.compose.resources.painterResource
  *
  * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
-class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
+class LoginScreen(private val userViewmodel: UserViewModel): Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual
@@ -62,7 +63,7 @@ class LoginScreen(private val userViewmodel: UserViewmodel): Screen {
         val username by userViewmodel.username.collectAsState("")
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
-        val login by userViewmodel.login.collectAsState(false)
+        val login by userViewmodel.login.collectAsState(true)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
 

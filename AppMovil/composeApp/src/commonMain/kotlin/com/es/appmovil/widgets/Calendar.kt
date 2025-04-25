@@ -50,6 +50,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
     // Creamos la variable que nos permite mostrar el dialogo
     var showDialog by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf(fechaActual) }
+    calendarViewmodel.generarBarrasPorDia(date)
 
     /**
      * Obtenemos el número de días del mes, el mes anterior y el siguiente
@@ -147,6 +148,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                 otherMonthModifier = otherMonthModifier.clickable {
                     showDialog = true
                     date = LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), ultimoDia)
+                    calendarViewmodel.generarBarrasPorDia(date)
                 }
                 Box(
                     modifier = otherMonthModifier.background(color),
@@ -176,6 +178,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                     .clickable {
                         showDialog = true
                         date = currentDate
+                        calendarViewmodel.generarBarrasPorDia(date)
                     }
 
                 val boxModifier = if (dayActualMonth == fechaActual.dayOfMonth) {
@@ -210,6 +213,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                     showDialog = true
                     date =
                         LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                    calendarViewmodel.generarBarrasPorDia(date)
                 }.background(color)
 
                 Box(

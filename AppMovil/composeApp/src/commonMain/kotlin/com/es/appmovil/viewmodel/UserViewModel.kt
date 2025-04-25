@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 /**
  * Clase viewmodel para el usuario, donde guardaremos los datos del usuario y sus posibles funciones
  */
-class UserViewmodel {
+class UserViewModel {
 
     // Nombre de usuario del trabajador con el que iniciará sesión.
     private var _username = MutableStateFlow("")

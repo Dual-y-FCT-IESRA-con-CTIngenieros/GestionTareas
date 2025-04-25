@@ -16,10 +16,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
-class AnualViewModel(
-    private val employeeActivities:List<EmployeeActivity>,
-    private val timeCodes: List<TimeCode>
-) {
+class AnualViewModel {
+
+    private val employeeActivities = DataViewModel.employeeActivities
+    private val timeCodes = DataViewModel.timeCodes
 
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars

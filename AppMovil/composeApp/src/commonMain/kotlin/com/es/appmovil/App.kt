@@ -13,7 +13,8 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.es.appmovil.screens.LoginScreen
-import com.es.appmovil.viewmodel.UserViewmodel
+import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.UserViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -24,7 +25,8 @@ import ctingenierosappmovil.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     MaterialTheme {
-        val userViewmodel = UserViewmodel()
+        val userViewmodel = UserViewModel()
+        DataViewModel.getHours()
 //        var showContent by remember { mutableStateOf(false) }
 //        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 //            Button(onClick = { showContent = !showContent }) {

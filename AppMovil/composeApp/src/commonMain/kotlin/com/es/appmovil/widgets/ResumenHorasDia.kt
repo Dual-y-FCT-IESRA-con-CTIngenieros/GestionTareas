@@ -27,6 +27,7 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
     val activity = actividades.find { it.date == calendarViewModel.today.value.toString() }
     val hours = activity?.time?.toDouble() ?: 0.0
     val color = activity?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+    val data by calendarViewModel.bars.collectAsState()
 
     val activiti = EmployeeActivity(
         idEmployee = 1,
@@ -58,14 +59,15 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
         indicatorProperties = HorizontalIndicatorProperties(
             count = IndicatorCount.CountBased(7),
         ),
-        data = remember {
-            listOf(
-                Bars(
-                    label = activiti.date,
-                    values = bars,
-                )
-            )
-        },
+        data = data,
+//        remember {
+//            listOf(
+//                Bars(
+//                    label = activiti.date,
+//                    values = bars,
+//                )
+//            )
+//        },
         barProperties = BarProperties(
             cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
             spacing = 3.dp,
