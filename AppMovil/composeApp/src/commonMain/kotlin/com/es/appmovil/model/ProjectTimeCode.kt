@@ -1,6 +1,6 @@
 package com.es.appmovil.model
 
 data class ProjectTimeCode(
-    val idProject: Int,
+    val idProject: String,
     val idTimeCode: Int
 )

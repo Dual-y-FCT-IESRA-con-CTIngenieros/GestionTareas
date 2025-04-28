@@ -18,5 +18,4 @@ object Database {
         install(Postgrest)
         //install other modules
     }
-
 }

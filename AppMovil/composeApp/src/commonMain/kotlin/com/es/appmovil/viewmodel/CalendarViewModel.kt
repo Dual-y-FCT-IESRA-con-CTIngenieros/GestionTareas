@@ -3,9 +3,12 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.forEach
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -25,18 +28,18 @@ class CalendarViewModel {
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
 
-    private var _timeCode = MutableStateFlow(
-        mutableMapOf<Int, String>(
-            100 to "Normal hours",
-            200 to "Non productive hours",
-            555 to "Extra hours",
-            900 to "Vacations hours",
-            901 to "Compensation hours"
-        )
-    )
-    val timeCode: StateFlow<Map<Int, String>> = _timeCode
-
     val timeCodes = MutableStateFlow(DataViewModel.timeCodes)
+
+    val proyects = MutableStateFlow(DataViewModel.proyects)
+
+    val projectTimeCodes = MutableStateFlow(DataViewModel.proyectTimecodes)
+    val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
+
+    private val _timeCodeSeleccionado = MutableStateFlow(null)
+    val timeCodeSeleccionado: StateFlow<Int?> = _timeCodeSeleccionado
+
+    private val _proyectoSeleccionado = MutableStateFlow(null)
+    val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
 
     private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
@@ -112,4 +115,16 @@ class CalendarViewModel {
         )
     }
 
+    fun generarProjectsTimeCode() {
+        var timeCode = 0
+        projectTimeCodes.value.forEach { code ->
+            if (code.idTimeCode != timeCode){
+                val projects = projectTimeCodes.value.filter { it.idTimeCode == code.idTimeCode }
+                val projectTimeCode = ProjectTimeCodeDTO(code.idTimeCode, mutableListOf())
+                projects.map{ projectTimeCode.projects.add(it.idProject) }
+                timeCode = code.idTimeCode
+                projectTimeCodeDTO.value.add(projectTimeCode)
+            }
+        }
+    }
 }

@@ -1,9 +1,9 @@
 package com.es.appmovil.model
 
 data class WorkOrder(
-    val idWorkOrder: Int,
+    val idWorkOrder: String,
     val desc: String,
     val projectManager: Int,
-    val idProject: Int,
-    val idEmployeeWO: Int
+    val idProject: String,
+    val idAircraft: Int
 )
