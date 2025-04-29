@@ -34,6 +34,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
+import com.es.appmovil.viewmodel.DataViewModel.getHours
 import com.es.appmovil.viewmodel.ResumeViewmodel
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.ConteoHoras
@@ -58,6 +59,7 @@ class ResumeScreen: Screen{
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
             }) {
+                getHours()
                 Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)

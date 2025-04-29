@@ -1,6 +1,8 @@
 package com.es.appmovil.model
 
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Activity(
     val idActivity: Int,
     val idTimeCode: Int,

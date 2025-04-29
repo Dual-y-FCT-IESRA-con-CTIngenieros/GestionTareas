@@ -1,5 +1,8 @@
 package com.es.appmovil.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Employee(
     val idEmployee: Int,
     val nombre: String,

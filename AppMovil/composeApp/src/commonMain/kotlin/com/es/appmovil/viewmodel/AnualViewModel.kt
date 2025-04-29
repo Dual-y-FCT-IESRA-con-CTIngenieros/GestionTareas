@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.CalendarYearDTO
+import com.es.appmovil.model.dto.TimeCodeDTO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 class AnualViewModel {
 
     private val employeeActivities = DataViewModel.employeeActivities
-    private val timeCodes = DataViewModel.timeCodes
+    private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
@@ -145,7 +146,7 @@ class AnualViewModel {
     }
 
     fun generarBarrasPorMes(i:Int) {
-        val timeCodeMap = timeCodes.associateBy { it.idTimeCode }
+        val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 
         val actividadesPorMes = employeeActivities.value.groupBy {
             val fecha = LocalDate.parse(it.date)
@@ -167,7 +168,7 @@ class AnualViewModel {
                     Bars.Data(
                         label = timeCode.desc,
                         value = listaActividades.sumOf { it.time.toDouble() },
-                        color = SolidColor(Color(timeCode.color))
+                        color = SolidColor(Color(timeCode.color.toLong()))
                     )
                 } ?: emptyList()
 

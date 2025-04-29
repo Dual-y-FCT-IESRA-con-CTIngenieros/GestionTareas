@@ -101,7 +101,7 @@ fun DayDialog(
                     calendarViewModel.addEmployeeActivity(
                         EmployeeActivity(
                             1,
-                            1,
+                            "1",
                             timeCode,
                             1,
                             horas.toFloat(),

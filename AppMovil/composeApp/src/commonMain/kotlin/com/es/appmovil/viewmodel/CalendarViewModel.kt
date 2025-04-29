@@ -3,14 +3,14 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
+import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.forEach
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -30,11 +30,11 @@ class CalendarViewModel {
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
 
-    val timeCodes = MutableStateFlow(DataViewModel.timeCodes)
+    val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
-    val proyects = MutableStateFlow(DataViewModel.proyects)
+    val proyects = MutableStateFlow(DataViewModel.projects)
 
-    val projectTimeCodes = MutableStateFlow(DataViewModel.proyectTimecodes)
+    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
     val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
 
     private val _timeCodeSeleccionado = MutableStateFlow(null)
@@ -102,7 +102,7 @@ class CalendarViewModel {
                 Bars.Data(
                     label = timeCode.desc,
                     value = listaActividades.sumOf { it.time.toDouble() },
-                    color = SolidColor(Color(timeCode.color))
+                    color = SolidColor(Color(timeCode.color.toLong()))
                 )
             }
 
@@ -128,12 +128,12 @@ class CalendarViewModel {
                     .map { it.idProject }
 
                 // Obtenemos los workOrders de esos proyectos
-                val workOrdersAsociados = DataViewModel.workOrders
+                val workOrdersAsociados = DataViewModel.workOrders.value
                     .filter { it.idProject in proyectosAsociados }
                     .map { it.idWorkOrder }
 
                 // Filtramos por los workOrders en los que participa el empleado
-                val workOrdersEmpleado = employeeWO
+                val workOrdersEmpleado = employeeWO.value
                     .filter { it.idWorkOrder in workOrdersAsociados && it.idEmployee == employee.idEmployee }
                     .map { it.idWorkOrder }
 

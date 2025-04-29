@@ -9,6 +9,7 @@ import com.es.appmovil.model.TimeCode
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.forEach
 
 class ResumeViewmodel {
 
@@ -37,10 +38,10 @@ class ResumeViewmodel {
         return days
     }
 
-    fun getLegend(): MutableState<MutableMap<String, Long>> {
-        val legend = mutableStateOf(mutableMapOf<String, Long>())
+    fun getLegend(): MutableState<MutableMap<String, ULong>> {
+        val legend = mutableStateOf(mutableMapOf<String, ULong>())
 
-        timeCodes.forEach {
+        timeCodes.value.forEach {
             legend.value[it.desc] = it.color
         }
         return legend
@@ -52,13 +53,13 @@ class ResumeViewmodel {
         employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
-                val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
+                val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
-                    if (timeActivity.value.containsKey(timeCode.color)) {
-                        val hours = timeActivity.value[timeCode.color]?.plus(it.time)
-                        timeActivity.value[timeCode.color] = hours ?: 0f
+                    if (timeActivity.value.containsKey(timeCode.color.toLong())) {
+                        val hours = timeActivity.value[timeCode.color.toLong()]?.plus(it.time)
+                        timeActivity.value[timeCode.color.toLong()] = hours ?: 0f
                     } else {
-                        timeActivity.value[timeCode.color] = it.time
+                        timeActivity.value[timeCode.color.toLong()] = it.time
                     }
                 }
         }
@@ -71,10 +72,10 @@ class ResumeViewmodel {
         employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
-                val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
+                val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 timeCode?.let { tc ->
                     val currentList = dayActivity.value[it.date] ?: mutableListOf()
-                    currentList.add(Color(tc.color))
+                    currentList.add(Color(tc.color.toLong()))
                     dayActivity.value[it.date] = currentList
                 }
             }
