@@ -15,7 +15,6 @@ import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -43,18 +42,23 @@ object DataViewModel {
         }
     }
 
+    val _projects = MutableStateFlow<List<Project>>(emptyList())
+    val projects: StateFlow<List<Project>> = _projects
+
+    private fun cargarProjects() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Project>("Project")
+            _projects.value = datos
+        }
+    }
+
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
+        cargarProjects()
     }
 
     val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
-
-    val proyects = listOf(
-        Project("K2312273","prueba",1,1,1),
-        Project("K2315252","prueba",1,1,1),
-        Project("M1638790","prueba",1,1,1),
-    )
 
     val proyectTimecodes = listOf(
         ProjectTimeCode("K2312273", 100),

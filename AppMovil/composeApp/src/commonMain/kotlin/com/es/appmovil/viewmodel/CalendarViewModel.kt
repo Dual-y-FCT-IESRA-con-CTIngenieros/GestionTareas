@@ -3,7 +3,6 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
@@ -11,8 +10,6 @@ import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.forEach
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -34,7 +31,7 @@ class CalendarViewModel {
 
     val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
-    val proyects = MutableStateFlow(DataViewModel.proyects)
+    val proyects = MutableStateFlow(DataViewModel.projects)
 
     val projectTimeCodes = MutableStateFlow(DataViewModel.proyectTimecodes)
     val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
