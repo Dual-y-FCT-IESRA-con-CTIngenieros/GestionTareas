@@ -34,6 +34,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
+import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.getHours
 import com.es.appmovil.viewmodel.ResumeViewmodel
 import com.es.appmovil.widgets.BottomNavigationBar
@@ -107,16 +108,16 @@ class ResumeScreen: Screen{
 
                     Spacer(Modifier.size(40.dp))
 
-                    Button(onClick = {navigator.push(AdminScreen())},
-                        elevation = ButtonDefaults.elevation(5.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth().height(60.dp)) {
-                        Text("ADMINISTRAR")
+                    if(employee.idRol == 2) {
+                        Button(onClick = {navigator.push(AdminScreen())},
+                            elevation = ButtonDefaults.elevation(5.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                            Text("ADMINISTRAR")
+                        }
                     }
-
                 }
-
             }
         }
     }
