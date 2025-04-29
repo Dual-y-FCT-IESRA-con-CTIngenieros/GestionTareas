@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 fun App() {
     MaterialTheme {
         val userViewmodel = UserViewModel()
-        DataViewModel.getHours()
+        DataViewModel
 //        var showContent by remember { mutableStateOf(false) }
 //        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 //            Button(onClick = { showContent = !showContent }) {
