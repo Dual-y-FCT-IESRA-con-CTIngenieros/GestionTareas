@@ -156,7 +156,7 @@ fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActua
                 withStyle(style = SpanStyle(color = Color.Gray)) {
                     append("/$maxValue")
                 }
-            }, fontSize = 32.sp, lineHeight = 28.sp)
+            }, fontSize = 30.sp, lineHeight = 28.sp)
             Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
             Text(text = "$fechaActual", fontSize = 14.sp)
         }
