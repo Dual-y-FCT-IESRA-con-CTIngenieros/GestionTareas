@@ -1,7 +1,5 @@
 package com.es.appmovil.widgets
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,22 +11,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -45,6 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.ProjectTimeCode
+import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import kotlinx.datetime.LocalDate
 
@@ -67,6 +61,12 @@ fun DayDialog(
     var comentario by remember { mutableStateOf("") }
     var horas by remember { mutableStateOf(8) }
     var timeCode by rememberSaveable { mutableStateOf(100) }
+    var project by rememberSaveable { mutableStateOf("K2312273") }
+    val timeCodes by calendarViewModel.timeCodes.collectAsState()
+    calendarViewModel.generarProjectsTimeCode()
+    val projectsTimeCodes by calendarViewModel.projectTimeCodeDTO.collectAsState()
+    var timeCodeSeleccionado by rememberSaveable { mutableStateOf<Int?>(null) }
+    var projectSeleccionado by rememberSaveable { mutableStateOf<String?>(null) }
 
 
     if (showDialog) {
@@ -83,8 +83,10 @@ fun DayDialog(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 NumberInputField(value = horas, onValueChange = { horas = it })
-                DropdownEjemplo(calendarViewModel, onTimeCodeSelected = { timeCode = it })
+                ProyectoYTimeCodeSelector(projectsTimeCodes, { timeCode = it }, timeCodeSeleccionado, {timeCodeSeleccionado = it}, {projectSeleccionado = it})
             }
+
+            ProjectsSelected(projectsTimeCodes, timeCodeSeleccionado, projectSeleccionado, {project = it}, {projectSeleccionado = it})
 
             OutlinedTextField(
                 value = comentario,
@@ -116,16 +118,113 @@ fun DayDialog(
             ) {
                 Text("Guardar")
             }
+            Spacer(modifier = Modifier.size(16.dp))
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownEjemplo(calendarViewModel: CalendarViewModel, onTimeCodeSelected: (Int) -> Unit) {
-    val opciones by calendarViewModel.timeCode.collectAsState()
-    val valores = opciones.entries.toList()
-    var seleccion by remember { mutableStateOf(valores.firstOrNull()?.value ?: "") }
+fun ProyectoYTimeCodeSelector(
+    proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
+    onTimeCodeSelected: (Int) -> Unit,
+    timeCodeSeleccionado: Int?,
+    onTimeCodeChange:(Int)->Unit,
+    onProyectChange:(String?)->Unit,
+) {
+    var expandirTimeCode by remember { mutableStateOf(false) }
+
+    // Dropdown de TimeCodes
+    ExposedDropdownMenuBox(
+        expanded = expandirTimeCode,
+        onExpandedChange = { expandirTimeCode = !expandirTimeCode },
+        modifier = Modifier.padding(end = 16.dp)
+    ) {
+        OutlinedTextField(
+            value = timeCodeSeleccionado?.toString() ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Seleccione TimeCode") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTimeCode) },
+            modifier = Modifier.menuAnchor()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expandirTimeCode,
+            onDismissRequest = { expandirTimeCode = false }
+        ) {
+            proyectTimecodesDTO.map { it.idTimeCode }.distinct().forEach { timeCode ->
+                DropdownMenuItem(
+                    text = { Text(timeCode.toString()) },
+                    onClick = {
+                        onTimeCodeChange(timeCode)
+                        onProyectChange(null)
+                        onTimeCodeSelected(timeCode)
+                        expandirTimeCode = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProjectsSelected(
+    proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
+    timeCodeSeleccionado:Int?,
+    proyectoSeleccionado:String?,
+    onChangeProyect:(String)-> Unit,
+    onProjectSelected: (String) -> Unit
+) {
+
+    var expandirProyecto by remember { mutableStateOf(false) }
+
+    // Una vez que se selecciona el timeCode, filtrar los proyectos asociados
+    val proyectosDisponibles = proyectTimecodesDTO
+        .firstOrNull { it.idTimeCode == timeCodeSeleccionado }
+        ?.projects
+        .orEmpty()
+
+
+    // Dropdown de Proyectos (solo si ya se eligió un TimeCode)
+    ExposedDropdownMenuBox(
+        expanded = expandirProyecto,
+        onExpandedChange = { expandirProyecto = !expandirProyecto },
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 16.dp, end = 16.dp)
+    ) {
+        OutlinedTextField(
+            value = proyectoSeleccionado ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Seleccione Proyecto") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
+            modifier = Modifier.menuAnchor(),
+            enabled = timeCodeSeleccionado != null
+        )
+
+        ExposedDropdownMenu(
+            expanded = expandirProyecto,
+            onDismissRequest = { expandirProyecto = false }
+        ) {
+            proyectosDisponibles.forEach { proyecto ->
+                DropdownMenuItem(
+                    text = { Text(proyecto) },
+                    onClick = {
+                        onChangeProyect(proyecto)
+                        onProjectSelected(proyecto)
+                        expandirProyecto = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownEjemplo(opciones: List<String>, onTimeCodeSelected: (String) -> Unit) {
+    var seleccion by remember { mutableStateOf(opciones.firstOrNull() ?: "") }
     var expandido by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -146,11 +245,11 @@ fun DropdownEjemplo(calendarViewModel: CalendarViewModel, onTimeCodeSelected: (I
             expanded = expandido,
             onDismissRequest = { expandido = false }
         ) {
-            valores.forEach { (codigo , descripcion) ->
+            opciones.forEach { codigo ->
                 DropdownMenuItem(
-                    text = { Text(descripcion) },
+                    text = { Text(codigo) },
                     onClick = {
-                        seleccion = descripcion
+                        seleccion = codigo
                         onTimeCodeSelected(codigo)
                         expandido = false
                     }
@@ -174,7 +273,7 @@ fun NumberInputField(
                 val num = it.toIntOrNull()
                 if (num != null) {
                     onValueChange(num)
-                    if (num > 24) onValueChange(24)
+                    if (num > 12) onValueChange(12)
                 }
                 if (num == null) onValueChange(0)
             },
@@ -186,7 +285,7 @@ fun NumberInputField(
         Column {
 
             Button(
-                onClick = { if (value < 24) onValueChange(value + 1) },
+                onClick = { if (value < 12) onValueChange(value + 1) },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
                     contentColor = Color.Black

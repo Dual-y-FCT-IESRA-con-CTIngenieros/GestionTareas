@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.viewmodel.DataViewModel.currentHours
 import com.es.appmovil.viewmodel.ResumeViewmodel
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.ConteoHoras
@@ -46,11 +47,10 @@ class ResumeScreen: Screen{
     @Composable
     override fun Content(){
         val resumeViewmodel = ResumeViewmodel()
-        resumeViewmodel.getHours()
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
         var canClick by remember { mutableStateOf(true) }
-        val currentHours by resumeViewmodel.currentHours.collectAsState()
+        val currentHours by currentHours.collectAsState()
         val dailyHours by resumeViewmodel.dailyHours.collectAsState()
         val currentDay by resumeViewmodel.currentDay.collectAsState()
 
@@ -76,7 +76,7 @@ class ResumeScreen: Screen{
                             Column(Modifier.clickable {
                                 if (canClick) {
                                     canClick = false
-                                    navigator.push(CalendarScreen())
+                                    navigator.push(AnualScreen())
                                 }
                             }
                             ) {
@@ -99,13 +99,13 @@ class ResumeScreen: Screen{
                                 )
                             }
                             Spacer(Modifier.size(20.dp))
-                            ResumenHorasMensual(resumeViewmodel)
+                            ResumenHorasMensual()
                         }
                     }
 
                     Spacer(Modifier.size(40.dp))
 
-                    Button(onClick = {navigator.push(CalendarScreen())},
+                    Button(onClick = {navigator.push(AdminScreen())},
                         elevation = ButtonDefaults.elevation(5.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                         shape = RoundedCornerShape(10.dp),

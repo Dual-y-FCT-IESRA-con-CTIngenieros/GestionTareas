@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.TimeCode
 import com.es.appmovil.viewmodel.CalendarViewModel
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
@@ -46,10 +48,12 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
     // Creamos las variables necesarias desde el viewmodel
     val fechaActual by calendarViewmodel.today.collectAsState()
     val actividades by calendarViewmodel.employeeActivity.collectAsState()
+    val timeCodes by calendarViewmodel.timeCodes.collectAsState()
 
     // Creamos la variable que nos permite mostrar el dialogo
     var showDialog by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf(fechaActual) }
+    calendarViewmodel.generarBarrasPorDia(date)
 
     /**
      * Obtenemos el número de días del mes, el mes anterior y el siguiente
@@ -136,7 +140,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                 // Buscar si hay una actividad en esa fecha
                 val actividad = actividades.find { it.date == currentDate.toString() }
 
-                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
 
                 val ultimoDiaMesAnterior =
                     LocalDate(fechaActual.year, fechaActual.monthNumber, 1)
@@ -147,6 +151,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                 otherMonthModifier = otherMonthModifier.clickable {
                     showDialog = true
                     date = LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), ultimoDia)
+                    calendarViewmodel.generarBarrasPorDia(date)
                 }
                 Box(
                     modifier = otherMonthModifier.background(color),
@@ -166,7 +171,7 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                 val actividad = actividades.find { it.date == currentDate.toString() }
 
                 // Color por defecto o según actividad
-                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode,timeCodes) } ?: Color.LightGray
 
                 val modifier = Modifier
                     .size(40.dp)
@@ -174,8 +179,9 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                     .padding(4.dp)
                     .background(color)
                     .clickable {
-                        showDialog = true
+                        if (tieneMenosDe8Horas(currentDate, actividades)) showDialog = true
                         date = currentDate
+                        calendarViewmodel.generarBarrasPorDia(date)
                     }
 
                 val boxModifier = if (dayActualMonth == fechaActual.dayOfMonth) {
@@ -204,12 +210,13 @@ fun Calendar(calendarViewmodel: CalendarViewModel) {
                 val actividad = actividades.find { it.date == currentDate.toString() }
 
                 // Color por defecto o según actividad
-                val color = actividad?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode,timeCodes) } ?: Color.LightGray
 
                 otherMonthModifier = otherMonthModifier.clickable {
                     showDialog = true
                     date =
                         LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                    calendarViewmodel.generarBarrasPorDia(date)
                 }.background(color)
 
                 Box(
@@ -246,15 +253,10 @@ fun monthNameInSpanish(monthNumber: String): String {
     }
 }
 
-fun colorPorTimeCode(code: Int): Color {
-    return when (code) {
-        100 -> Color.Green
-        200 -> Color.Red
-        555 -> Color.Blue
-        900 -> Color.Yellow
-        901 -> Color.Magenta
-        else -> Color.LightGray
-    }
+fun colorPorTimeCode(code: Int, timeCodes:List<TimeCode>): Color {
+    val timeCode = timeCodes.find { it.idTimeCode == code }
+    return if (timeCode != null) Color(timeCode.color)
+    else Color.Black
 }
 
 
@@ -300,4 +302,12 @@ fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
 
     val diaSemanaUltimoDia = ultimoDia.dayOfWeek.isoDayNumber // 1 (Lunes) - 7 (Domingo)
     return 7 - diaSemanaUltimoDia
+}
+
+fun tieneMenosDe8Horas(fecha: LocalDate, actividades: List<EmployeeActivity>): Boolean {
+    val totalHoras = actividades
+        .filter { it.date == fecha.toString() }
+        .sumOf { it.time.toDouble() }
+
+    return totalHoras < 8.0
 }

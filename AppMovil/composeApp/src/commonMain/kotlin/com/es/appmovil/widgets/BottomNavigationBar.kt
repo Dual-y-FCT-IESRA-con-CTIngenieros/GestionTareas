@@ -34,20 +34,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
+import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
 import com.es.appmovil.screens.ResumeScreen
 
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
     val selected by remember { selectScreen(navigator) }
-    val items = listOf("Home", "Calendar", "Notifications", "Profile")
+    val items = listOf("Home", "Calendar", "Anual", "Profile")
+    var canClick by remember { mutableStateOf(true) }
     val icons = listOf(
         Icons.Filled.Home,
         Icons.Filled.DateRange,
         Icons.Filled.Notifications,
         Icons.Filled.Person
     )
-    val screenItems:List<Screen> = listOf(ResumeScreen(), CalendarScreen())
+    val screenItems:List<Screen> = listOf(ResumeScreen(), CalendarScreen(), AnualScreen())
 
     Box(
         modifier = Modifier
@@ -84,13 +86,16 @@ fun BottomNavigationBar(navigator: Navigator) {
             items.forEachIndexed { index, item ->
                 IconButton(onClick = {
                     if (selected != index) {
-                        navigator.push(screenItems[index])
+                        if (canClick) {
+                            canClick = false
+                            navigator.push(screenItems[index])
+                        }
                     }
                 }) {
                     Icon(
                         imageVector = icons[index],
                         contentDescription = item,
-                        tint = if (selected == index) Color(0xFF7F57FF) else Color.Gray,
+                        tint = if (selected == index) Color(0xFFF4A900) else Color.Gray,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -104,6 +109,7 @@ fun selectScreen(navigator: Navigator):MutableState<Int> {
     return when(currentScreen) {
         is ResumeScreen -> mutableStateOf(0)
         is CalendarScreen -> mutableStateOf(1)
+        is AnualScreen -> mutableStateOf(2)
         else -> mutableStateOf(0)
     }
 }
