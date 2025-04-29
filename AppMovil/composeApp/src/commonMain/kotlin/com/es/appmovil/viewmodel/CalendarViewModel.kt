@@ -133,7 +133,7 @@ class CalendarViewModel {
                     .map { it.idWorkOrder }
 
                 // Filtramos por los workOrders en los que participa el empleado
-                val workOrdersEmpleado = employeeWO
+                val workOrdersEmpleado = employeeWO.value
                     .filter { it.idWorkOrder in workOrdersAsociados && it.idEmployee == employee.idEmployee }
                     .map { it.idWorkOrder }
 
