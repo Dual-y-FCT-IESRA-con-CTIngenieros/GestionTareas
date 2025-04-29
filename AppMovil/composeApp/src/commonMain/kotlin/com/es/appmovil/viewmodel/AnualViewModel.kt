@@ -41,7 +41,7 @@ class AnualViewModel {
     }
 
     fun calcularHorasPorMes(): List<Double> {
-        val hourMonth = employeeActivities
+        val hourMonth = employeeActivities.value
             .groupBy { it.date.split("-")[1].toInt() }
             .mapValues { (_, timeMonth) ->
                 timeMonth.sumOf { it.time.toDouble() }
@@ -147,7 +147,7 @@ class AnualViewModel {
     fun generarBarrasPorMes(i:Int) {
         val timeCodeMap = timeCodes.associateBy { it.idTimeCode }
 
-        val actividadesPorMes = employeeActivities.groupBy {
+        val actividadesPorMes = employeeActivities.value.groupBy {
             val fecha = LocalDate.parse(it.date)
             fecha.monthNumber to fecha.year
         }

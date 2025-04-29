@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
 import com.es.appmovil.viewmodel.ResumeViewmodel
 import com.es.appmovil.widgets.BottomNavigationBar
@@ -100,7 +99,7 @@ class ResumeScreen: Screen{
                                 )
                             }
                             Spacer(Modifier.size(20.dp))
-                            ResumenHorasMensual(resumeViewmodel)
+                            ResumenHorasMensual()
                         }
                     }
 

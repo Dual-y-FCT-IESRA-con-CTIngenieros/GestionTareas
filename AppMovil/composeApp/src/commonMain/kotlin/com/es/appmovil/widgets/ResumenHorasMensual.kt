@@ -19,6 +19,7 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,13 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.ResumeViewmodel
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
 @Composable
-fun ResumenHorasMensual(resumeViewmodel: ResumeViewmodel) {
-    val dataGraphic by remember { resumeViewmodel.getPie() }
+fun ResumenHorasMensual() {
+    DataViewModel.getPie()
+    val dataGraphic by DataViewModel.pieList.collectAsState()
         Column {
             ElevatedCard(
                 colors = CardColors(

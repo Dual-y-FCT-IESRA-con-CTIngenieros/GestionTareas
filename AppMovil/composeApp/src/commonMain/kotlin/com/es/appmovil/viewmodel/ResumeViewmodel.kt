@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ResumeViewmodel {
-    
-    private val employeeActivities = DataViewModel.employeeActivities
+
+    private val employeeActivities = MutableStateFlow(DataViewModel.employeeActivities.value)
     private val employee = DataViewModel.employee
     private val timeCodes = DataViewModel.timeCodes
 
@@ -26,7 +26,7 @@ class ResumeViewmodel {
     private fun getDays():Int {
         var fc = ""
         var days = 0
-        employeeActivities
+        employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
                 if (fc != it.date) {
@@ -35,40 +35,6 @@ class ResumeViewmodel {
                 }
             }
         return days
-    }
-
-    fun getPie() : MutableState<MutableList<Pie>> {
-        val pies = mutableStateOf(mutableListOf<Pie>())
-
-        employeeActivities
-            .filter { employee.idEmployee == it.idEmployee }
-            .forEach {
-            val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
-            if (timeCode != null){
-                val pie = pies.value.find { p -> p.label == timeCode.desc }
-
-                if (pie != null) {
-                    val timePie = pie.data + it.time
-                    pies.value.remove(pie)
-                    pies.value.add(
-                        Pie(
-                            label = timeCode.desc,
-                            data = timePie,
-                            color = Color(timeCode.color)
-                        )
-                    )
-                } else {
-                    pies.value.add(
-                        Pie(
-                            label = timeCode.desc,
-                            data = it.time.toDouble(),
-                            color = Color(timeCode.color)
-                        )
-                    )
-                }
-            }
-        }
-        return pies
     }
 
     fun getLegend(): MutableState<MutableMap<String, Long>> {
@@ -83,7 +49,7 @@ class ResumeViewmodel {
     fun getTimeActivity() : MutableState<MutableMap<Long, Float>> {
         val timeActivity = mutableStateOf(mutableMapOf<Long, Float>())
 
-        employeeActivities
+        employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
                 val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
@@ -102,7 +68,7 @@ class ResumeViewmodel {
     fun getDayActivity(): MutableState<MutableMap<String, MutableList<Color>>>  {
         val dayActivity = mutableStateOf(mutableMapOf<String, MutableList<Color>>())
 
-        employeeActivities
+        employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
                 val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }

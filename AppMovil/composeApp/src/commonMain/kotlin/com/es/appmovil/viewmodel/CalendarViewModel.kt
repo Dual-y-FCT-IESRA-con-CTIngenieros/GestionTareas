@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +43,7 @@ class CalendarViewModel {
     private val _proyectoSeleccionado = MutableStateFlow(null)
     val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
 
-    private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities)
+    private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities.value)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
 
     /**
@@ -70,10 +72,7 @@ class CalendarViewModel {
     }
 
     fun addEmployeeActivity(employeeActivity: EmployeeActivity){
-        print(_employeeActivity)
-        _employeeActivity.value = _employeeActivity.value.toMutableList().apply {
-            add(employeeActivity)
-        }
+        DataViewModel.employeeActivities.value.add(employeeActivity)
     }
 
     fun generarBarrasPorDia(fechaSeleccionada: LocalDate) {
@@ -116,15 +115,34 @@ class CalendarViewModel {
     }
 
     fun generarProjectsTimeCode() {
-        var timeCode = 0
+        val workOrdersPorTimeCode = mutableListOf<ProjectTimeCodeDTO>()
+        val timeCodeProcesados = mutableSetOf<Int>()
+
         projectTimeCodes.value.forEach { code ->
-            if (code.idTimeCode != timeCode){
-                val projects = projectTimeCodes.value.filter { it.idTimeCode == code.idTimeCode }
-                val projectTimeCode = ProjectTimeCodeDTO(code.idTimeCode, mutableListOf())
-                projects.map{ projectTimeCode.projects.add(it.idProject) }
-                timeCode = code.idTimeCode
-                projectTimeCodeDTO.value.add(projectTimeCode)
+            if (code.idTimeCode !in timeCodeProcesados) {
+                timeCodeProcesados.add(code.idTimeCode)
+
+                // Filtramos los proyectos que tienen este timeCode
+                val proyectosAsociados = projectTimeCodes.value
+                    .filter { it.idTimeCode == code.idTimeCode }
+                    .map { it.idProject }
+
+                // Obtenemos los workOrders de esos proyectos
+                val workOrdersAsociados = DataViewModel.workOrders
+                    .filter { it.idProject in proyectosAsociados }
+                    .map { it.idWorkOrder }
+
+                // Filtramos por los workOrders en los que participa el empleado
+                val workOrdersEmpleado = employeeWO
+                    .filter { it.idWorkOrder in workOrdersAsociados && it.idEmployee == employee.idEmployee }
+                    .map { it.idWorkOrder }
+
+                val dto = ProjectTimeCodeDTO(code.idTimeCode, workOrdersEmpleado.toMutableList())
+                workOrdersPorTimeCode.add(dto)
             }
         }
+
+        projectTimeCodeDTO.value = workOrdersPorTimeCode
     }
+
 }

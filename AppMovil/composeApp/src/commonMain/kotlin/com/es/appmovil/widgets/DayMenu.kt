@@ -273,7 +273,7 @@ fun NumberInputField(
                 val num = it.toIntOrNull()
                 if (num != null) {
                     onValueChange(num)
-                    if (num > 24) onValueChange(24)
+                    if (num > 12) onValueChange(12)
                 }
                 if (num == null) onValueChange(0)
             },
@@ -285,7 +285,7 @@ fun NumberInputField(
         Column {
 
             Button(
-                onClick = { if (value < 24) onValueChange(value + 1) },
+                onClick = { if (value < 12) onValueChange(value + 1) },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
                     contentColor = Color.Black
