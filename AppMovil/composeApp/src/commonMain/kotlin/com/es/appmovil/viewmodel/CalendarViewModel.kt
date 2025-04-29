@@ -3,7 +3,9 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
+import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -30,7 +32,7 @@ class CalendarViewModel {
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
 
-    val timeCodes = MutableStateFlow(DataViewModel.timeCodes)
+    val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
     val proyects = MutableStateFlow(DataViewModel.proyects)
 
@@ -102,7 +104,7 @@ class CalendarViewModel {
                 Bars.Data(
                     label = timeCode.desc,
                     value = listaActividades.sumOf { it.time.toDouble() },
-                    color = SolidColor(Color(timeCode.color))
+                    color = SolidColor(Color(timeCode.color.toLong()))
                 )
             }
 

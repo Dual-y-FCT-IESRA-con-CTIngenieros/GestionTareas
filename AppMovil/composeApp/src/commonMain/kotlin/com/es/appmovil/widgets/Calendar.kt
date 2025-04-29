@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
@@ -253,9 +253,9 @@ fun monthNameInSpanish(monthNumber: String): String {
     }
 }
 
-fun colorPorTimeCode(code: Int, timeCodes:List<TimeCode>): Color {
+fun colorPorTimeCode(code: Int, timeCodes: List<TimeCodeDTO>): Color {
     val timeCode = timeCodes.find { it.idTimeCode == code }
-    return if (timeCode != null) Color(timeCode.color)
+    return if (timeCode != null) Color(timeCode.color.toLong())
     else Color.Black
 }
 

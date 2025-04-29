@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class TimeCode(
     val idTimeCode: Int,
     val desc: String,
-    val color: Long,
+    val color: String,
     val chkProd: Boolean
 )
