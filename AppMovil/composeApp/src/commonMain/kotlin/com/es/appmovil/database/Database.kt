@@ -21,11 +21,55 @@ object Database {
     }
 
     suspend inline fun <reified T : Any> getData(table: String): List<T> {
-        return supabase
-            .from(table)
-            .select()
-            .decodeList<T>()
+        try {
+            return supabase
+                .from(table)
+                .select()
+                .decodeList<T>()
+        }catch (
+            e:Exception
+        ) {
+            println(e)
+            return emptyList()
+        }
     }
 
+    suspend fun addData(table: String, data: Any) {
+        try {
+            supabase.from(table).insert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun updateData(table:String, data:Any, idName:String, id:Any){
+        try {
+            supabase.from(table).update(data) {
+                filter { eq(idName, id) }
+            }
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun deregister(table:String, fecha:String, idName:String, id:Any){
+        try {
+            supabase.from(table).update(
+                {
+                    set("dateTo", fecha)
+                }
+            ){
+                filter { eq(idName, id) }
+            }
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
 
 }
