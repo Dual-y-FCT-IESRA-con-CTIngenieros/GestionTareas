@@ -62,21 +62,25 @@ object DataViewModel {
         }
     }
 
+    private val _workOrders = MutableStateFlow<List<WorkOrder>>(emptyList())
+    val workOrders: StateFlow<List<WorkOrder>> = _workOrders
+
+    private fun cargarWorkOrders() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<WorkOrder>("WorkOrder")
+            _workOrders.value = datos
+        }
+    }
 
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
         cargarProjects()
         cargarProjectsTimeCode()
+        cargarWorkOrders()
     }
 
     val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
-
-    val workOrders = listOf(
-        WorkOrder("K2312273-1", "hola", 1, "K2312273", 1),
-        WorkOrder("K2315252-1", "hola", 1, "K2315252", 1),
-        WorkOrder("M1638790-1", "hola", 1, "M1638790", 1)
-    )
 
     val employeeWO = listOf(
         EmployeeWO("K2312273-1",1, "hola", "2025-02-06", "2025-05-06"),

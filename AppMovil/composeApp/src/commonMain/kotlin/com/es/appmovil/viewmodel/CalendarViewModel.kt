@@ -3,6 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
@@ -33,7 +34,7 @@ class CalendarViewModel {
 
     val proyects = MutableStateFlow(DataViewModel.projects)
 
-    val projectTimeCodes = MutableStateFlow(DataViewModel.proyectTimecodes)
+    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
     val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
 
     private val _timeCodeSeleccionado = MutableStateFlow(null)
@@ -127,7 +128,7 @@ class CalendarViewModel {
                     .map { it.idProject }
 
                 // Obtenemos los workOrders de esos proyectos
-                val workOrdersAsociados = DataViewModel.workOrders
+                val workOrdersAsociados = DataViewModel.workOrders.value
                     .filter { it.idProject in proyectosAsociados }
                     .map { it.idWorkOrder }
 
