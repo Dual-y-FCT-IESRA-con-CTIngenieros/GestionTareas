@@ -32,7 +32,7 @@ object DataViewModel {
         }
     }
 
-    val _employeeActivities = MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
+    private val _employeeActivities = MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
     val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
 
     private fun cargarEmployeeActivities() {
@@ -42,7 +42,7 @@ object DataViewModel {
         }
     }
 
-    val _projects = MutableStateFlow<List<Project>>(emptyList())
+    private val _projects = MutableStateFlow<List<Project>>(emptyList())
     val projects: StateFlow<List<Project>> = _projects
 
     private fun cargarProjects() {
@@ -52,20 +52,25 @@ object DataViewModel {
         }
     }
 
+    private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
+    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
+
+    private fun cargarProjectsTimeCode() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<ProjectTimeCode>("ProjectTimeCode")
+            _projectTimeCodes.value = datos
+        }
+    }
+
+
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
         cargarProjects()
+        cargarProjectsTimeCode()
     }
 
     val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
-
-    val proyectTimecodes = listOf(
-        ProjectTimeCode("K2312273", 100),
-        ProjectTimeCode("K2312273", 555),
-        ProjectTimeCode("K2315252", 100),
-        ProjectTimeCode("M1638790", 900),
-    )
 
     val workOrders = listOf(
         WorkOrder("K2312273-1", "hola", 1, "K2312273", 1),
@@ -109,7 +114,7 @@ object DataViewModel {
                         pies.remove(pie)
                         pies.add(
                             Pie(
-                                label = timeCode.desc,
+                                label = timeCode.idTimeCode.toString(),
                                 data = timePie,
                                 color = Color(timeCode.color.toLong())
                             )
@@ -117,7 +122,7 @@ object DataViewModel {
                     } else {
                         pies.add(
                             Pie(
-                                label = timeCode.desc,
+                                label = timeCode.idTimeCode.toString(),
                                 data = it.time.toDouble(),
                                 color = Color(timeCode.color.toLong())
                             )
