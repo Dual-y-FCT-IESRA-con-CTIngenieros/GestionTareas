@@ -33,19 +33,22 @@ object DataViewModel {
         }
     }
 
-    init {
-        cargarTimeCodes()
+    val _employeeActivities = MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
+    val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
+
+    private fun cargarEmployeeActivities() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
+            _employeeActivities.value = datos.toMutableList()
+        }
     }
 
-    val employee = Employee(1, "Pepe", "Pepito Pepe", "pepe@pepe.com", "2025-01-01", "2025-12-31", 1)
+    init {
+        cargarTimeCodes()
+        cargarEmployeeActivities()
+    }
 
-    val employeeActivities = MutableStateFlow( mutableListOf(
-        EmployeeActivity(1, 1, 100, 1, 8f, "2025-04-11", "PERFEE"),
-        EmployeeActivity(1, 2, 200, 2, 6f, "2025-04-10", "OK"),
-        EmployeeActivity(1, 3, 900, 3, 7f, "2025-04-09", "REV"),
-        EmployeeActivity(1, 2, 200, 2, 7f, "2025-04-09", "REV")
-    )
-    )
+    val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
 
     val proyects = listOf(
         Project("K2312273","prueba",1,1,1),
