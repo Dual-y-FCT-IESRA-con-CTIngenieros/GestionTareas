@@ -1,5 +1,8 @@
 package com.es.appmovil.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Project(
     val idProject: String,
     val desc: String,

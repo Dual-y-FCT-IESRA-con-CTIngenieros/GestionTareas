@@ -9,6 +9,7 @@ import com.es.appmovil.model.TimeCode
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.forEach
 
 class ResumeViewmodel {
 
@@ -40,7 +41,7 @@ class ResumeViewmodel {
     fun getLegend(): MutableState<MutableMap<String, Long>> {
         val legend = mutableStateOf(mutableMapOf<String, Long>())
 
-        timeCodes.forEach {
+        timeCodes.value.forEach {
             legend.value[it.desc] = it.color
         }
         return legend
@@ -52,7 +53,7 @@ class ResumeViewmodel {
         employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
-                val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
+                val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
                     if (timeActivity.value.containsKey(timeCode.color)) {
                         val hours = timeActivity.value[timeCode.color]?.plus(it.time)
@@ -71,7 +72,7 @@ class ResumeViewmodel {
         employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee }
             .forEach {
-                val timeCode = timeCodes.find { time -> time.idTimeCode == it.idTimeCode }
+                val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 timeCode?.let { tc ->
                     val currentList = dayActivity.value[it.date] ?: mutableListOf()
                     currentList.add(Color(tc.color))
