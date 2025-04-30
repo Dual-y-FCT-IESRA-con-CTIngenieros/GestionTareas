@@ -21,14 +21,12 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.viewmodel.DataViewModel
-import com.es.appmovil.viewmodel.ResumeViewmodel
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
@@ -94,17 +92,19 @@ fun ResumenHorasMensual() {
 fun PieInfo(data: List<Pie>) {
     LazyColumn(Modifier.padding(bottom = 20.dp)) {
         items(data.size) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 4.dp)
-            ) {
-                Box(
-                    Modifier
-                        .size(12.dp)
-                        .background(data[it].color, shape = CircleShape)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("${data[it].data.toInt()}")
+            if (data[it].data != 0.0) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Box(
+                        Modifier
+                            .size(12.dp)
+                            .background(data[it].color, shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${data[it].data.toInt()}")
+                }
             }
         }
     }

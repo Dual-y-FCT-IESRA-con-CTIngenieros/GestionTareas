@@ -43,10 +43,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.es.appmovil.viewmodel.DataViewModel
+import cafe.adriel.voyager.navigator.Navigator
+import com.es.appmovil.database.Database
 import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -109,12 +115,21 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             if (navigator != null) {
                 Boton {userViewmodel.checkLogin()}
                 if (login) {
-                    navigator.push(ResumeScreen())
-                    userViewmodel.resetVar()
-                    userViewmodel.resetError()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        doLogin(username, login, navigator)
+                    }
                 }
             }
         }
+    }
+
+    private suspend fun doLogin(username: String, login:Boolean, navigator: Navigator) {
+        withContext(Dispatchers.IO) {
+            Database.getEmployee(username)
+        }
+        navigator.push(ResumeScreen())
+        userViewmodel.resetVar()
+        userViewmodel.resetError()
     }
 
     /**

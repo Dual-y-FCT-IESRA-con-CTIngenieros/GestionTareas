@@ -7,6 +7,7 @@ import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,19 +33,32 @@ class CalendarViewModel {
 
     val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
-    val proyects = MutableStateFlow(DataViewModel.projects)
-
-    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
+    private val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
     val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
-
-    private val _timeCodeSeleccionado = MutableStateFlow(null)
-    val timeCodeSeleccionado: StateFlow<Int?> = _timeCodeSeleccionado
-
-    private val _proyectoSeleccionado = MutableStateFlow(null)
-    val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
 
     private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities.value)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
+
+    private var _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog
+
+    private var _date = MutableStateFlow(today.value)
+    val date: StateFlow<LocalDate> = _date
+
+//    val proyects = MutableStateFlow(DataViewModel.projects)
+//    private val _timeCodeSeleccionado = MutableStateFlow(null)
+//    val timeCodeSeleccionado: StateFlow<Int?> = _timeCodeSeleccionado
+//
+//    private val _proyectoSeleccionado = MutableStateFlow(null)
+//    val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
+
+    fun changeDialog(bool: Boolean) {
+        _showDialog.value = bool
+    }
+
+    fun changeDate(dateCurrent:LocalDate) {
+        _date.value = dateCurrent
+    }
 
     /**
      * Función para cambiar el mes que se muestra en el calendario
@@ -72,7 +86,15 @@ class CalendarViewModel {
     }
 
     fun addEmployeeActivity(employeeActivity: EmployeeActivity){
-        DataViewModel.employeeActivities.value.add(employeeActivity)
+        val filtro = employeeActivities.value.find { it.date == employeeActivity.date && it.idTimeCode == employeeActivity.idTimeCode }
+        if (filtro == null) {
+            if (employeeActivity.time != 0f) employeeActivities.value.add(employeeActivity)
+        }
+        else {
+            employeeActivities.value.remove(filtro)
+            if (employeeActivity.time != 0f) employeeActivities.value.add(employeeActivity)
+        }
+        DataViewModel.getPie()
     }
 
     fun generarBarrasPorDia(fechaSeleccionada: LocalDate) {
@@ -102,7 +124,7 @@ class CalendarViewModel {
                 Bars.Data(
                     label = timeCode.desc,
                     value = listaActividades.sumOf { it.time.toDouble() },
-                    color = SolidColor(Color(timeCode.color.toLong()))
+                    color = SolidColor(Color(timeCode.color))
                 )
             }
 

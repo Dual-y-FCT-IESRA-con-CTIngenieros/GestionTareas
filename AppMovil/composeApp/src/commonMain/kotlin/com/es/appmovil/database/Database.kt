@@ -1,5 +1,7 @@
 package com.es.appmovil.database
 
+import com.es.appmovil.model.Employee
+import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -32,6 +34,20 @@ object Database {
             println(e)
             return emptyList()
         }
+    }
+
+    suspend fun getEmployee(email:String){
+        try {
+            val employees = supabase.from("Employee").select().decodeList<Employee>()
+
+            DataViewModel.employee = employees.first { it.email == email }
+
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+
     }
 
     suspend fun addData(table: String, data: Any) {

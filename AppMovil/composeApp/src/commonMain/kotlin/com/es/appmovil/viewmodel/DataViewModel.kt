@@ -1,6 +1,8 @@
 package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
@@ -91,7 +93,7 @@ object DataViewModel {
         cargarEmployeeWO()
     }
 
-    val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
+    var employee = Employee(-1, "", "", "", "", null, -1)
 
 
     private var _currentHours = MutableStateFlow(0)
@@ -119,6 +121,7 @@ object DataViewModel {
                 if (timeCode != null){
                     val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
 
+
                     if (pie != null) {
                         val timePie = pie.data + it.time
                         pies.remove(pie)
@@ -126,7 +129,7 @@ object DataViewModel {
                             Pie(
                                 label = timeCode.idTimeCode.toString(),
                                 data = timePie,
-                                color = Color(timeCode.color.toLong())
+                                color = Color(timeCode.color)
                             )
                         )
                     } else {
@@ -134,7 +137,7 @@ object DataViewModel {
                             Pie(
                                 label = timeCode.idTimeCode.toString(),
                                 data = it.time.toDouble(),
-                                color = Color(timeCode.color.toLong())
+                                color = Color(timeCode.color)
                             )
                         )
                     }

@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.dto.TimeCodeDTO
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ class ResumeViewmodel {
 
     private val employeeActivities = MutableStateFlow(DataViewModel.employeeActivities.value)
     private val employee = DataViewModel.employee
-    private val timeCodes = DataViewModel.timeCodes
+    private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
     private var _dailyHours = MutableStateFlow(8)
     val dailyHours: StateFlow<Int> = _dailyHours
@@ -38,11 +39,11 @@ class ResumeViewmodel {
         return days
     }
 
-    fun getLegend(): MutableState<MutableMap<String, ULong>> {
-        val legend = mutableStateOf(mutableMapOf<String, ULong>())
+    fun getLegend(): MutableState<MutableMap<String, Long>> {
+        val legend = mutableStateOf(mutableMapOf<String, Long>())
 
         timeCodes.value.forEach {
-            legend.value[it.desc] = it.color
+            legend.value[it.idTimeCode.toString()] = it.color
         }
         return legend
     }
@@ -55,11 +56,11 @@ class ResumeViewmodel {
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
-                    if (timeActivity.value.containsKey(timeCode.color.toLong())) {
-                        val hours = timeActivity.value[timeCode.color.toLong()]?.plus(it.time)
-                        timeActivity.value[timeCode.color.toLong()] = hours ?: 0f
+                    if (timeActivity.value.containsKey(timeCode.color)) {
+                        val hours = timeActivity.value[timeCode.color]?.plus(it.time)
+                        timeActivity.value[timeCode.color] = hours ?: 0f
                     } else {
-                        timeActivity.value[timeCode.color.toLong()] = it.time
+                        timeActivity.value[timeCode.color] = it.time
                     }
                 }
         }
@@ -75,7 +76,7 @@ class ResumeViewmodel {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 timeCode?.let { tc ->
                     val currentList = dayActivity.value[it.date] ?: mutableListOf()
-                    currentList.add(Color(tc.color.toLong()))
+                    currentList.add(Color(tc.color))
                     dayActivity.value[it.date] = currentList
                 }
             }

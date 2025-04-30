@@ -9,9 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import com.es.appmovil.model.Calendar
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.viewmodel.AnualViewModel
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
@@ -19,10 +16,6 @@ import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 
 @Composable
 fun TeoricoAnual(anualViewModel: AnualViewModel) {

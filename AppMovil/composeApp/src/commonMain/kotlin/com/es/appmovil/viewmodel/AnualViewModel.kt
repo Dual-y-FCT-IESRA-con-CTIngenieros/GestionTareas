@@ -168,7 +168,7 @@ class AnualViewModel {
                     Bars.Data(
                         label = timeCode.desc,
                         value = listaActividades.sumOf { it.time.toDouble() },
-                        color = SolidColor(Color(timeCode.color.toLong()))
+                        color = SolidColor(Color(timeCode.color))
                     )
                 } ?: emptyList()
 

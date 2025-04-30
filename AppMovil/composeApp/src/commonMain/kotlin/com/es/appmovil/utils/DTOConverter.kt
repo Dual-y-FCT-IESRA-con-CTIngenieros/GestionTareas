@@ -9,7 +9,7 @@ object DTOConverter {
         return TimeCodeDTO(
             idTimeCode = idTimeCode,
             desc = desc,
-            color = color.removePrefix("0x").toULong(16),
+            color = color.removePrefix("0x").toULong(16).toLong(),
             chkProd = chkProd
         )
     }

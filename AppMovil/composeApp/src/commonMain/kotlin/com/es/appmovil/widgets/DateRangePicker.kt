@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -16,28 +15,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
 
 @Composable
-fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate) {
+fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate, onGetListDates:(SnapshotStateList<LocalDate>)->Unit) {
     var selectedStartDate by remember { mutableStateOf<Long?>(null) }
     var selectedEndDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
@@ -82,6 +82,18 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate) {
             onDateRangeSelected = { startDate, endDate ->
                 selectedStartDate = startDate
                 selectedEndDate = endDate
+
+                if (startDate != null && endDate != null) {
+                    val start = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val end = Instant.fromEpochMilliseconds(endDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val listOfDates = generateDatesBetween(start, end)
+                    onGetListDates(listOfDates)
+                } else if (startDate != null){
+                    val start = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val end = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val listOfDates = generateDatesBetween(start, end)
+                    onGetListDates(listOfDates)
+                }
             },
             onDismiss = { showModal = false }
         )
@@ -127,9 +139,18 @@ fun DatePickerModal(
     }
 }
 
-
 fun convertMillisToDate(millis: Long): String {
     val instant = Instant.fromEpochMilliseconds(millis)
-    val localDate = instant.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()).date
+    val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
     return "${localDate.dayOfMonth}/${localDate.monthNumber}/${localDate.year}"
+}
+
+fun generateDatesBetween(start: LocalDate, end: LocalDate): SnapshotStateList<LocalDate> {
+    val dates = mutableStateListOf<LocalDate>()
+    var current = start
+    while (current <= end) {
+        dates.add(current)
+        current = current.plus(1, DateTimeUnit.DAY)
+    }
+    return dates
 }

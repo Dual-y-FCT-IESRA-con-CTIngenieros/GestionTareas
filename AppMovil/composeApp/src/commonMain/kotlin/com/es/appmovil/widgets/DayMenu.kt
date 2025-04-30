@@ -27,6 +27,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,10 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
+import com.es.appmovil.viewmodel.DataViewModel.employee
 import kotlinx.datetime.LocalDate
 
 
@@ -60,9 +62,8 @@ fun DayDialog(
     val sheetState = rememberModalBottomSheetState()
     var comentario by remember { mutableStateOf("") }
     var horas by remember { mutableStateOf(8) }
-    var timeCode by rememberSaveable { mutableStateOf(100) }
-    var project by rememberSaveable { mutableStateOf("K2312273") }
-    val timeCodes by calendarViewModel.timeCodes.collectAsState()
+    var timeCode by rememberSaveable { mutableStateOf(0) }
+    var project by rememberSaveable { mutableStateOf("") }
     calendarViewModel.generarProjectsTimeCode()
     val projectsTimeCodes by calendarViewModel.projectTimeCodeDTO.collectAsState()
     var timeCodeSeleccionado by rememberSaveable { mutableStateOf<Int?>(null) }
@@ -78,7 +79,11 @@ fun DayDialog(
             modifier = Modifier.fillMaxHeight()
         ) {
 
-            DatePickerFieldToModal(Modifier.padding(16.dp), day)
+            val dates = remember { mutableStateOf(listOf(day)) }
+
+            DatePickerFieldToModal(Modifier.padding(16.dp), day) {
+                dates.value = it
+            }
 
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -97,18 +102,26 @@ fun DayDialog(
 
             Button(
                 onClick = {
-                    onChangeDialog(false)
-                    calendarViewModel.addEmployeeActivity(
-                        EmployeeActivity(
-                            1,
-                            "1",
-                            timeCode,
-                            1,
-                            horas.toFloat(),
-                            day.toString(),
-                            comentario
-                        )
-                    )
+
+                    val filter = dates.value.filter { it > calendarViewModel.today.value }
+
+                    if (timeCode != 0 && project.isNotBlank() && filter.isEmpty()) { // CONSULTAR
+                        onChangeDialog(false)
+                        dates.value.forEach { date ->
+                            calendarViewModel.addEmployeeActivity(
+                                EmployeeActivity(
+                                    employee.idEmployee,
+                                    project,
+                                    timeCode,
+                                    1,
+                                    horas.toFloat(),
+                                    date.toString(),
+                                    comentario
+                                )
+                            )
+                        }
+
+                    }
                 },
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -197,7 +210,7 @@ fun ProjectsSelected(
             value = proyectoSeleccionado ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text("Seleccione Proyecto") },
+            label = { Text("Seleccione WorkOrder") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
             modifier = Modifier.menuAnchor(),
             enabled = timeCodeSeleccionado != null
