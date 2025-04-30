@@ -2,6 +2,7 @@ package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import com.es.appmovil.database.Database
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
@@ -10,8 +11,12 @@ import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import ir.ehsannarmani.compose_charts.models.Bars
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -82,11 +87,25 @@ class CalendarViewModel {
     fun addEmployeeActivity(employeeActivity: EmployeeActivity){
         val filtro = employeeActivities.value.find { it.date == employeeActivity.date && it.idTimeCode == employeeActivity.idTimeCode }
         if (filtro == null) {
-            if (employeeActivity.time != 0f) employeeActivities.value.add(employeeActivity)
+            if (employeeActivity.time != 0f) {
+                employeeActivities.value.add(employeeActivity)
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.addEmployeeActivity(employeeActivity)
+                }
+            }
         }
         else {
             employeeActivities.value.remove(filtro)
-            if (employeeActivity.time != 0f) employeeActivities.value.add(employeeActivity)
+            if (employeeActivity.time != 0f) {
+                employeeActivities.value.add(employeeActivity)
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.updateEmployeeActivity(employeeActivity)
+                }
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.deleteEmployeeActivity(employeeActivity)
+                }
+            }
         }
         DataViewModel.getPie()
     }

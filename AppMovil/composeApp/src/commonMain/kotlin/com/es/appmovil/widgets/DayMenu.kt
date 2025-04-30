@@ -111,7 +111,7 @@ fun DayDialog(
                                     employee.idEmployee,
                                     project,
                                     timeCode,
-                                    1,
+                                    59,
                                     horas.toFloat(),
                                     date.toString(),
                                     comentario

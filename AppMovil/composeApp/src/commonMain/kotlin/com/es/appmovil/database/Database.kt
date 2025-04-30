@@ -1,6 +1,7 @@
 package com.es.appmovil.database
 
 import com.es.appmovil.model.Employee
+import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
@@ -60,10 +61,58 @@ object Database {
         }
     }
 
+    suspend fun addEmployeeActivity(data: EmployeeActivity) {
+        try {
+            supabase.from("EmployeeActivity").insert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
     suspend fun updateData(table:String, data:Any, idName:String, id:Any){
         try {
             supabase.from(table).update(data) {
                 filter { eq(idName, id) }
+            }
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun updateEmployeeActivity(data:EmployeeActivity){
+        try {
+            supabase.from("EmployeeActivity").update({ mapOf("time" to data.time) }) {
+                filter {
+                    and {
+                        eq("idEmployee", data.idEmployee)
+                        eq("idTimeCode", data.idTimeCode)
+                        eq("idWorkOrder", data.idWorkOrder)
+                        eq("idActivity", data.idActivity)
+                        eq("date", data.date)
+                    }
+                }
+            }
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun deleteEmployeeActivity(data:EmployeeActivity) {
+        try {
+            supabase.from("EmployeeActivity").delete() {
+                filter {
+                    eq("idEmployee", data.idEmployee)
+                    eq("idTimeCode", data.idTimeCode)
+                    eq("idWorkOrder", data.idWorkOrder)
+                    eq("idActivity", data.idActivity)
+                    eq("date", data.date)
+                }
             }
         }catch (
             e:Exception

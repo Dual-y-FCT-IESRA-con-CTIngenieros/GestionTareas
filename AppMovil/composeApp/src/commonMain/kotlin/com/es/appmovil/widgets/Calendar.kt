@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
+import com.es.appmovil.viewmodel.DataViewModel.employee
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -136,7 +137,7 @@ fun Calendar(
 
 
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() }
+                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 val color =
                     actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
@@ -171,7 +172,7 @@ fun Calendar(
                     LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
 
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() }
+                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 // Color por defecto o según actividad
                 val color =
@@ -214,7 +215,7 @@ fun Calendar(
                 }
 
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() }
+                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 // Color por defecto o según actividad
                 val color =
