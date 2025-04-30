@@ -36,14 +36,11 @@ class CalendarViewModel {
     private val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
     val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
 
-    private var _employeeActivity = MutableStateFlow(DataViewModel.employeeActivities.value)
+    private var _employeeActivity = MutableStateFlow(employeeActivities.value)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
 
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
-
-    private var _date = MutableStateFlow(today.value)
-    val date: StateFlow<LocalDate> = _date
 
 //    val proyects = MutableStateFlow(DataViewModel.projects)
 //    private val _timeCodeSeleccionado = MutableStateFlow(null)
@@ -56,9 +53,6 @@ class CalendarViewModel {
         _showDialog.value = bool
     }
 
-    fun changeDate(dateCurrent:LocalDate) {
-        _date.value = dateCurrent
-    }
 
     /**
      * Función para cambiar el mes que se muestra en el calendario

@@ -116,14 +116,14 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                 Boton {userViewmodel.checkLogin()}
                 if (login) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        doLogin(username, login, navigator)
+                        doLogin(username, navigator)
                     }
                 }
             }
         }
     }
 
-    private suspend fun doLogin(username: String, login:Boolean, navigator: Navigator) {
+    private suspend fun doLogin(username: String, navigator: Navigator) {
         withContext(Dispatchers.IO) {
             Database.getEmployee(username)
         }

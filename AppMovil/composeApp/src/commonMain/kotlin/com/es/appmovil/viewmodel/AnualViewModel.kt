@@ -2,8 +2,6 @@ package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import ir.ehsannarmani.compose_charts.models.Bars

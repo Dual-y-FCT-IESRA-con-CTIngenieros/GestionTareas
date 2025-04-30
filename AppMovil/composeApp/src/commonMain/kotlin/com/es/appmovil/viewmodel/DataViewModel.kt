@@ -1,8 +1,6 @@
 package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity

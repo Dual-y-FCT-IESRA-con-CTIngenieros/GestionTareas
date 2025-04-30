@@ -3,14 +3,9 @@ package com.es.appmovil.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import com.es.appmovil.model.Employee
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.TimeCodeDTO
-import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.forEach
 
 class ResumeViewmodel {
 
