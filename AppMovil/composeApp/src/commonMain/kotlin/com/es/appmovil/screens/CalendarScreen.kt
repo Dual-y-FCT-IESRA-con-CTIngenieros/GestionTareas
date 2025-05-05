@@ -25,6 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.DataViewModel.today
 import com.es.appmovil.widgets.ActionButton
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.Calendar
@@ -39,7 +40,7 @@ class CalendarScreen() : Screen {
         val calendarViewmodel = CalendarViewModel()
 
         // Creamos las variables necesarias desde el viewmodel
-        val fechaActual by calendarViewmodel.today.collectAsState()
+        val fechaActual by today.collectAsState()
         val actividades by calendarViewmodel.employeeActivity.collectAsState()
         val timeCodes by calendarViewmodel.timeCodes.collectAsState()
 

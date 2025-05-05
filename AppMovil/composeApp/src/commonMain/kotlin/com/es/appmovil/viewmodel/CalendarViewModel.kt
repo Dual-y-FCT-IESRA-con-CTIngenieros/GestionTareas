@@ -7,9 +7,13 @@ import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
+import com.es.appmovil.viewmodel.DataViewModel.getMonth
+import com.es.appmovil.viewmodel.DataViewModel.getPie
+import com.es.appmovil.viewmodel.DataViewModel.today
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +33,6 @@ import kotlinx.datetime.toLocalDateTime
  * Clase viewmodel para el calendario, donde guardaremos los datos del calendario y sus posibles funciones
  */
 class CalendarViewModel {
-    private var _today =
-        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
-    val today: StateFlow<LocalDate> = _today
 
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
@@ -64,14 +65,16 @@ class CalendarViewModel {
      * @param month Numero de meses que se van a cambiar hacia atras
      */
     fun onMonthChangePrevious(month: DatePeriod) {
-        _today.value = _today.value.minus(month)
+        today.value = today.value.minus(month)
+        changeMonth(today.value.monthNumber.toString())
+        getPie()
     }
 
     /**
      * Funcion para cambiar el mes al actual
      */
     fun resetMonth() {
-        _today.value = Clock.System.now().toLocalDateTime(
+        today.value = Clock.System.now().toLocalDateTime(
             TimeZone.currentSystemDefault()
         ).date
     }
@@ -81,7 +84,9 @@ class CalendarViewModel {
      * @param month Numero de meses que se van a cambiar hacia delante
      */
     fun onMonthChangeFordward(month: DatePeriod) {
-        _today.value = _today.value.plus(month)
+        today.value = today.value.plus(month)
+        changeMonth(today.value.monthNumber.toString())
+        getPie()
     }
 
     fun addEmployeeActivity(employeeActivity: EmployeeActivity){

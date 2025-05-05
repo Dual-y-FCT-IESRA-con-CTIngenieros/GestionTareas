@@ -8,12 +8,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.viewmodel.AnualViewModel
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 
@@ -27,8 +29,8 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
                 Line(
                     label = "Teórico",
                     values = anualViewModel.calcularHorasTeoricasPorMes(calendar),
-                    color = SolidColor(Color(0xFF23af92)),
-                    firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
+                    color = SolidColor(Color(0xFFF4A900)),
+                    firstGradientFillColor = Color(0xFFFFCF65).copy(alpha = .5f),
                     secondGradientFillColor = Color.Transparent,
                     strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
                     gradientAnimationDelay = 1000,
@@ -56,7 +58,8 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
         animationMode = AnimationMode.Together(delayBuilder = {
             it * 500L
         }),
-        labelHelperProperties = LabelHelperProperties(enabled = false)
+        labelHelperProperties = LabelHelperProperties(enabled = false),
+
     )
 }
 

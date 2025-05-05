@@ -40,6 +40,7 @@ import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.today
 import kotlinx.datetime.LocalDate
 
 
@@ -100,10 +101,7 @@ fun DayDialog(
 
             Button(
                 onClick = {
-
-                    val filter = dates.value.filter { it > calendarViewModel.today.value }
-
-                    if (timeCode != 0 && project.isNotBlank() && filter.isEmpty()) { // CONSULTAR
+                    if (timeCode != 0 && project.isNotBlank()) {
                         onChangeDialog(false)
                         dates.value.forEach { date ->
                             calendarViewModel.addEmployeeActivity(

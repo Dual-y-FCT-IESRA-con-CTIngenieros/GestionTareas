@@ -85,17 +85,7 @@ object Database {
 
     suspend fun updateEmployeeActivity(data:EmployeeActivity){
         try {
-            supabase.from("EmployeeActivity").update({ mapOf("time" to data.time) }) {
-                filter {
-                    and {
-                        eq("idEmployee", data.idEmployee)
-                        eq("idTimeCode", data.idTimeCode)
-                        eq("idWorkOrder", data.idWorkOrder)
-                        eq("idActivity", data.idActivity)
-                        eq("date", data.date)
-                    }
-                }
-            }
+            supabase.from("EmployeeActivity").upsert(data)
         }catch (
             e:Exception
         ){
