@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import com.es.appmovil.widgets.UserData
@@ -20,11 +21,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.es.appmovil.viewmodel.DataViewModel
 
 
 class UserManageScreen: Screen {
     @Composable
     override fun Content() {
+
+        LaunchedEffect(Unit){
+            DataViewModel.cargarEmployees()
+            DataViewModel.cargarRoles()
+        }
+
+        val employees = DataViewModel.employees.value
+        val roles = DataViewModel.roles.value
+
         var showDialog by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)){
             Row(
@@ -39,7 +50,9 @@ class UserManageScreen: Screen {
                 )
             }
             LazyColumn {
-                item{ UserData(showDialog){showDialog = it}}
+                employees.forEachIndexed { index, employee ->
+                    item{ UserData(showDialog, index, employee, roles){showDialog = it}}
+                }
             }
         }
     }
