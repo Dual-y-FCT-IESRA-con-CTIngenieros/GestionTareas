@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -46,59 +47,73 @@ class AnualScreen : Screen {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
             }) {
-                Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+                Column {
+                    Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
 
-                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp)
+                        Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp)
 
-                    Spacer(Modifier.size(30.dp))
+                        Spacer(Modifier.size(30.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Horas Totales: $currentHours")
-                        Row {
-                            IconButton(
-                                onClick = {
-                                    if (index != 1) {
-                                        anualViewModel.changeIndex(1)
-                                    }
-                                }, modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
-                                    contentDescription = ""
-                                )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Horas Totales: $currentHours")
+                            Row {
+                                IconButton(
+                                    onClick = {
+                                        if (index != 1) {
+                                            anualViewModel.changeIndex(1)
+                                        }
+                                    }, modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                                        contentDescription = ""
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        if (index != 2) {
+                                            anualViewModel.changeIndex(2)
+                                        }
+                                    }, modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                        contentDescription = ""
+                                    )
+                                }
                             }
-                            IconButton(
-                                onClick = {
-                                    if (index != 2) {
-                                        anualViewModel.changeIndex(2)
-                                    }
-                                }, modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                    contentDescription = ""
-                                )
-                            }
+
                         }
 
+                        Spacer(Modifier.size(10.dp))
+
+                        ResumenAnual(anualViewModel)
+
+                        Spacer(Modifier.size(30.dp))
+
+                        TeoricoAnual(anualViewModel)
+
                     }
-
-                    Spacer(Modifier.size(10.dp))
-
-                    ResumenAnual(anualViewModel)
-
-                    Spacer(Modifier.size(20.dp))
-
-                    Text("Teórico")
-
-                    Spacer(Modifier.size(10.dp))
-
-                    TeoricoAnual(anualViewModel)
-
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 62.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        val meses = listOf("E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
+                        meses.forEach { mes ->
+                            Text(
+                                text = mes,
+                                fontSize = 12.sp,
+                                modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(end = 12.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
             }
         }

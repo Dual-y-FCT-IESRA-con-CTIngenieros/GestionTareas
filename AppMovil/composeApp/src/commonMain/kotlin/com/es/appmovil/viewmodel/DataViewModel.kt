@@ -107,6 +107,7 @@ object DataViewModel {
     val currentHours: StateFlow<Int> = _currentHours
 
     private var _currentMonth = MutableStateFlow("0")
+    private var _currentYear = MutableStateFlow("0")
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList:StateFlow<MutableList<Pie>> = _pieList
@@ -122,17 +123,19 @@ object DataViewModel {
 
     fun getMonth() {
         _currentMonth.value = today.value.monthNumber.toString()
+        _currentYear.value = today.value.year.toString()
     }
 
-    fun changeMonth(month:String) {
+    fun changeMonth(month:String, year:String) {
         _currentMonth.value = month
+        _currentYear.value = year
     }
 
     fun getPie() {
         val pies = mutableListOf<Pie>()
         val dateFilter = if (today.value.monthNumber.toString().length == 1) "0${_currentMonth.value}" else _currentMonth.value
         employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[1] ==  dateFilter}
+            .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[1] ==  dateFilter && it.date.split("-")[0] == _currentYear.value}
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null){

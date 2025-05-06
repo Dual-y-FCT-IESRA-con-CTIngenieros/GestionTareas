@@ -38,7 +38,7 @@ class ResumeViewmodel {
         val legend = mutableStateOf(mutableMapOf<String, Long>())
 
         timeCodes.value.forEach {
-            legend.value[it.idTimeCode.toString()] = it.color
+            legend.value[it.desc.take(10)] = it.color
         }
         return legend
     }

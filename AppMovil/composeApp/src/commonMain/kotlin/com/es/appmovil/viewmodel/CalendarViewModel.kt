@@ -66,7 +66,7 @@ class CalendarViewModel {
      */
     fun onMonthChangePrevious(month: DatePeriod) {
         today.value = today.value.minus(month)
-        changeMonth(today.value.monthNumber.toString())
+        changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
     }
 
@@ -85,7 +85,7 @@ class CalendarViewModel {
      */
     fun onMonthChangeFordward(month: DatePeriod) {
         today.value = today.value.plus(month)
-        changeMonth(today.value.monthNumber.toString())
+        changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
     }
 

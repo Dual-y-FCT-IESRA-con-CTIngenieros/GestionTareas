@@ -49,7 +49,6 @@ fun Calendar(
     actividades: List<EmployeeActivity>,
     timeCodes: List<TimeCodeDTO>
 ) {
-
     var monthChangeFlag = true
     var date by remember { mutableStateOf(fechaActual) }
     calendarViewmodel.generarBarrasPorDia(date)
@@ -85,7 +84,8 @@ fun Calendar(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = {
                 if (monthChangeFlag) {
@@ -123,18 +123,24 @@ fun Calendar(
         // Generamos el calendario
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().height(240.dp)
         ) {
 
             // Dias del mes anterior
             items(mesAnterior) { dia ->
                 val dayPrevMonth = mesAnterior - dia
-                val currentDate = if (fechaActual.monthNumber == 1) {
-                    LocalDate(fechaActual.year.minus(1), 12, dayPrevMonth)
-                } else {
-                    LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), dayPrevMonth)
-                }
 
+                val ultimoDiaMesAnterior =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber, 1)
+
+                val ultimoDia = ultimoDiaMesAnterior
+                    .minus(dayPrevMonth, DateTimeUnit.DAY).dayOfMonth
+
+                val currentDate = if (fechaActual.monthNumber == 1) {
+                    LocalDate(fechaActual.year.minus(1), 12, ultimoDia)
+                } else {
+                    LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), ultimoDia)
+                }
 
                 // Buscar si hay una actividad en esa fecha
                 val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
@@ -142,11 +148,7 @@ fun Calendar(
                 val color =
                     actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
 
-                val ultimoDiaMesAnterior =
-                    LocalDate(fechaActual.year, fechaActual.monthNumber, 1)
 
-                val ultimoDia = ultimoDiaMesAnterior
-                    .minus(dayPrevMonth, DateTimeUnit.DAY).dayOfMonth
 
                 otherMonthModifier = otherMonthModifier.clickable {
                     calendarViewmodel.changeDialog(true)
@@ -219,7 +221,9 @@ fun Calendar(
 
                 // Color por defecto o según actividad
                 val color =
-                    actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
+                    actividad?.let {
+                        colorPorTimeCode(it.idTimeCode, timeCodes)
+                    } ?: Color.LightGray
 
                 otherMonthModifier = otherMonthModifier.clickable {
                     calendarViewmodel.changeDialog(true)

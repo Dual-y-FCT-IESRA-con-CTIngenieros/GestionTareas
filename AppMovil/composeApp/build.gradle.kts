@@ -59,7 +59,8 @@ kotlin {
             // Libreria para graficos
             implementation ("io.github.ehsannarmani:compose-charts:0.1.2")
 
-
+            // Multiplatform settings para guardar la sesión
+            implementation("com.russhwolf:multiplatform-settings:1.3.0")
         }
     }
 }

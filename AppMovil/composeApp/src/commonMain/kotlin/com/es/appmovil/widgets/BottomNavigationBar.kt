@@ -85,7 +85,12 @@ fun BottomNavigationBar(navigator: Navigator) {
                         if (selected != index) {
                             if (canClick) {
                                 canClick = false
-                                navigator.push(screenItems[index])
+                                if (screenItems[index] !is ResumeScreen){
+                                    navigator.push(screenItems[index])
+                                } else {
+                                    navigator.replaceAll(ResumeScreen())
+                                }
+
                             }
                         }
                     }) {

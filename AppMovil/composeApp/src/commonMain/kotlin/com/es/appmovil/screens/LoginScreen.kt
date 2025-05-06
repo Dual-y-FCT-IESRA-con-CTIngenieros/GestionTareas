@@ -70,8 +70,14 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
+        val checkSess by userViewmodel.checkSess.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
+        if (!checkSess) {
+            CoroutineScope(Dispatchers.IO).launch {
+                userViewmodel.checkSession()
+            }
+        }
 
         if (loginError) {
             DialogError(loginErrorMesssage) {userViewmodel.resetError()}
@@ -127,9 +133,10 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         withContext(Dispatchers.IO) {
             Database.getEmployee(username)
         }
-        navigator.push(ResumeScreen())
+        //navigator.push(ResumeScreen())
         userViewmodel.resetVar()
         userViewmodel.resetError()
+        navigator.replaceAll(ResumeScreen())
     }
 
     /**

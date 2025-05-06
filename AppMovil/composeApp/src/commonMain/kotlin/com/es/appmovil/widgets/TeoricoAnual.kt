@@ -8,15 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.viewmodel.AnualViewModel
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
-import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
-import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 
 @Composable
@@ -48,8 +45,8 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
                     dotProperties = DotProperties(
                         enabled = true,
                         color = SolidColor(Color.White),
-                        strokeWidth = 4.dp,
-                        radius = 7.dp,
+                        strokeWidth = 2.dp,
+                        radius = 5.dp,
                         strokeColor = SolidColor(Color.Black),
                     )
                 )
@@ -58,8 +55,7 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
         animationMode = AnimationMode.Together(delayBuilder = {
             it * 500L
         }),
-        labelHelperProperties = LabelHelperProperties(enabled = false),
-
+        maxValue = 200.0
     )
 }
 
