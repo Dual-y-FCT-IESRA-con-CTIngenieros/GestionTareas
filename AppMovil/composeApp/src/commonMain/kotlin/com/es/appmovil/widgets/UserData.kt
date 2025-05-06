@@ -1,24 +1,18 @@
 package com.es.appmovil.widgets
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.PersonRemove
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,13 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +43,8 @@ fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
     val user by mutableStateOf("")
     var data = false
 
+    var expandido by remember { mutableStateOf(false) }
+
     val name by mutableStateOf("")
     val lastName1 by mutableStateOf("")
     val lastName2 by mutableStateOf("")
@@ -59,11 +54,28 @@ fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
 
 
 
-    Row(Modifier.fillMaxWidth().padding(16.dp).height(30.dp)) {
-        Icon(Icons.Filled.AccountCircle, contentDescription = "User")
-        Text(user)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.AccountCircle,
+            contentDescription = "User"
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = user,
+            modifier = Modifier.weight(1f) // Empuja el botón hacia la derecha
+        )
         IconButton(onClick = { data = !data }) {
-            Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Down Arrow")
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Down Arrow"
+            )
         }
     }
     if (showDialog) {
@@ -89,26 +101,32 @@ fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
                 onValueChange = {},
                 label = { Text("Segundo apellido") },
             )
-            OutlinedTextField(
-                value = seleccion,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Rol") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                modifier = Modifier.menuAnchor()
-            )
-            ExposedDropdownMenu(
+            ExposedDropdownMenuBox(
                 expanded = expandido,
-                onDismissRequest = { expandido = false }
+                onExpandedChange = { expandido = !expandido },
+                modifier = Modifier.padding(16.dp)
             ) {
-                opciones.forEach { opcion ->
-                    DropdownMenuItem(
-                        text = { androidx.compose.material.Text(opcion) },
-                        onClick = {
-                            seleccion = opcion
-                            expandido = false
-                        }
+                ExposedDropdownMenu(
+                    expanded = expandido,
+                    onDismissRequest = { expandido = false }
+                ) {
+                    OutlinedTextField(
+                        value = seleccion,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Rol") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                        modifier = Modifier.menuAnchor()
                     )
+                    opciones.forEach { opcion ->
+                        DropdownMenuItem(
+                            text = { androidx.compose.material.Text(opcion) },
+                            onClick = {
+                                seleccion = opcion
+                                expandido = false
+                            }
+                        )
+                    }
                 }
             }
             Button(onClick = {}) {

@@ -105,7 +105,7 @@ class ResumeScreen: Screen{
 
                     Spacer(Modifier.size(40.dp))
 
-                    Button(onClick = {navigator.push(CalendarScreen())},
+                    Button(onClick = {navigator.push(AdminScreen())},
                         elevation = ButtonDefaults.elevation(5.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                         shape = RoundedCornerShape(10.dp),

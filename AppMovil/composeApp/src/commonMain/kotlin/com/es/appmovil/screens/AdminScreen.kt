@@ -78,6 +78,7 @@ class AdminScreen : Screen {
                         modifier = Modifier.size(180.dp).clickable{
                             if (canClick) {
                                 canClick = false
+                                navigator.push(UserManageScreen())
                             }
                         },
                         elevation = CardDefaults.elevatedCardElevation(8.dp)
