@@ -8,6 +8,7 @@ import com.es.appmovil.model.EmployeeWO
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
+import com.es.appmovil.model.Rol
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
@@ -88,6 +89,26 @@ object DataViewModel {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeWO>("EmployeeWO")
             _employeeWO.value = datos
+        }
+    }
+
+    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
+    val employees: StateFlow<List<Employee>> = _employees
+
+    fun cargarEmployees(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Employee>("Employee")
+            _employees.value = datos
+        }
+    }
+
+    private val _roles = MutableStateFlow<List<Rol>>(emptyList())
+    val roles: StateFlow<List<Rol>> = _roles
+
+    fun cargarRoles() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Rol>("Role")
+            _roles.value = datos
         }
     }
 
