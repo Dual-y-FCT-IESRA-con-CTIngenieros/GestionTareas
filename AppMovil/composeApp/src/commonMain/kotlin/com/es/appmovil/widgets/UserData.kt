@@ -1,7 +1,7 @@
 package com.es.appmovil.widgets
 
 import androidx.compose.foundation.border
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,6 +27,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,22 +36,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.Rol
-import com.es.appmovil.viewmodel.DataViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserData(showDialog: Boolean, index: Int, employee: Employee, roles: List<Rol>, onChangeDialog: (Boolean) -> Unit) {
+fun UserData(
+    showDialog: Boolean,
+    index: Int,
+    employee: Employee,
+    roles: List<Rol>,
+    onChangeDialog: (Boolean) -> Unit
+) {
 
     val sheetState = rememberModalBottomSheetState()
 
     var expandido by remember { mutableStateOf(false) }
     var expandedIndex by remember { mutableStateOf<Int?>(null) }
     val opciones = roles.map { it.rol }
-    var seleccion by remember { mutableStateOf(opciones[0]) }
+    var seleccion by remember { mutableStateOf(roles.find { it.idRol == employee.idRol }?.rol ?: "") }
 
-    val name by mutableStateOf("")
-    val lastName by mutableStateOf("")
-    val email by mutableStateOf("")
+    val name by mutableStateOf(employee.nombre)
+    val lastName by mutableStateOf(employee.apellidos)
+    val email by mutableStateOf(employee.email)
 
 
 
@@ -80,7 +86,80 @@ fun UserData(showDialog: Boolean, index: Int, employee: Employee, roles: List<Ro
             )
         }
     }
+
     if (expandedIndex == index) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
+                .padding(8.dp)
+        ) {
+            Row{
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = name,
+                    onValueChange = {},
+                    label = { Text("Nombre") },
+                )
+                OutlinedTextField(
+                    modifier = Modifier.weight(2f),
+                    value = lastName,
+                    onValueChange = {},
+                    label = { Text("Primer apellido") },
+                )
+            }
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = email,
+                onValueChange = {},
+                label = { Text("Correo electrónico") },
+            )
+            ExposedDropdownMenuBox(
+                expanded = expandido,
+                onExpandedChange = { expandido = !expandido },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = seleccion,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Rol") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandido,
+                    onDismissRequest = { expandido = false }
+                ) {
+                    opciones.forEach { opcion ->
+                        DropdownMenuItem(
+                            text = { androidx.compose.material.Text(opcion) },
+                            onClick = {
+                                seleccion = opcion
+                                expandido = false
+                            }
+                        )
+                    }
+                }
+            }
+            Row(modifier =  Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.End){
+                Button(onClick = {}) {
+                    Text("Guardar")
+                }
+                Button(onClick = {}) {
+                    Icon(
+                        Icons.Filled.PersonRemove,
+                        contentDescription = "User Delete",
+                        tint = Color.Red
+                    )
+                }
+            }
+        }
+
+    }
+
+    if (showDialog) {
         ModalBottomSheet(
             onDismissRequest = {
                 onChangeDialog(false)
