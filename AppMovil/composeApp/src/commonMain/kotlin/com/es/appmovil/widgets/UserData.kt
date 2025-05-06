@@ -33,30 +33,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.model.Employee
+import com.es.appmovil.model.Rol
 import com.es.appmovil.viewmodel.DataViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
+fun UserData(showDialog: Boolean, index: Int, employee: Employee, roles: List<Rol>, onChangeDialog: (Boolean) -> Unit) {
 
-    LaunchedEffect(Unit){
-        DataViewModel.cargarEmployees()
-        DataViewModel.cargarRoles()
-    }
-
-    val opciones = listOf("Usuario", "Admin")
     val sheetState = rememberModalBottomSheetState()
-    val user by mutableStateOf("")
-    var data = false
 
     var expandido by remember { mutableStateOf(false) }
+    var expandedIndex by remember { mutableStateOf<Int?>(null) }
+    val opciones = roles.map { it.rol }
+    var seleccion by remember { mutableStateOf(opciones[0]) }
 
     val name by mutableStateOf("")
-    val lastName1 by mutableStateOf("")
-    val lastName2 by mutableStateOf("")
+    val lastName by mutableStateOf("")
     val email by mutableStateOf("")
-    val rol by mutableStateOf("")
-    var seleccion by remember { mutableStateOf(opciones[0]) }
 
 
 
@@ -74,17 +68,19 @@ fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = user,
+            text = employee.nombre,
             modifier = Modifier.weight(1f) // Empuja el botón hacia la derecha
         )
-        IconButton(onClick = { data = !data }) {
+        IconButton(onClick = {
+            expandedIndex = if (expandedIndex == index) null else index
+        }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
                 contentDescription = "Down Arrow"
             )
         }
     }
-    if (showDialog) {
+    if (expandedIndex == index) {
         ModalBottomSheet(
             onDismissRequest = {
                 onChangeDialog(false)
@@ -98,14 +94,14 @@ fun UserData(showDialog: Boolean, onChangeDialog: (Boolean) -> Unit) {
                 label = { Text("Nombre") },
             )
             OutlinedTextField(
-                value = lastName1,
+                value = lastName,
                 onValueChange = {},
                 label = { Text("Primer apellido") },
             )
             OutlinedTextField(
-                value = lastName2,
+                value = email,
                 onValueChange = {},
-                label = { Text("Segundo apellido") },
+                label = { Text("Correo electrónico") },
             )
             ExposedDropdownMenuBox(
                 expanded = expandido,

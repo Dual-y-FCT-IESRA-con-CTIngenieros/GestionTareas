@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WorkOrder(
-    val idWorkOrder: Int,
+    val idWorkOrder: String,
     val desc: String,
-    val projectManager: Int,
-    val idProject: Int,
-    val idEmployeeWO: Int
+    val projectManager: Int?,
+    val idProject: String,
+    val idAircraft: Int?
 )

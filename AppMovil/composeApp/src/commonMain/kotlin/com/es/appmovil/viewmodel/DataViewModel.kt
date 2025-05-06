@@ -107,7 +107,7 @@ object DataViewModel {
 
     fun cargarRoles() {
         CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Rol>("Role")
+            val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
         }
     }

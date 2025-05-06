@@ -51,7 +51,7 @@ class UserManageScreen: Screen {
             }
             LazyColumn {
                 employees.forEachIndexed { index, employee ->
-                    item{ UserData(showDialog, index, employee, roles){showDialog = it}}
+                    item{ UserData(showDialog, index, employee, roles) { showDialog = it } }
                 }
             }
         }

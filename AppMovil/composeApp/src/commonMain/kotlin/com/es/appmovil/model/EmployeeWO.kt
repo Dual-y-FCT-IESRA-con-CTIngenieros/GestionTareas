@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EmployeeWO(
-    val idEmployeeWorkOrder: Int,
+    val idWorkOrder: String,
+    val idEmployee:Int,
     val desc: String,
-    val idAircraft: Int,
-    val dateFrom: String,
-    val dateTo: String
+    val dateFrom: String?,
+    val dateTo: String?
 )

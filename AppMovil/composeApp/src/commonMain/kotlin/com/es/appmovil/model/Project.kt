@@ -4,9 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Project(
-    val idProject: Int,
+    val idProject: String,
     val desc: String,
-    val idCliente: Int,
-    val idArea: Int,
-    val idAircraft: Int
+    val idCliente: Int?,
+    val idArea: Int?
 )

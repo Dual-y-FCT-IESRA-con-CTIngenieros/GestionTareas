@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProjectTimeCode(
-    val idProject: Int,
+    val idProject: String,
     val idTimeCode: Int
 )
