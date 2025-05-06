@@ -11,7 +11,6 @@ import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.employeeWO
-import com.es.appmovil.viewmodel.DataViewModel.getMonth
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -112,7 +111,7 @@ class CalendarViewModel {
                 }
             }
         }
-        DataViewModel.getPie()
+        getPie()
     }
 
     fun generarBarrasPorDia(fechaSeleccionada: LocalDate) {

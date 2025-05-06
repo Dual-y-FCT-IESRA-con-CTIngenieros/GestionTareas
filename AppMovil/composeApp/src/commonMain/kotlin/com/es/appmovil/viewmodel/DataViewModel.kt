@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -52,7 +51,7 @@ object DataViewModel {
     }
 
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
-    val projects: StateFlow<List<Project>> = _projects
+    //val projects: StateFlow<List<Project>> = _projects
 
     private fun cargarProjects() {
         CoroutineScope(Dispatchers.IO).launch {
