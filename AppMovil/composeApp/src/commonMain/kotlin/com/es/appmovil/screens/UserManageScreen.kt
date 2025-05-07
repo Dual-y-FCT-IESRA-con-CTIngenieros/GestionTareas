@@ -3,6 +3,7 @@ package com.es.appmovil.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,12 +11,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -24,11 +33,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.es.appmovil.database.Database
+import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.widgets.UserData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class UserManageScreen : Screen {
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
 
@@ -40,7 +55,17 @@ class UserManageScreen : Screen {
         val employees = DataViewModel.employees.value
         val roles = DataViewModel.roles.value
 
+        val opciones = roles.map { it.rol }
+        val seleccionInicial = if (opciones.isNotEmpty()) opciones[1] else ""
+        var seleccion by remember { mutableStateOf(seleccionInicial) }
+
+        var name by mutableStateOf("")
+        var lastName by mutableStateOf("")
+        var email by mutableStateOf("")
+
         var showDialog by rememberSaveable { mutableStateOf(false) }
+        var expandido by remember { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState()
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
             Row(
@@ -59,8 +84,80 @@ class UserManageScreen : Screen {
             }
             LazyColumn {
                 employees.forEachIndexed { index, employee ->
-                    item { UserData(showDialog, index, employee, roles) { showDialog = it } }
+                    item { UserData(index, employee, roles) }
                 }
+            }
+        }
+        if (showDialog) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showDialog = false
+                },
+                sheetState = sheetState,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nombre") },
+                )
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Primer apellido") },
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Correo electrónico") },
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expandido,
+                    onExpandedChange = { expandido = !expandido },
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = seleccion,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Rol") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                        modifier = Modifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandido,
+                        onDismissRequest = { expandido = false }
+                    ) {
+
+                        opciones.forEach { opcion ->
+                            DropdownMenuItem(
+                                text = { androidx.compose.material.Text(opcion) },
+                                onClick = {
+                                    seleccion = opcion
+                                    expandido = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Button(onClick = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Database.addEmployee(
+                            EmployeeInsertDTO(
+                                name,
+                                lastName,
+                                email,
+                                "2023-01-01",
+                                roles.find { it.rol == seleccion }?.idRol ?: -1
+                            )
+                        )
+                    }
+                    showDialog = false
+                }
+                ) {
+                    Text("Guardar")
+                }
+
             }
         }
     }

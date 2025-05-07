@@ -1,14 +1,11 @@
-package com.es.appmovil.model
-
+package com.es.appmovil.model.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Employee(
-    val idEmployee: Int,
+data class EmployeeInsertDTO(
     val nombre: String,
     val apellidos: String,
     val email: String,
     val dateFrom: String,
-    val dateTo: String?,
     val idRol: Int
 )

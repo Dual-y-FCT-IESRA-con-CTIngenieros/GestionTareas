@@ -2,6 +2,8 @@ package com.es.appmovil.database
 
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.dto.EmployeeInsertDTO
+import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
@@ -57,6 +59,26 @@ object Database {
         }catch (
             e:Exception
         ){
+            println(e)
+        }
+    }
+
+    suspend fun addEmployee(data: EmployeeInsertDTO) {
+        try {
+            supabase.from("Employee").insert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun updateEmployee(data:EmployeeUpdateDTO){
+        try {
+            supabase.from("Employee").upsert(data)
+        }catch (
+            e:Exception
+            ){
             println(e)
         }
     }
