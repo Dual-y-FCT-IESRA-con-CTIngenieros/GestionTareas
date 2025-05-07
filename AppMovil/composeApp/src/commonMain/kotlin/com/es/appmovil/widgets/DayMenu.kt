@@ -108,6 +108,7 @@ fun DayDialog(
                     workOrdersTimeCodes,
                     timeCodeSeleccionado,
                     workSeleccionado,
+                    "WorkOrder",
                     Modifier.weight(1f).padding(start = 16.dp, top = 8.dp),
                     { dayMenuViewModel.onWorkOrder(it) },
                     { dayMenuViewModel.onWorkSelected(it) }
@@ -116,6 +117,7 @@ fun DayDialog(
                     activitiesTimeCodes,
                     timeCodeSeleccionado,
                     activitySeleccionado,
+                    "Activity",
                     Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
                     { dayMenuViewModel.onActivity(it) },
                     { dayMenuViewModel.onActivitySelected(it) })
@@ -226,6 +228,7 @@ fun ProjectsSelected(
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
     timeCodeSeleccionado: Int?,
     proyectoSeleccionado: String?,
+    placeholder:String,
     modifier: Modifier,
     onChangeProyect: (String) -> Unit,
     onProjectSelected: (String) -> Unit
@@ -248,7 +251,7 @@ fun ProjectsSelected(
             value = proyectoSeleccionado ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text("WorkOrder") },
+            label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
             modifier = Modifier.menuAnchor(),
             enabled = timeCodeSeleccionado != null
