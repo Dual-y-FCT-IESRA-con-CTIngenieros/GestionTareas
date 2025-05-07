@@ -8,9 +8,7 @@ import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
-import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
-import com.es.appmovil.viewmodel.DataViewModel.employeeWO
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -35,9 +33,6 @@ class CalendarViewModel {
 
     val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
-    private val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
-    val projectTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
-
     private var _employeeActivity = MutableStateFlow(employeeActivities.value)
     val employeeActivity: StateFlow<List<EmployeeActivity>> = _employeeActivity
 
@@ -45,13 +40,6 @@ class CalendarViewModel {
     val showDialog: StateFlow<Boolean> = _showDialog
 
     private var _reset = MutableStateFlow(false)
-
-//    val proyects = MutableStateFlow(DataViewModel.projects)
-//    private val _timeCodeSeleccionado = MutableStateFlow(null)
-//    val timeCodeSeleccionado: StateFlow<Int?> = _timeCodeSeleccionado
-//
-//    private val _proyectoSeleccionado = MutableStateFlow(null)
-//    val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
 
 
     fun changeDialog(bool: Boolean) {
