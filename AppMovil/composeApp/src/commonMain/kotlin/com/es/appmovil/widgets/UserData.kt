@@ -1,29 +1,22 @@
 package com.es.appmovil.widgets
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.PersonRemove
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -35,12 +28,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -49,19 +39,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.Popup
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.Rol
-import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.model.dto.EmployeeUpdateDTO
+import com.es.appmovil.utils.customButtonColors
+import com.es.appmovil.utils.customTextFieldColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -140,12 +126,14 @@ fun UserData(
             ) {
                 Row {
                     OutlinedTextField(
+                        colors = customTextFieldColors(),
                         modifier = Modifier.weight(1f),
                         value = name,
                         onValueChange = {},
                         label = { Text("Nombre") },
                     )
                     OutlinedTextField(
+                        colors = customTextFieldColors(),
                         modifier = Modifier.weight(2f),
                         value = lastName,
                         onValueChange = {},
@@ -153,6 +141,7 @@ fun UserData(
                     )
                 }
                 OutlinedTextField(
+                    colors = customTextFieldColors(),
                     modifier = Modifier.fillMaxWidth(),
                     value = email,
                     onValueChange = {},
@@ -165,6 +154,7 @@ fun UserData(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
+                        colors = customTextFieldColors(),
                         value = seleccion,
                         onValueChange = {},
                         readOnly = true,
@@ -191,7 +181,9 @@ fun UserData(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Button(onClick = {
+                    Button(
+                        colors = customButtonColors(),
+                        onClick = {
                         CoroutineScope(Dispatchers.Main).launch {
                             Database.updateEmployee(
                                 EmployeeUpdateDTO(
@@ -208,7 +200,9 @@ fun UserData(
                     }) {
                         Text("Guardar")
                     }
-                    Button(onClick = {
+                    Button(
+                        colors = customButtonColors(),
+                        onClick = {
                         alertOpen = true
                     }) {
                         Icon(
@@ -264,7 +258,9 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
                             Text("Cancelar")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = {
+                        Button(
+                            colors = customButtonColors(),
+                            onClick = {
                             employee.dateTo = dateTo.value
                             CoroutineScope(Dispatchers.Main).launch {
                                 Database.updateEmployee(
@@ -301,6 +297,7 @@ fun DatePickerDialogSample(dateFrom: MutableState<String>) {
 
     OutlinedTextField(
         value = dateFrom.value,
+        colors = customTextFieldColors(),
         onValueChange = {},
         label = { Text("Fecha") },
         readOnly = true,
