@@ -20,13 +20,10 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 
 /**
  * Clase viewmodel para el calendario, donde guardaremos los datos del calendario y sus posibles funciones
@@ -47,6 +44,8 @@ class CalendarViewModel {
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
+    private var _reset = MutableStateFlow(false)
+
 //    val proyects = MutableStateFlow(DataViewModel.projects)
 //    private val _timeCodeSeleccionado = MutableStateFlow(null)
 //    val timeCodeSeleccionado: StateFlow<Int?> = _timeCodeSeleccionado
@@ -54,10 +53,10 @@ class CalendarViewModel {
 //    private val _proyectoSeleccionado = MutableStateFlow(null)
 //    val proyectoSeleccionado: StateFlow<String?> = _proyectoSeleccionado
 
+
     fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
-
 
     /**
      * Función para cambiar el mes que se muestra en el calendario
@@ -67,15 +66,7 @@ class CalendarViewModel {
         today.value = today.value.minus(month)
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
-    }
-
-    /**
-     * Funcion para cambiar el mes al actual
-     */
-    fun resetMonth() {
-        today.value = Clock.System.now().toLocalDateTime(
-            TimeZone.currentSystemDefault()
-        ).date
+        _reset.value = true
     }
 
     /**
@@ -86,6 +77,20 @@ class CalendarViewModel {
         today.value = today.value.plus(month)
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
+        _reset.value = true
+    }
+
+    private fun resetBars() {
+        _bars.value = listOf(Bars(
+            label = "",
+            values = listOf(
+                Bars.Data(
+                    label = "",
+                    value = 0.0,
+                    color = SolidColor(Color.Black)
+                )
+            )
+        ))
     }
 
     fun addEmployeeActivity(employeeActivity: EmployeeActivity){
@@ -121,17 +126,9 @@ class CalendarViewModel {
             LocalDate.parse(it.date) == fechaSeleccionada
         }
 
-        if (actividadesDelDia.isEmpty()) {
-            _bars.value = listOf(Bars(
-                label = "",
-                values = listOf(
-                    Bars.Data(
-                        label = "",
-                        value = 0.0,
-                        color = SolidColor(Color.Black)
-                    )
-                )
-            ))
+        if (actividadesDelDia.isEmpty() || _reset.value) {
+            resetBars()
+            _reset.value = false
             return
         }
 
@@ -152,36 +149,4 @@ class CalendarViewModel {
             )
         )
     }
-
-    fun generarProjectsTimeCode() {
-        val workOrdersPorTimeCode = mutableListOf<ProjectTimeCodeDTO>()
-        val timeCodeProcesados = mutableSetOf<Int>()
-
-        projectTimeCodes.value.forEach { code ->
-            if (code.idTimeCode !in timeCodeProcesados) {
-                timeCodeProcesados.add(code.idTimeCode)
-
-                // Filtramos los proyectos que tienen este timeCode
-                val proyectosAsociados = projectTimeCodes.value
-                    .filter { it.idTimeCode == code.idTimeCode }
-                    .map { it.idProject }
-
-                // Obtenemos los workOrders de esos proyectos
-                val workOrdersAsociados = DataViewModel.workOrders.value
-                    .filter { it.idProject in proyectosAsociados }
-                    .map { it.idWorkOrder }
-
-                // Filtramos por los workOrders en los que participa el empleado
-                val workOrdersEmpleado = employeeWO.value
-                    .filter { it.idWorkOrder in workOrdersAsociados && it.idEmployee == employee.idEmployee }
-                    .map { it.idWorkOrder }
-
-                val dto = ProjectTimeCodeDTO(code.idTimeCode, workOrdersEmpleado.toMutableList())
-                workOrdersPorTimeCode.add(dto)
-            }
-        }
-
-        projectTimeCodeDTO.value = workOrdersPorTimeCode
-    }
-
 }

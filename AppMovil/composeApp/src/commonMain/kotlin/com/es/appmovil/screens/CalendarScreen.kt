@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.viewmodel.DayMenuViewModel
 import com.es.appmovil.widgets.ActionButton
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.Calendar
@@ -38,6 +39,7 @@ class CalendarScreen() : Screen {
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
         val calendarViewmodel = CalendarViewModel()
+        val dayMenuViewModel = DayMenuViewModel()
 
         // Creamos las variables necesarias desde el viewmodel
         val fechaActual by today.collectAsState()
@@ -56,7 +58,7 @@ class CalendarScreen() : Screen {
 
                 Box(Modifier.padding(innerPadding).fillMaxSize()) {
                     Column {
-                        Calendar(calendarViewmodel, fechaActual, showDialog, actividades, timeCodes)
+                        Calendar(calendarViewmodel, dayMenuViewModel, fechaActual, showDialog, actividades, timeCodes)
                         Row {
                             ElevatedCard(
                                 colors = CardColors(

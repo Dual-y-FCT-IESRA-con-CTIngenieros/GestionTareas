@@ -67,7 +67,7 @@ class ResumeScreen: Screen{
                         LegendButton(resumeViewmodel)
                     }
 
-                    Spacer(Modifier.size(30.dp))
+                    Spacer(Modifier.size(10.dp))
 
                     ResumenSemana(resumeViewmodel)
                     Spacer(Modifier.size(20.dp))

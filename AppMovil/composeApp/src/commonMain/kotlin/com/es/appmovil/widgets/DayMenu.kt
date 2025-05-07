@@ -1,5 +1,6 @@
 package com.es.appmovil.widgets
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +40,7 @@ import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employee
-import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.viewmodel.DayMenuViewModel
 import kotlinx.datetime.LocalDate
 
 
@@ -55,18 +55,26 @@ import kotlinx.datetime.LocalDate
 fun DayDialog(
     showDialog: Boolean,
     day: LocalDate,
+    dayMenuViewModel: DayMenuViewModel,
     calendarViewModel: CalendarViewModel,
     onChangeDialog: (Boolean) -> Unit
 ) {
+    dayMenuViewModel.generateWorkOrders()
+    dayMenuViewModel.generateActivities()
     val sheetState = rememberModalBottomSheetState()
-    var comentario by remember { mutableStateOf("") }
-    var horas by remember { mutableStateOf(8) }
-    var timeCode by rememberSaveable { mutableStateOf(0) }
-    var project by rememberSaveable { mutableStateOf("") }
-    calendarViewModel.generarProjectsTimeCode()
-    val projectsTimeCodes by calendarViewModel.projectTimeCodeDTO.collectAsState()
-    var timeCodeSeleccionado by rememberSaveable { mutableStateOf<Int?>(null) }
-    var projectSeleccionado by rememberSaveable { mutableStateOf<String?>(null) }
+    val comentario by dayMenuViewModel.comment.collectAsState()
+    val horas by dayMenuViewModel.hours.collectAsState()
+
+    val timeCode by dayMenuViewModel.timeCode.collectAsState()
+    val timeCodeSeleccionado by dayMenuViewModel.timeCodeSeleccionado.collectAsState()
+
+    val workOrder by dayMenuViewModel.workOrder.collectAsState()
+    val workOrdersTimeCodes by dayMenuViewModel.workOrderTimeCodeDTO.collectAsState()
+    val workSeleccionado by dayMenuViewModel.workSelected.collectAsState()
+
+    val activity by dayMenuViewModel.activity.collectAsState()
+    val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
+    val activitySeleccionado by dayMenuViewModel.activitySelected.collectAsState()
 
 
     if (showDialog) {
@@ -80,55 +88,89 @@ fun DayDialog(
 
             val dates = remember { mutableStateOf(listOf(day)) }
 
-            DatePickerFieldToModal(Modifier.padding(16.dp), day) {
+            DatePickerFieldToModal(Modifier.padding(horizontal = 16.dp), day) {
                 dates.value = it
             }
-
+            Spacer(Modifier.size(8.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                NumberInputField(value = horas, onValueChange = { horas = it })
-                ProyectoYTimeCodeSelector(projectsTimeCodes, { timeCode = it }, timeCodeSeleccionado, {timeCodeSeleccionado = it}, {projectSeleccionado = it})
+                NumberInputField(value = horas, onValueChange = { dayMenuViewModel.onHours(it) })
+                ProyectoYTimeCodeSelector(
+                    workOrdersTimeCodes,
+                    { dayMenuViewModel.onTimeCode(it) },
+                    timeCodeSeleccionado,
+                    { dayMenuViewModel.onTimeSelected(it) },
+                    { dayMenuViewModel.onWorkSelected(it) })
             }
 
-            ProjectsSelected(projectsTimeCodes, timeCodeSeleccionado, projectSeleccionado, {project = it}, {projectSeleccionado = it})
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                ProjectsSelected(
+                    workOrdersTimeCodes,
+                    timeCodeSeleccionado,
+                    workSeleccionado,
+                    Modifier.weight(1f).padding(start = 16.dp, top = 8.dp),
+                    { dayMenuViewModel.onWorkOrder(it) },
+                    { dayMenuViewModel.onWorkSelected(it) }
+                )
+                ProjectsSelected(
+                    activitiesTimeCodes,
+                    timeCodeSeleccionado,
+                    activitySeleccionado,
+                    Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
+                    { dayMenuViewModel.onActivity(it) },
+                    { dayMenuViewModel.onActivitySelected(it) })
+            }
+
 
             OutlinedTextField(
                 value = comentario,
-                onValueChange = { comentario = it },
+                onValueChange = { dayMenuViewModel.onComment(it) },
                 label = { Text("Comentario") },
-                modifier = Modifier.fillMaxWidth().padding(16.dp).height(100.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).height(100.dp)
             )
 
-            Button(
-                onClick = {
-                    if (timeCode != 0 && project.isNotBlank()) {
-                        onChangeDialog(false)
-                        dates.value.forEach { date ->
-                            calendarViewModel.addEmployeeActivity(
-                                EmployeeActivity(
-                                    employee.idEmployee,
-                                    project,
-                                    timeCode,
-                                    59,
-                                    horas.toFloat(),
-                                    date.toString(),
-                                    comentario
-                                )
-                            )
-                        }
-
-                    }
-                },
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFFF5B014),
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Guardar")
-            }
+            Save(timeCode, workOrder, activity, { onChangeDialog(false) }, {
+                dates.value.forEach { date ->
+                    calendarViewModel.addEmployeeActivity(
+                        EmployeeActivity(
+                            employee.idEmployee,
+                            workOrder,
+                            timeCode,
+                            activity.toIntOrNull() ?: 59,
+                            horas.toFloat(),
+                            date.toString(),
+                            comentario
+                        )
+                    )
+                }
+            })
             Spacer(modifier = Modifier.size(16.dp))
         }
+    }
+}
+
+@Composable
+fun Save(
+    timeCode: Int,
+    workOrder: String,
+    activity: String,
+    onChangeDialog: () -> Unit,
+    onSaveEmploye: () -> Unit
+) {
+    Button(
+        onClick = {
+            if (timeCode != 0 && workOrder.isNotBlank() && activity.isNotBlank()) {
+                onChangeDialog()
+                onSaveEmploye()
+            }
+        },
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFFF5B014),
+            contentColor = Color.Black
+        )
+    ) {
+        Text("Guardar")
     }
 }
 
@@ -138,8 +180,8 @@ fun ProyectoYTimeCodeSelector(
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
     onTimeCodeSelected: (Int) -> Unit,
     timeCodeSeleccionado: Int?,
-    onTimeCodeChange:(Int)->Unit,
-    onProyectChange:(String?)->Unit,
+    onTimeCodeChange: (Int) -> Unit,
+    onProyectChange: (String?) -> Unit,
 ) {
     var expandirTimeCode by remember { mutableStateOf(false) }
 
@@ -162,17 +204,18 @@ fun ProyectoYTimeCodeSelector(
             expanded = expandirTimeCode,
             onDismissRequest = { expandirTimeCode = false }
         ) {
-            proyectTimecodesDTO.map { it.idTimeCode }.distinct().forEach { timeCode ->
-                DropdownMenuItem(
-                    text = { Text(timeCode.toString()) },
-                    onClick = {
-                        onTimeCodeChange(timeCode)
-                        onProyectChange(null)
-                        onTimeCodeSelected(timeCode)
-                        expandirTimeCode = false
-                    }
-                )
-            }
+            proyectTimecodesDTO.sortedBy { it.idTimeCode }.map { it.idTimeCode }.distinct()
+                .forEach { timeCode ->
+                    DropdownMenuItem(
+                        text = { Text(timeCode.toString()) },
+                        onClick = {
+                            onTimeCodeChange(timeCode)
+                            onProyectChange(null)
+                            onTimeCodeSelected(timeCode)
+                            expandirTimeCode = false
+                        }
+                    )
+                }
         }
     }
 }
@@ -181,12 +224,12 @@ fun ProyectoYTimeCodeSelector(
 @Composable
 fun ProjectsSelected(
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
-    timeCodeSeleccionado:Int?,
-    proyectoSeleccionado:String?,
-    onChangeProyect:(String)-> Unit,
+    timeCodeSeleccionado: Int?,
+    proyectoSeleccionado: String?,
+    modifier: Modifier,
+    onChangeProyect: (String) -> Unit,
     onProjectSelected: (String) -> Unit
 ) {
-
     var expandirProyecto by remember { mutableStateOf(false) }
 
     // Una vez que se selecciona el timeCode, filtrar los proyectos asociados
@@ -195,18 +238,17 @@ fun ProjectsSelected(
         ?.projects
         .orEmpty()
 
-
     // Dropdown de Proyectos (solo si ya se eligió un TimeCode)
     ExposedDropdownMenuBox(
         expanded = expandirProyecto,
         onExpandedChange = { expandirProyecto = !expandirProyecto },
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 16.dp, end = 16.dp)
+        modifier = modifier
     ) {
         OutlinedTextField(
             value = proyectoSeleccionado ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text("Seleccione WorkOrder") },
+            label = { Text("WorkOrder") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
             modifier = Modifier.menuAnchor(),
             enabled = timeCodeSeleccionado != null
@@ -230,43 +272,6 @@ fun ProjectsSelected(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownEjemplo(opciones: List<String>, onTimeCodeSelected: (String) -> Unit) {
-    var seleccion by remember { mutableStateOf(opciones.firstOrNull() ?: "") }
-    var expandido by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expandido,
-        onExpandedChange = { expandido = !expandido },
-        modifier = Modifier.padding(16.dp)
-    ) {
-        OutlinedTextField(
-            value = seleccion,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Seleccione time code") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-            modifier = Modifier.menuAnchor()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expandido,
-            onDismissRequest = { expandido = false }
-        ) {
-            opciones.forEach { codigo ->
-                DropdownMenuItem(
-                    text = { Text(codigo) },
-                    onClick = {
-                        seleccion = codigo
-                        onTimeCodeSelected(codigo)
-                        expandido = false
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun NumberInputField(
@@ -292,7 +297,6 @@ fun NumberInputField(
             modifier = Modifier.width(100.dp).padding(start = 16.dp)
         )
         Column {
-
             Button(
                 onClick = { if (value < 12) onValueChange(value + 1) },
                 colors = ButtonDefaults.buttonColors(

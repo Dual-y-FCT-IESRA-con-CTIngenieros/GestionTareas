@@ -33,6 +33,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
 import com.es.appmovil.screens.ResumeScreen
+import com.es.appmovil.viewmodel.DataViewModel.resetToday
 
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
@@ -86,8 +87,11 @@ fun BottomNavigationBar(navigator: Navigator) {
                             if (canClick) {
                                 canClick = false
                                 if (screenItems[index] !is ResumeScreen){
+                                    if (screenItems[index] is CalendarScreen)
+                                        resetToday()
                                     navigator.push(screenItems[index])
                                 } else {
+                                    resetToday()
                                     navigator.replaceAll(ResumeScreen())
                                 }
 

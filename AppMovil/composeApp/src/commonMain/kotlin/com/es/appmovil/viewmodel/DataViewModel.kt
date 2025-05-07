@@ -2,6 +2,7 @@ package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
+import com.es.appmovil.model.Activity
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.EmployeeWO
@@ -24,13 +25,56 @@ import kotlinx.datetime.toLocalDateTime
 
 object DataViewModel {
 
-    var today =
-        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+    var today = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+    var currentToday = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+
+    var employee = Employee(-1, "", "", "", "", null, -1)
 
 
+    // Variables comunes a varias pantallas
+    private var _currentHours = MutableStateFlow(0)
+    val currentHours: StateFlow<Int> = _currentHours
 
+    private var _currentMonth = MutableStateFlow("0")
+    private var _currentYear = MutableStateFlow("0")
+
+    private var _pieList = MutableStateFlow(mutableListOf<Pie>())
+    val pieList: StateFlow<MutableList<Pie>> = _pieList
+
+
+    // Listas con todos los datos de las tablas
     private val _timeCodes = MutableStateFlow<List<TimeCodeDTO>>(emptyList())
     val timeCodes: StateFlow<List<TimeCodeDTO>> = _timeCodes
+
+    private val _employeeActivities =
+        MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
+    val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
+
+    private val _projects = MutableStateFlow<List<Project>>(emptyList())
+    //val projects: StateFlow<List<Project>> = _projects
+
+    private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
+    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
+
+    private val _workOrders = MutableStateFlow<List<WorkOrder>>(emptyList())
+    val workOrders: StateFlow<List<WorkOrder>> = _workOrders
+
+    private val _activities = MutableStateFlow<List<Activity>>(emptyList())
+    val activities: StateFlow<List<Activity>> = _activities
+
+    private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
+    val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
+
+    // Carga de los datos de la base de datos
+    init {
+        cargarTimeCodes()
+        cargarEmployeeActivities()
+        cargarProjects()
+        cargarProjectsTimeCode()
+        cargarWorkOrders()
+        cargarActivities()
+        cargarEmployeeWO()
+    }
 
     private fun cargarTimeCodes() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -39,19 +83,12 @@ object DataViewModel {
 
         }
     }
-
-    private val _employeeActivities = MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
-    val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
-
     private fun cargarEmployeeActivities() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
             _employeeActivities.value = datos.toMutableList()
         }
     }
-
-    private val _projects = MutableStateFlow<List<Project>>(emptyList())
-    //val projects: StateFlow<List<Project>> = _projects
 
     private fun cargarProjects() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -60,19 +97,12 @@ object DataViewModel {
         }
     }
 
-    private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
-    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
-
     private fun cargarProjectsTimeCode() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<ProjectTimeCode>("ProjectTimeCode")
             _projectTimeCodes.value = datos
         }
     }
-
-    private val _workOrders = MutableStateFlow<List<WorkOrder>>(emptyList())
-    val workOrders: StateFlow<List<WorkOrder>> = _workOrders
-
     private fun cargarWorkOrders() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<WorkOrder>("WorkOrder")
@@ -80,8 +110,13 @@ object DataViewModel {
         }
     }
 
-    private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
-    val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
+    private fun cargarActivities() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Activity>("Activity")
+            _activities.value = datos
+
+        }
+    }
 
     private fun cargarEmployeeWO() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -90,27 +125,8 @@ object DataViewModel {
         }
     }
 
-    init {
-        cargarTimeCodes()
-        cargarEmployeeActivities()
-        cargarProjects()
-        cargarProjectsTimeCode()
-        cargarWorkOrders()
-        cargarEmployeeWO()
-    }
 
-    var employee = Employee(-1, "", "", "", "", null, -1)
-
-
-    private var _currentHours = MutableStateFlow(0)
-    val currentHours: StateFlow<Int> = _currentHours
-
-    private var _currentMonth = MutableStateFlow("0")
-    private var _currentYear = MutableStateFlow("0")
-
-    private var _pieList = MutableStateFlow(mutableListOf<Pie>())
-    val pieList:StateFlow<MutableList<Pie>> = _pieList
-
+    // Funciones comunes a varias pantallas
     fun getHours() {
         _currentHours.value = 0
         employeeActivities.value
@@ -125,45 +141,57 @@ object DataViewModel {
         _currentYear.value = today.value.year.toString()
     }
 
-    fun changeMonth(month:String, year:String) {
+    fun resetToday() {
+        today.value = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
+    }
+
+    fun changeMonth(month: String, year: String) {
         _currentMonth.value = month
         _currentYear.value = year
     }
 
     fun getPie() {
         val pies = mutableListOf<Pie>()
-        val dateFilter = if (today.value.monthNumber.toString().length == 1) "0${_currentMonth.value}" else _currentMonth.value
+        val dateFilter =
+            if (today.value.monthNumber.toString().length == 1) "0${_currentMonth.value}"
+            else _currentMonth.value
         employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[1] ==  dateFilter && it.date.split("-")[0] == _currentYear.value}
-            .forEach {
-                val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
-                if (timeCode != null){
-                    val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
-
-
-                    if (pie != null) {
-                        val timePie = pie.data + it.time
-                        pies.remove(pie)
-                        pies.add(
-                            Pie(
-                                label = timeCode.idTimeCode.toString(),
-                                data = timePie,
-                                color = Color(timeCode.color)
-                            )
-                        )
-                    } else {
-                        pies.add(
-                            Pie(
-                                label = timeCode.idTimeCode.toString(),
-                                data = it.time.toDouble(),
-                                color = Color(timeCode.color)
-                            )
-                        )
-                    }
-                }
+            .filter {
+                employee.idEmployee == it.idEmployee
+                        && it.date.split("-")[1] == dateFilter
+                        && it.date.split("-")[0] == _currentYear.value
+            }
+            .forEach { activity ->
+                createPie(pies, activity)
             }
         _pieList.value = pies
     }
 
+    private fun createPie(pies:MutableList<Pie>, activity:EmployeeActivity) {
+        val timeCode = timeCodes.value.find { time -> time.idTimeCode == activity.idTimeCode }
+        if (timeCode != null) {
+            val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
 
+            if (pie != null) {
+                val timePie = pie.data + activity.time
+                pies.remove(pie)
+                pies.add(
+                    Pie(
+                        label = timeCode.idTimeCode.toString(),
+                        data = timePie,
+                        color = Color(timeCode.color)
+                    )
+                )
+            } else {
+                pies.add(
+                    Pie(
+                        label = timeCode.idTimeCode.toString(),
+                        data = activity.time.toDouble(),
+                        color = Color(timeCode.color)
+                    )
+                )
+            }
+        }
+    }
 }

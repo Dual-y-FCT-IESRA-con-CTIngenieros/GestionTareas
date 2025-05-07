@@ -158,9 +158,16 @@ fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActua
                 }
             }, fontSize = 30.sp, lineHeight = 28.sp)
             Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
-            Text(text = "$fechaActual", fontSize = 14.sp)
+            Text(text = formatearFecha(fechaActual), fontSize = 14.sp)
         }
     }
+}
+
+fun formatearFecha(fecha: LocalDate): String {
+    val dia = fecha.dayOfMonth.toString().padStart(2, '0')
+    val mes = fecha.monthNumber.toString().padStart(2, '0')
+    val anio = fecha.year.toString()
+    return "$dia-$mes-$anio"
 }
 
 private fun getMeterValue(inputPercentage: Int): Int {

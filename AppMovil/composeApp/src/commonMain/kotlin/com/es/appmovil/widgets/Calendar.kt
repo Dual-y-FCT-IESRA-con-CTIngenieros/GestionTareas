@@ -32,7 +32,10 @@ import androidx.compose.ui.unit.sp
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
+import com.es.appmovil.viewmodel.DataViewModel.currentToday
 import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.resetToday
+import com.es.appmovil.viewmodel.DayMenuViewModel
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -44,6 +47,7 @@ import kotlinx.datetime.plus
 @Composable
 fun Calendar(
     calendarViewmodel: CalendarViewModel,
+    dayMenuViewModel: DayMenuViewModel,
     fechaActual: LocalDate,
     showDialog: Boolean,
     actividades: List<EmployeeActivity>,
@@ -74,7 +78,7 @@ fun Calendar(
         .graphicsLayer { alpha = 0.3f }
 
 
-    DayDialog(showDialog, date, calendarViewmodel) {
+    DayDialog(showDialog, date,dayMenuViewModel, calendarViewmodel) {
         calendarViewmodel.changeDialog(it)
     }
 
@@ -98,7 +102,7 @@ fun Calendar(
             Text(
                 "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
                 fontSize = 20.sp,
-                modifier = Modifier.clickable { calendarViewmodel.resetMonth() })
+                modifier = Modifier.clickable { resetToday() })
             IconButton(onClick = {
                 if (monthChangeFlag) {
                     monthChangeFlag = false
@@ -159,8 +163,14 @@ fun Calendar(
                     )
                     calendarViewmodel.generarBarrasPorDia(date)
                 }
+
+                val boxModifier = if (currentDate == currentToday.value) {
+                    otherMonthModifier.border(3.dp, Color(0xFFF5B014))
+                } else if(currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
+                else otherMonthModifier
+
                 Box(
-                    modifier = otherMonthModifier.background(color),
+                    modifier = boxModifier.background(color),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = ultimoDia.toString(), fontSize = 16.sp)
@@ -195,9 +205,10 @@ fun Calendar(
                         calendarViewmodel.generarBarrasPorDia(date)
                     }
 
-                val boxModifier = if (dayActualMonth == fechaActual.dayOfMonth) {
+                val boxModifier = if (currentDate == currentToday.value) {
                     modifier.border(3.dp, Color(0xFFF5B014))
-                } else modifier
+                } else if(currentDate == date) modifier.border(2.dp, Color.Black)
+                else modifier
 
                 Box(
                     modifier = boxModifier,
@@ -235,8 +246,13 @@ fun Calendar(
                     calendarViewmodel.generarBarrasPorDia(date)
                 }.background(color)
 
+                val boxModifier = if (currentDate == currentToday.value) {
+                    otherMonthModifier.border(3.dp, Color(0xFFF5B014))
+                } else if(currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
+                else otherMonthModifier
+
                 Box(
-                    modifier = otherMonthModifier,
+                    modifier = boxModifier,
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = dayNextMonth.toString(), fontSize = 16.sp)
