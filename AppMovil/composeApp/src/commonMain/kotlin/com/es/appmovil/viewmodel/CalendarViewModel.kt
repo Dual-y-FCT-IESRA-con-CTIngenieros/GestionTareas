@@ -4,8 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.ProjectTimeCode
-import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
