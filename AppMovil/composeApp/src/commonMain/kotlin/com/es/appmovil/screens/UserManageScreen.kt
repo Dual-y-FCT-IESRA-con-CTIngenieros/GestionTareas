@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.DropdownMenuItem
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -39,6 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.utils.customButtonColors
@@ -61,6 +66,7 @@ class UserManageScreen : Screen {
             DataViewModel.cargarRoles()
         }
 
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val employees = DataViewModel.employees.value
         val roles = DataViewModel.roles.value
 
@@ -83,6 +89,9 @@ class UserManageScreen : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = {navigator.pop()}){
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
+                }
                 Text(
                     "Usuarios",
                     fontWeight = FontWeight.Black,
