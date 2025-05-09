@@ -1,5 +1,10 @@
 package com.es.appmovil.database
 
+import com.es.appmovil.model.Employee
+import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.dto.EmployeeInsertDTO
+import com.es.appmovil.model.dto.EmployeeUpdateDTO
+import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -34,9 +39,53 @@ object Database {
         }
     }
 
+    suspend fun getEmployee(email:String){
+        try {
+            val employees = supabase.from("Employee").select().decodeList<Employee>()
+
+            DataViewModel.employee = employees.first { it.email == email }
+
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+
+    }
+
     suspend fun addData(table: String, data: Any) {
         try {
             supabase.from(table).insert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun addEmployee(data: EmployeeInsertDTO) {
+        try {
+            supabase.from("Employee").insert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun updateEmployee(data:EmployeeUpdateDTO){
+        try {
+            supabase.from("Employee").upsert(data)
+        }catch (
+            e:Exception
+            ){
+            println(e)
+        }
+    }
+
+    suspend fun addEmployeeActivity(data: EmployeeActivity) {
+        try {
+            supabase.from("EmployeeActivity").insert(data)
         }catch (
             e:Exception
         ){
@@ -48,6 +97,34 @@ object Database {
         try {
             supabase.from(table).update(data) {
                 filter { eq(idName, id) }
+            }
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun updateEmployeeActivity(data:EmployeeActivity){
+        try {
+            supabase.from("EmployeeActivity").upsert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun deleteEmployeeActivity(data:EmployeeActivity) {
+        try {
+            supabase.from("EmployeeActivity").delete() {
+                filter {
+                    eq("idEmployee", data.idEmployee)
+                    eq("idTimeCode", data.idTimeCode)
+                    eq("idWorkOrder", data.idWorkOrder)
+                    eq("idActivity", data.idActivity)
+                    eq("date", data.date)
+                }
             }
         }catch (
             e:Exception

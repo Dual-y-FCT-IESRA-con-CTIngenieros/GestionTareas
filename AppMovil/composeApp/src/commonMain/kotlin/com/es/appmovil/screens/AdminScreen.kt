@@ -79,6 +79,7 @@ class AdminScreen : Screen {
                             if (canClick) {
                                   //navigator.push(UserManageScreen())
                                 canClick = false
+                                navigator.push(UserManageScreen())
                             }
                         },
                         elevation = CardDefaults.elevatedCardElevation(8.dp)

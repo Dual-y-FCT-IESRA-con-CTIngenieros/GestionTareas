@@ -17,77 +17,10 @@ import ir.ehsannarmani.compose_charts.RowChart
 import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+
 
 @Composable
 fun ResumenAnual(anualViewModel: AnualViewModel) {
-    val data = remember {
-        listOf(
-            Bars(
-                label = "Jan",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 70.0, color = SolidColor(Color.Red))
-                ),
-            ),
-            Bars(
-                label = "Feb",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 60.0, color = SolidColor(Color.Red))
-                ),
-            ),
-            Bars(
-                label = "Mar",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 70.0, color = SolidColor(Color.Red))
-                ),
-            ),
-            Bars(
-                label = "Apr",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 60.0, color = SolidColor(Color.Red))
-                ),
-            ),
-            Bars(
-                label = "May",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 50.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 70.0, color = SolidColor(Color.Red))
-                ),
-            ),
-            Bars(
-                label = "Jun",
-                values = listOf(
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Linux", value = 80.0, color = SolidColor(Color.Blue)),
-                    Bars.Data(label = "Windows", value = 60.0, color = SolidColor(Color.Red))
-                ),
-            ),
-        )
-    }
     val data2 by anualViewModel.bars.collectAsState()
     RowChart(
         modifier = Modifier.height(325.dp),
@@ -100,6 +33,3 @@ fun ResumenAnual(anualViewModel: AnualViewModel) {
         labelHelperProperties = LabelHelperProperties(enabled = false)
     )
 }
-
-
-
