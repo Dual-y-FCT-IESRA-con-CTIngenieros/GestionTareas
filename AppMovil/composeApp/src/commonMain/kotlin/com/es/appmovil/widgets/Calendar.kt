@@ -1,6 +1,7 @@
 package com.es.appmovil.widgets
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,14 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,31 +27,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import kotlinx.datetime.Clock
+import com.es.appmovil.model.EmployeeActivity
+import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.CalendarViewModel
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
+
 
 @Composable
-fun Calendar() {
-    var fechaActual by remember {
-        mutableStateOf(
-            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        )
-    }
+fun Calendar(calendarViewmodel: CalendarViewModel) {
 
-    val diasDelMes = obtenerDiasDelMes(fechaActual.year, fechaActual.monthNumber)
-    val primerDiaSemana = obtenerPrimerDiaSemana(fechaActual.year, fechaActual.monthNumber)
+    var monthChangeFlag = true
+    // Creamos las variables necesarias desde el viewmodel
+    val fechaActual by calendarViewmodel.today.collectAsState()
+    val actividades by calendarViewmodel.employeeActivity.collectAsState()
+    val timeCodes by calendarViewmodel.timeCodes.collectAsState()
 
+    // Creamos la variable que nos permite mostrar el dialogo
     var showDialog by remember { mutableStateOf(false) }
+    var date by remember { mutableStateOf(fechaActual) }
+    calendarViewmodel.generarBarrasPorDia(date)
 
-    DayDialog(showDialog) {
+    /**
+     * Obtenemos el número de días del mes, el mes anterior y el siguiente
+     * mediate unas fucniones
+     */
+    val diasDelMes = obtenerDiasDelMes(fechaActual.year, fechaActual.monthNumber)
+    val mesAnterior = primerDiaMes(fechaActual.year, fechaActual.monthNumber)
+    val mesSiguiente = obtenerMesSiguiente(fechaActual.year, fechaActual.monthNumber)
+
+    // Lista de dias de la semana abreviados
+    val diasSemana = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
+
+
+    // Modificador del mes siguiente o anterior
+    var otherMonthModifier = Modifier
+        .size(40.dp)
+        .clip(RoundedCornerShape(50))
+        .padding(4.dp)
+        .background(Color.LightGray.copy(alpha = 0.3f))
+        .graphicsLayer { alpha = 0.3f }
+
+
+    DayDialog(showDialog, date, calendarViewmodel) {
         showDialog = false
     }
 
@@ -65,18 +88,31 @@ fun Calendar() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { fechaActual = fechaActual.minus(DatePeriod(months = 1)) }) {
+            IconButton(onClick = {
+                if (monthChangeFlag){
+                    monthChangeFlag = false
+                    calendarViewmodel.onMonthChangePrevious(DatePeriod(months = 1))
+                }
+            }) {
                 Text("<", fontSize = 24.sp)
             }
-            Text("${fechaActual.month.name} ${fechaActual.year}", fontSize = 20.sp)
-            IconButton(onClick = { fechaActual = fechaActual.plus(DatePeriod(months = 1)) }) {
+            Text(
+                "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
+                fontSize = 20.sp,
+                modifier = Modifier.clickable { calendarViewmodel.resetMonth() })
+            IconButton(onClick = {
+                if (monthChangeFlag){
+                    monthChangeFlag = false
+                    calendarViewmodel.onMonthChangeFordward(DatePeriod(months = 1))
+                }
+            }) {
                 Text(">", fontSize = 24.sp)
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val diasSemana = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
+        // Generamos los dias de la semana
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             diasSemana.forEach { dia ->
                 Text(text = dia, fontSize = 16.sp, color = Color.Gray)
@@ -85,70 +121,151 @@ fun Calendar() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Generamos el calendario
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(primerDiaSemana) { Spacer(modifier = Modifier.size(40.dp)) }
+
+            // Dias del mes anterior
+            items(mesAnterior) { dia ->
+                val dayPrevMonth = mesAnterior - dia
+                val currentDate = if (fechaActual.monthNumber == 1) {
+                    LocalDate(fechaActual.year.minus(1), 12, dayPrevMonth)
+                } else {
+                    LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), dayPrevMonth)
+                }
+
+
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
+
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
+
+                val ultimoDiaMesAnterior =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber, 1)
+
+                val ultimoDia = ultimoDiaMesAnterior
+                    .minus(dayPrevMonth, DateTimeUnit.DAY).dayOfMonth
+
+                otherMonthModifier = otherMonthModifier.clickable {
+                    showDialog = true
+                    date = LocalDate(fechaActual.year, fechaActual.monthNumber.minus(1), ultimoDia)
+                    calendarViewmodel.generarBarrasPorDia(date)
+                }
+                Box(
+                    modifier = otherMonthModifier.background(color),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = ultimoDia.toString(), fontSize = 16.sp)
+                }
+            }
 
             // Días del mes
             items(diasDelMes) { dia ->
-                val day = dia + 1
+                val dayActualMonth = dia + 1
+                val currentDate =
+                    LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
 
-                if (day == fechaActual.dayOfMonth){
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.Cyan)
-                            .clickable {  showDialog = true },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = day.toString(), fontSize = 16.sp)
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
+
+                // Color por defecto o según actividad
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode,timeCodes) } ?: Color.LightGray
+
+                val modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(50))
+                    .padding(4.dp)
+                    .background(color)
+                    .clickable {
+                        if (tieneMenosDe8Horas(currentDate, actividades)) showDialog = true
+                        date = currentDate
+                        calendarViewmodel.generarBarrasPorDia(date)
                     }
-                }else {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray)
-                            .clickable { showDialog = true },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = day.toString(), fontSize = 16.sp)
-                    }
+
+                val boxModifier = if (dayActualMonth == fechaActual.dayOfMonth) {
+                    modifier.border(3.dp, Color(0xFFF5B014))
+                } else modifier
+
+                Box(
+                    modifier = boxModifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = dayActualMonth.toString(), fontSize = 16.sp)
+                }
+            }
+
+            // Dias del siguiente mes
+            items(mesSiguiente) { dia ->
+                val dayNextMonth = dia + 1
+                val currentDate = if (fechaActual.monthNumber == 12) {
+                    LocalDate(fechaActual.year.plus(1), 1, dayNextMonth)
+                } else {
+                    LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                }
+
+
+                // Buscar si hay una actividad en esa fecha
+                val actividad = actividades.find { it.date == currentDate.toString() }
+
+                // Color por defecto o según actividad
+                val color = actividad?.let { colorPorTimeCode(it.idTimeCode,timeCodes) } ?: Color.LightGray
+
+                otherMonthModifier = otherMonthModifier.clickable {
+                    showDialog = true
+                    date =
+                        LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
+                    calendarViewmodel.generarBarrasPorDia(date)
+                }.background(color)
+
+                Box(
+                    modifier = otherMonthModifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = dayNextMonth.toString(), fontSize = 16.sp)
                 }
             }
         }
     }
 }
 
-@Composable
-fun DayDialog(showDialog: Boolean, onChangeDialog:(Boolean)-> Unit) {
-
-    if (showDialog) {
-        Dialog(onDismissRequest = { onChangeDialog(false) }) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Column {
-                    Text("Dia")
-                    TextField(value = "", onValueChange = {})
-                    Text("Horas")
-                    TextField(value = "", onValueChange = {})
-                    Text("Codigo")
-                    TextField(value = "", onValueChange = {})
-
-                    Button({onChangeDialog(false)}) {
-                        Text("Guardar")
-                    }
-                }
-            }
-        }
+/**
+ * Función para obtener el nombre del mes en español
+ *
+ * @param monthNumber Número del mes
+ */
+fun monthNameInSpanish(monthNumber: String): String {
+    return when (monthNumber) {
+        "JANUARY" -> "Enero"
+        "FEBRUARY" -> "Febrero"
+        "MARCH" -> "Marzo"
+        "APRIL" -> "Abril"
+        "MAY" -> "Mayo"
+        "JUNE" -> "Junio"
+        "JULY" -> "Julio"
+        "AUGUST" -> "Agosto"
+        "SEPTEMBER" -> "Septiembre"
+        "OCTOBER" -> "Octubre"
+        "NOVEMBER" -> "Noviembre"
+        "DECEMBER" -> "Diciembre"
+        else -> monthNumber
     }
 }
 
+fun colorPorTimeCode(code: Int, timeCodes: List<TimeCodeDTO>): Color {
+    val timeCode = timeCodes.find { it.idTimeCode == code }
+    return if (timeCode != null) Color(timeCode.color.toLong())
+    else Color.Black
+}
+
+
+/**
+ * Función para obtener el número de días en un mes dado
+ *
+ * @param anio Número del año
+ * @param mes Número del mes
+ */
 fun obtenerDiasDelMes(anio: Int, mes: Int): Int {
     val fecha = LocalDate(anio, mes, 1)
 
@@ -161,12 +278,36 @@ fun obtenerDiasDelMes(anio: Int, mes: Int): Int {
     }
 }
 
-// Función para obtener el día de la semana del primer día del mes (0 = Lunes, 6 = Domingo)
-fun obtenerPrimerDiaSemana(anio: Int, mes: Int): Int {
+/**
+ *  Función para obtener el número del primer dia de la primera semana del mes dado
+ *
+ *  @param anio Número del año
+ *  @param mes Número del mes
+ */
+fun primerDiaMes(anio: Int, mes: Int): Int {
     val primerDia = LocalDate(anio, mes, 1).dayOfWeek
-    return primerDia.ordinal  // Ajuste para empezar en lunes
+    return primerDia.ordinal
 }
 
-fun diaActual(): LocalDate {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+/**
+ * Función para obtener el número de los primeros dias del siguiente mes al dado
+ *
+ * @param anio Número del año
+ * @param mes Número del mes
+ */
+fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
+    val primerDiaMesSiguiente = LocalDate(anio, mes, 1).plus(1, DateTimeUnit.MONTH)
+    val ultimoDia = primerDiaMesSiguiente
+        .minus(1, DateTimeUnit.DAY)
+
+    val diaSemanaUltimoDia = ultimoDia.dayOfWeek.isoDayNumber // 1 (Lunes) - 7 (Domingo)
+    return 7 - diaSemanaUltimoDia
+}
+
+fun tieneMenosDe8Horas(fecha: LocalDate, actividades: List<EmployeeActivity>): Boolean {
+    val totalHoras = actividades
+        .filter { it.date == fecha.toString() }
+        .sumOf { it.time.toDouble() }
+
+    return totalHoras < 8.0
 }

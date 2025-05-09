@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import com.es.appmovil.model.dto.TimeCodeDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.forEach
 
 class ResumeViewmodel {
 
@@ -18,7 +19,6 @@ class ResumeViewmodel {
 
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
-
 
     private fun getDays():Int {
         var fc = ""
@@ -51,11 +51,11 @@ class ResumeViewmodel {
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
-                    if (timeActivity.value.containsKey(timeCode.color)) {
-                        val hours = timeActivity.value[timeCode.color]?.plus(it.time)
-                        timeActivity.value[timeCode.color] = hours ?: 0f
+                    if (timeActivity.value.containsKey(timeCode.color.toLong())) {
+                        val hours = timeActivity.value[timeCode.color.toLong()]?.plus(it.time)
+                        timeActivity.value[timeCode.color.toLong()] = hours ?: 0f
                     } else {
-                        timeActivity.value[timeCode.color] = it.time
+                        timeActivity.value[timeCode.color.toLong()] = it.time
                     }
                 }
             }
@@ -71,7 +71,7 @@ class ResumeViewmodel {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 timeCode?.let { tc ->
                     val currentList = dayActivity.value[it.date] ?: mutableListOf()
-                    currentList.add(Color(tc.color))
+                    currentList.add(Color(tc.color.toLong()))
                     dayActivity.value[it.date] = currentList
                 }
             }

@@ -45,7 +45,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
-import com.es.appmovil.viewmodel.UserViewmodel
+import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +61,7 @@ import org.jetbrains.compose.resources.painterResource
  *
  * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
-class LoginScreen(private val userViewmodel: UserViewmodel) : Screen {
+class LoginScreen(private val userViewmodel: UserViewModel): Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual

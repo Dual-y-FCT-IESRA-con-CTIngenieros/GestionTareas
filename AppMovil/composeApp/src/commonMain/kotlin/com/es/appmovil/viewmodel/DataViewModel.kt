@@ -29,8 +29,6 @@ object DataViewModel {
     var today =
         MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
-
-
     private val _timeCodes = MutableStateFlow<List<TimeCodeDTO>>(emptyList())
     val timeCodes: StateFlow<List<TimeCodeDTO>> = _timeCodes
 
@@ -111,7 +109,6 @@ object DataViewModel {
             _roles.value = datos
         }
     }
-
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
@@ -124,8 +121,10 @@ object DataViewModel {
     var employee = Employee(-1, "", "", "", "", null, -1)
 
 
+
     private var _currentHours = MutableStateFlow(0)
     val currentHours: StateFlow<Int> = _currentHours
+
 
     private var _currentMonth = MutableStateFlow("0")
 
@@ -158,8 +157,7 @@ object DataViewModel {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null){
                     val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
-
-
+                   
                     if (pie != null) {
                         val timePie = pie.data + it.time
                         pies.remove(pie)
@@ -168,6 +166,7 @@ object DataViewModel {
                                 label = timeCode.idTimeCode.toString(),
                                 data = timePie,
                                 color = Color(timeCode.color)
+
                             )
                         )
                     } else {
@@ -176,6 +175,7 @@ object DataViewModel {
                                 label = timeCode.idTimeCode.toString(),
                                 data = it.time.toDouble(),
                                 color = Color(timeCode.color)
+
                             )
                         )
                     }

@@ -77,6 +77,7 @@ class AdminScreen : Screen {
                         ),
                         modifier = Modifier.size(180.dp).clickable{
                             if (canClick) {
+                                  //navigator.push(UserManageScreen())
                                 canClick = false
                                 navigator.push(UserManageScreen())
                             }
