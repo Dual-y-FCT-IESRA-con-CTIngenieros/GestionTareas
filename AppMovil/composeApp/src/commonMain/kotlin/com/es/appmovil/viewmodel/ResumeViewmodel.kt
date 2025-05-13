@@ -7,6 +7,7 @@ import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.DatePeriod
@@ -27,7 +28,6 @@ class ResumeViewmodel {
 
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
-
 
     fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
         val selectedDate = LocalDate(year, month, day)
@@ -89,7 +89,7 @@ class ResumeViewmodel {
                         timeActivity.value[timeCode.color] = it.time
                     }
                 }
-        }
+            }
         return timeActivity
     }
 

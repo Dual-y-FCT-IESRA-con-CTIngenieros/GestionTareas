@@ -27,6 +27,3 @@ fun ResumenAnual(anualViewModel: AnualViewModel) {
         labelHelperProperties = LabelHelperProperties(enabled = false)
     )
 }
-
-
-

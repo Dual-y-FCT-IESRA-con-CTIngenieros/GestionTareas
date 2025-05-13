@@ -9,6 +9,7 @@ import com.es.appmovil.model.EmployeeWO
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
+import com.es.appmovil.model.Rol
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -125,6 +127,46 @@ object DataViewModel {
         }
     }
 
+    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
+    val employees: StateFlow<List<Employee>> = _employees
+
+    fun cargarEmployees(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Employee>("Employee")
+            _employees.value = datos
+        }
+    }
+
+    private val _roles = MutableStateFlow<List<Rol>>(emptyList())
+    val roles: StateFlow<List<Rol>> = _roles
+
+    fun cargarRoles() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Rol>("Rol")
+            _roles.value = datos
+        }
+    }
+    init {
+        cargarTimeCodes()
+        cargarEmployeeActivities()
+        cargarProjects()
+        cargarProjectsTimeCode()
+        cargarWorkOrders()
+        cargarEmployeeWO()
+    }
+
+    var employee = Employee(-1, "", "", "", "", null, -1)
+
+
+
+    private var _currentHours = MutableStateFlow(0)
+    val currentHours: StateFlow<Int> = _currentHours
+
+
+    private var _currentMonth = MutableStateFlow("0")
+
+    private var _pieList = MutableStateFlow(mutableListOf<Pie>())
+    val pieList:StateFlow<MutableList<Pie>> = _pieList
 
     // Funciones comunes a varias pantallas
     fun getHours() {

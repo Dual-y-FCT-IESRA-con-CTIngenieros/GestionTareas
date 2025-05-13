@@ -46,46 +46,46 @@ fun ResumenHorasMensual() {
                 modifier = Modifier.width(180.dp).height(306.dp).align(Alignment.CenterHorizontally),
                 elevation = CardDefaults.elevatedCardElevation(5.dp)
 
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(Modifier.size(20.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(150.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Spacer(Modifier.size(20.dp))
+                    PieChart(
+                        modifier = Modifier.size(150.dp),
+                        data = dataGraphic,
+                        selectedScale = 1.2f,
+                        scaleAnimEnterSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ),
+                        colorAnimEnterSpec = tween(300),
+                        colorAnimExitSpec = tween(300),
+                        scaleAnimExitSpec = tween(300),
+                        spaceDegreeAnimExitSpec = tween(300),
+                        selectedPaddingDegree = 4f,
+                        spaceDegree = 6f,
+                        style = Pie.Style.Stroke(width = 30.dp)
+                    )
 
-                    Box(
-                        modifier = Modifier
-                            .size(150.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        PieChart(
-                            modifier = Modifier.size(150.dp),
-                            data = dataGraphic,
-                            selectedScale = 1.2f,
-                            scaleAnimEnterSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            colorAnimEnterSpec = tween(300),
-                            colorAnimExitSpec = tween(300),
-                            scaleAnimExitSpec = tween(300),
-                            spaceDegreeAnimExitSpec = tween(300),
-                            selectedPaddingDegree = 4f,
-                            spaceDegree = 6f,
-                            style = Pie.Style.Stroke(width = 30.dp)
-                        )
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Total")
-                            Text("${dataGraphic.sumOf { it.data.toInt() }}", fontWeight = FontWeight.Bold)
-                        }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Total")
+                        Text("${dataGraphic.sumOf { it.data.toInt() }}", fontWeight = FontWeight.Bold)
                     }
-                    Spacer(Modifier.size(20.dp))
-
-                    PieInfo(dataGraphic)
                 }
+                Spacer(Modifier.size(20.dp))
+
+                PieInfo(dataGraphic)
             }
         }
+    }
 
 }
 

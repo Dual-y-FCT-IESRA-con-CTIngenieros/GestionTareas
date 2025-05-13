@@ -55,7 +55,22 @@ class AdminScreen : Screen {
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically) {
+                    ElevatedCard(
+                        colors = CardColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.Black
+                        ),
+                        modifier = Modifier.size(180.dp).clickable{
+                            if (canClick) {
+                                  //navigator.push(UserManageScreen())
+                                canClick = false
+                                navigator.push(UserManageScreen())
+                            }
+                        },
+                        elevation = CardDefaults.elevatedCardElevation(8.dp)
                     ) {
                         Text(
                             "Administración",
