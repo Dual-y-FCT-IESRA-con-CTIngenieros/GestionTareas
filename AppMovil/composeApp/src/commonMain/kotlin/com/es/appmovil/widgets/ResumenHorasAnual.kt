@@ -63,25 +63,29 @@ fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
             val totalHours = timeActivity.value.values.sum()
 
             timeActivity.value.forEach { (color, hour) ->
-                Box(
-                    boxModifier.background(color = Color(color)).weight(hour / totalHours)
-                )
-                Spacer(Modifier.width(5.dp))
+                if (hour != 0f) {
+                    Box(
+                        boxModifier.background(color = Color(color)).weight(hour / totalHours)
+                    )
+                    Spacer(Modifier.width(5.dp))
+                }
             }
 
         }
         Spacer(Modifier.size(5.dp))
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
             timeActivity.value.forEach { (timeCode, hour) ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        Modifier
-                            .size(10.dp)
-                            .background(Color(timeCode), shape = CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("$hour", fontSize = 12.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
+                if (hour != 0f) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier
+                                .size(10.dp)
+                                .background(Color(timeCode), shape = CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("${hour.toInt()}", fontSize = 12.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
                 }
             }
         }

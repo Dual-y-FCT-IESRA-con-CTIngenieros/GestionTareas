@@ -30,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
@@ -156,11 +157,29 @@ fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActua
                 withStyle(style = SpanStyle(color = Color.Gray)) {
                     append("/$maxValue")
                 }
-            }, fontSize = 30.sp, lineHeight = 28.sp)
+            }, fontSize = calculateFontSize(meterValue, maxValue), lineHeight = 28.sp)
             Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
-            Text(text = "$fechaActual", fontSize = 14.sp)
+            Text(text = formatearFecha(fechaActual), fontSize = 14.sp)
         }
     }
+}
+
+fun calculateFontSize(meterValue: Int, maxValue: Int): TextUnit {
+    val longestLength = maxOf(meterValue.toString().length, maxValue.toString().length)
+    return when (longestLength) {
+        in 1..1 -> 42.sp
+        in 2..2 -> 38.sp
+        in 3..3 -> 30.sp
+        in 4..4 -> 24.sp
+        else -> 26.sp
+    }
+}
+
+fun formatearFecha(fecha: LocalDate): String {
+    val dia = fecha.dayOfMonth.toString().padStart(2, '0')
+    val mes = fecha.monthNumber.toString().padStart(2, '0')
+    val anio = fecha.year.toString()
+    return "$dia-$mes-$anio"
 }
 
 private fun getMeterValue(inputPercentage: Int): Int {

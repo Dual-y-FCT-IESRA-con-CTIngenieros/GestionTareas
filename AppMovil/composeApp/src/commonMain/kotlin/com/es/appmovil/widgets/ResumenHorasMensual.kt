@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.viewmodel.DataViewModel
-import com.es.appmovil.viewmodel.ResumeViewmodel
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
@@ -36,16 +35,16 @@ import ir.ehsannarmani.compose_charts.models.Pie
 fun ResumenHorasMensual() {
     DataViewModel.getPie()
     val dataGraphic by DataViewModel.pieList.collectAsState()
-    Column {
-        ElevatedCard(
-            colors = CardColors(
-                containerColor = Color.White,
-                contentColor = Color.Black,
-                disabledContainerColor = Color.Gray,
-                disabledContentColor = Color.Black
-            ),
-            modifier = Modifier.width(180.dp).height(306.dp).align(Alignment.CenterHorizontally),
-            elevation = CardDefaults.elevatedCardElevation(5.dp)
+        Column {
+            ElevatedCard(
+                colors = CardColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = Color.Black
+                ),
+                modifier = Modifier.width(180.dp).height(306.dp).align(Alignment.CenterHorizontally),
+                elevation = CardDefaults.elevatedCardElevation(5.dp)
 
         ) {
             Column(

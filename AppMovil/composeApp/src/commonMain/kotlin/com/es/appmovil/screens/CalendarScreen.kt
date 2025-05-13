@@ -14,6 +14,8 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +25,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.viewmodel.DayMenuViewModel
 import com.es.appmovil.widgets.ActionButton
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.Calendar
@@ -34,8 +38,17 @@ class CalendarScreen() : Screen {
     override fun Content() {
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
-
         val calendarViewmodel = CalendarViewModel()
+        val dayMenuViewModel = DayMenuViewModel()
+
+        // Creamos las variables necesarias desde el viewmodel
+        val fechaActual by today.collectAsState()
+        val actividades by calendarViewmodel.employeeActivity.collectAsState()
+        val timeCodes by calendarViewmodel.timeCodes.collectAsState()
+
+        // Creamos la variable que nos permite mostrar el dialogo
+        val showDialog by calendarViewmodel.showDialog.collectAsState()
+
         DataViewModel.getPie()
 
         MaterialTheme {
@@ -45,7 +58,7 @@ class CalendarScreen() : Screen {
 
                 Box(Modifier.padding(innerPadding).fillMaxSize()) {
                     Column {
-                        Calendar(calendarViewmodel)
+                        Calendar(calendarViewmodel, dayMenuViewModel, fechaActual, showDialog, actividades, timeCodes)
                         Row {
                             ElevatedCard(
                                 colors = CardColors(
@@ -69,7 +82,9 @@ class CalendarScreen() : Screen {
                                 ResumenHorasMensual()
                             }
                         }
-                        ActionButton { }
+                        ActionButton {
+                            calendarViewmodel.changeDialog(true)
+                        }
                     }
                 }
             }

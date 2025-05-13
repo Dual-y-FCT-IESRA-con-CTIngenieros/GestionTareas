@@ -2,9 +2,7 @@ package com.es.appmovil.widgets
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -26,9 +24,9 @@ fun ActionButton(pageFunc: () -> Unit) {
         FloatingActionButton(
             onClick = { pageFunc() },
             shape = CircleShape,
-            contentColor = Color(0xFF7F57FF), // espacio respecto al borde inferior
+            backgroundColor = Color(0xFFF4A900), // espacio respecto al borde inferior
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Menu")
+            Icon(Icons.Filled.Add, contentDescription = "Menu", tint = Color.Black)
         }
     }
 }

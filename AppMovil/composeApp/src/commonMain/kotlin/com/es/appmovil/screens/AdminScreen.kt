@@ -50,24 +50,12 @@ class AdminScreen : Screen {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
             }) {
-            }
 
-            Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Administración",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 25.sp
-                    )
-                }
-
-                Spacer(Modifier.size(30.dp))
-
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically) {
                     ElevatedCard(
                         colors = CardColors(
                             containerColor = Color.White,
@@ -84,118 +72,144 @@ class AdminScreen : Screen {
                         },
                         elevation = CardDefaults.elevatedCardElevation(8.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.SupervisedUserCircle,
-                                contentDescription = "Usuario",
-                                modifier = Modifier.size(size.dp),
-                                tint = Color(0xFF707272)
-                            )
-                            Text("Gestión de Usuarios")
-                        }
-
+                        Text(
+                            "Administración",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 25.sp
+                        )
                     }
 
-                    ElevatedCard(
-                        colors = CardColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Black
-                        ),
-                        modifier = Modifier.size(180.dp).clickable{
-                            if (canClick) {
-                                canClick = false
-                            }
-                        },
-                        elevation = CardDefaults.elevatedCardElevation(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                    Spacer(Modifier.size(30.dp))
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.size(180.dp).clickable {
+                                if (canClick) {
+                                    //navigator.push(UserManageScreen())
+                                    canClick = false
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.TableView,
-                                contentDescription = "Usuario",
-                                modifier = Modifier.size(size.dp),
-                                tint = Color(0xFF707272)
-                            )
-                            Text("Gestión de Tablas")
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.SupervisedUserCircle,
+                                    contentDescription = "Usuario",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Gestión de Usuarios")
+                            }
+
                         }
 
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.size(180.dp).clickable {
+                                if (canClick) {
+                                    canClick = false
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.TableView,
+                                    contentDescription = "Usuario",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Gestión de Tablas")
+                            }
+
+                        }
+                    }
+
+                    Spacer(Modifier.size(30.dp))
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.size(180.dp).clickable {
+                                if (canClick) {
+                                    canClick = false
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Summarize,
+                                    contentDescription = "Usuario",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Generar Informes")
+                            }
+
+                        }
+
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.size(180.dp).clickable {
+                                if (canClick) {
+                                    canClick = false
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.EditCalendar,
+                                    contentDescription = "Usuario",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Gestión de calendario")
+                            }
+
+                        }
                     }
                 }
 
-                Spacer(Modifier.size(30.dp))
-
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ElevatedCard(
-                        colors = CardColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Black
-                        ),
-                        modifier = Modifier.size(180.dp).clickable{
-                            if (canClick) {
-                                canClick = false
-                            }
-                        },
-                        elevation = CardDefaults.elevatedCardElevation(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Summarize,
-                                contentDescription = "Usuario",
-                                modifier = Modifier.size(size.dp),
-                                tint = Color(0xFF707272)
-                            )
-                            Text("Generar Informes")
-                        }
-
-                    }
-
-                    ElevatedCard(
-                        colors = CardColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Black
-                        ),
-                        modifier = Modifier.size(180.dp).clickable{
-                            if (canClick) {
-                                canClick = false
-                            }
-                        },
-                        elevation = CardDefaults.elevatedCardElevation(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.EditCalendar,
-                                contentDescription = "Usuario",
-                                modifier = Modifier.size(size.dp),
-                                tint = Color(0xFF707272)
-                            )
-                            Text("Gestión de calendario")
-                        }
-
-                    }
-                }
             }
-
         }
     }
 }

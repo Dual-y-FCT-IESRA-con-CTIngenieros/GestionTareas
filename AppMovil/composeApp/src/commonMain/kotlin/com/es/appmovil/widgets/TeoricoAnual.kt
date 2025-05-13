@@ -11,9 +11,6 @@ import androidx.compose.ui.graphics.SolidColor
 
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.es.appmovil.model.Calendar
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.viewmodel.AnualViewModel
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
@@ -23,10 +20,6 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 
 @Composable
 fun TeoricoAnual(anualViewModel: AnualViewModel) {
@@ -57,8 +50,8 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
                     dotProperties = DotProperties(
                         enabled = true,
                         color = SolidColor(Color.White),
-                        strokeWidth = 4.dp,
-                        radius = 7.dp,
+                        strokeWidth = 2.dp,
+                        radius = 5.dp,
                         strokeColor = SolidColor(Color.Black),
                     )
                 )
@@ -67,7 +60,7 @@ fun TeoricoAnual(anualViewModel: AnualViewModel) {
         animationMode = AnimationMode.Together(delayBuilder = {
             it * 500L
         }),
-
+        maxValue = 200.0
         labelHelperProperties = LabelHelperProperties(enabled = false)
     )
 }
