@@ -8,6 +8,7 @@ import com.es.appmovil.model.EmployeeWO
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
+import com.es.appmovil.model.Rol
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
@@ -18,8 +19,15 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 object DataViewModel {
+
+    var today =
+        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
     private val _timeCodes = MutableStateFlow<List<TimeCodeDTO>>(emptyList())
     val timeCodes: StateFlow<List<TimeCodeDTO>> = _timeCodes
@@ -82,6 +90,25 @@ object DataViewModel {
         }
     }
 
+    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
+    val employees: StateFlow<List<Employee>> = _employees
+
+    fun cargarEmployees(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Employee>("Employee")
+            _employees.value = datos
+        }
+    }
+
+    private val _roles = MutableStateFlow<List<Rol>>(emptyList())
+    val roles: StateFlow<List<Rol>> = _roles
+
+    fun cargarRoles() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Rol>("Rol")
+            _roles.value = datos
+        }
+    }
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
@@ -91,11 +118,15 @@ object DataViewModel {
         cargarEmployeeWO()
     }
 
-    val employee = Employee(1, "Antonio", "Pardeza Julia", "apardeza@ctengineeringgroup.com", "2012-01-05", null, 1)
+    var employee = Employee(-1, "", "", "", "", null, -1)
+
 
 
     private var _currentHours = MutableStateFlow(0)
     val currentHours: StateFlow<Int> = _currentHours
+
+
+    private var _currentMonth = MutableStateFlow("0")
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList:StateFlow<MutableList<Pie>> = _pieList
@@ -109,16 +140,24 @@ object DataViewModel {
             }
     }
 
+    fun getMonth() {
+        _currentMonth.value = today.value.monthNumber.toString()
+    }
+
+    fun changeMonth(month:String) {
+        _currentMonth.value = month
+    }
+
     fun getPie() {
         val pies = mutableListOf<Pie>()
-
+        val dateFilter = if (today.value.monthNumber.toString().length == 1) "0${_currentMonth.value}" else _currentMonth.value
         employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee }
+            .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[1] ==  dateFilter}
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null){
                     val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
-
+                   
                     if (pie != null) {
                         val timePie = pie.data + it.time
                         pies.remove(pie)
@@ -126,7 +165,8 @@ object DataViewModel {
                             Pie(
                                 label = timeCode.idTimeCode.toString(),
                                 data = timePie,
-                                color = Color(timeCode.color.toLong())
+                                color = Color(timeCode.color)
+
                             )
                         )
                     } else {
@@ -134,7 +174,8 @@ object DataViewModel {
                             Pie(
                                 label = timeCode.idTimeCode.toString(),
                                 data = it.time.toDouble(),
-                                color = Color(timeCode.color.toLong())
+                                color = Color(timeCode.color)
+
                             )
                         )
                     }

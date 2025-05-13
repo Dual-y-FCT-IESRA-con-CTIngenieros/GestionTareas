@@ -3,10 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import com.es.appmovil.model.Employee
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
-import ir.ehsannarmani.compose_charts.models.Pie
+import com.es.appmovil.model.dto.TimeCodeDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.forEach
@@ -15,7 +12,7 @@ class ResumeViewmodel {
 
     private val employeeActivities = MutableStateFlow(DataViewModel.employeeActivities.value)
     private val employee = DataViewModel.employee
-    private val timeCodes = DataViewModel.timeCodes
+    private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
     private var _dailyHours = MutableStateFlow(8)
     val dailyHours: StateFlow<Int> = _dailyHours
@@ -23,7 +20,6 @@ class ResumeViewmodel {
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
 
-    
     private fun getDays():Int {
         var fc = ""
         var days = 0
@@ -38,11 +34,11 @@ class ResumeViewmodel {
         return days
     }
 
-    fun getLegend(): MutableState<MutableMap<String, ULong>> {
-        val legend = mutableStateOf(mutableMapOf<String, ULong>())
+    fun getLegend(): MutableState<MutableMap<String, Long>> {
+        val legend = mutableStateOf(mutableMapOf<String, Long>())
 
         timeCodes.value.forEach {
-            legend.value[it.desc] = it.color
+            legend.value[it.idTimeCode.toString()] = it.color
         }
         return legend
     }
@@ -62,7 +58,7 @@ class ResumeViewmodel {
                         timeActivity.value[timeCode.color.toLong()] = it.time
                     }
                 }
-        }
+            }
         return timeActivity
     }
 
