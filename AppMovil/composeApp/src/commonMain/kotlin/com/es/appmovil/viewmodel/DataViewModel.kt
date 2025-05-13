@@ -155,19 +155,6 @@ object DataViewModel {
         cargarEmployeeWO()
     }
 
-    var employee = Employee(-1, "", "", "", "", null, -1)
-
-
-
-    private var _currentHours = MutableStateFlow(0)
-    val currentHours: StateFlow<Int> = _currentHours
-
-
-    private var _currentMonth = MutableStateFlow("0")
-
-    private var _pieList = MutableStateFlow(mutableListOf<Pie>())
-    val pieList:StateFlow<MutableList<Pie>> = _pieList
-
     // Funciones comunes a varias pantallas
     fun getHours() {
         _currentHours.value = 0

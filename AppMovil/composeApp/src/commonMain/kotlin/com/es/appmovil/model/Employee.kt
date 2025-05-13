@@ -8,7 +8,7 @@ data class Employee(
     val nombre: String,
     val apellidos: String,
     val email: String,
-    val dateFrom: String?,
+    val dateFrom: String,
     val dateTo: String?,
     val idRol: Int
 )

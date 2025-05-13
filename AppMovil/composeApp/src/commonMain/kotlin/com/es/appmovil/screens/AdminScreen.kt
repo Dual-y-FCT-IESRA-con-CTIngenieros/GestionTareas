@@ -55,22 +55,7 @@ class AdminScreen : Screen {
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically) {
-                    ElevatedCard(
-                        colors = CardColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Black
-                        ),
-                        modifier = Modifier.size(180.dp).clickable{
-                            if (canClick) {
-                                  //navigator.push(UserManageScreen())
-                                canClick = false
-                                navigator.push(UserManageScreen())
-                            }
-                        },
-                        elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             "Administración",
@@ -81,7 +66,10 @@ class AdminScreen : Screen {
 
                     Spacer(Modifier.size(30.dp))
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
@@ -112,6 +100,7 @@ class AdminScreen : Screen {
                             }
 
                         }
+
 
                         ElevatedCard(
                             colors = CardColors(
@@ -146,7 +135,10 @@ class AdminScreen : Screen {
 
                     Spacer(Modifier.size(30.dp))
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
