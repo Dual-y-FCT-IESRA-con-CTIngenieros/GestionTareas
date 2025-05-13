@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -25,8 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,10 +43,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import com.es.appmovil.database.Database
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -64,11 +71,17 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
+        val checkSess by userViewmodel.checkSess.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
+        if (!checkSess) {
+            CoroutineScope(Dispatchers.IO).launch {
+                userViewmodel.checkSession()
+            }
+        }
 
         if (loginError) {
-            DialogError(loginErrorMesssage) {userViewmodel.resetError()}
+            DialogError(loginErrorMesssage) { userViewmodel.resetError() }
         }
 
         // Montamos la estructura
@@ -89,17 +102,23 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             Spacer(Modifier.size(20.dp))
 
             // Añadimos los campos a rellenar del usuario y la contraseña
-            PedirLogin(username, password, visibility,
+            PedirLogin(
+                username, password, visibility,
                 onChangeValue = { user, pass ->
                     userViewmodel.onChangeValue(user, pass)
                 },
-                onClickIcon = {userViewmodel.onChangeVisibility()}
+                onClickIcon = { userViewmodel.onChangeVisibility() }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Text("¿Olvidaste tu contraseña?", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFFF4A900), modifier = Modifier.clickable{} )
+                Text(
+                    "¿Olvidaste tu contraseña?",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color(0xFFF4A900),
+                    modifier = Modifier.clickable {})
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -107,14 +126,23 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Boton {userViewmodel.checkLogin()}
+                Boton { userViewmodel.checkLogin() }
                 if (login) {
-                    navigator.push(ResumeScreen())
-                    userViewmodel.resetVar()
-                    userViewmodel.resetError()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        doLogin(username, navigator)
+                    }
                 }
             }
         }
+    }
+
+    private suspend fun doLogin(username: String, navigator: Navigator) {
+        withContext(Dispatchers.IO) {
+            Database.getEmployee(username)
+        }
+        userViewmodel.resetVar()
+        userViewmodel.resetError()
+        navigator.replaceAll(ResumeScreen())
     }
 
     /**
@@ -128,11 +156,11 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
      */
     @Composable
     fun PedirLogin(
-        username:String,
-        password:String,
-        visibility:Boolean,
-        onChangeValue:(String, String) -> Unit,
-        onClickIcon:() -> Unit
+        username: String,
+        password: String,
+        visibility: Boolean,
+        onChangeValue: (String, String) -> Unit,
+        onClickIcon: () -> Unit
     ) {
         // TextField para el username
         OutlinedTextField(
@@ -142,7 +170,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
-            colors =  customTextFieldColors()
+            colors = customTextFieldColors()
         )
         Spacer(modifier = Modifier.height(2.dp)) // Separador entre ambos campos
         // TextField para la password
@@ -153,8 +181,8 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
-            colors =  customTextFieldColors(),
-            visualTransformation = if(!visibility) PasswordVisualTransformation() else VisualTransformation.None, // Ponemos los puntos o mostrarmos el texto
+            colors = customTextFieldColors(),
+            visualTransformation = if (!visibility) PasswordVisualTransformation() else VisualTransformation.None, // Ponemos los puntos o mostrarmos el texto
             trailingIcon = { // Dependiendo de si está visible o no cambia el icono
                 IconButton(onClick = onClickIcon) {
                     Icon(
@@ -194,7 +222,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
     }
 
     @Composable
-    fun customButtonColors():ButtonColors {
+    fun customButtonColors(): ButtonColors {
         return ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFF4A900),
             contentColor = Color.Black,
@@ -223,7 +251,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
      * @param onDismiss:() -> Unit función lambda que cierra el dialog
      */
     @Composable
-    fun DialogError(errorMessage:String,onDismiss:() -> Unit) {
+    fun DialogError(errorMessage: String, onDismiss: () -> Unit) {
         Dialog(onDismissRequest = onDismiss) { // Creamos el Dialog con la funcionalidad de cerrase
             Card( // Creamos y le damos un estilo bonito a la card
                 shape = RoundedCornerShape(16.dp),

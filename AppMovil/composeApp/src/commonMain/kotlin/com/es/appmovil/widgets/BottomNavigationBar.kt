@@ -7,15 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -37,6 +33,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
 import com.es.appmovil.screens.ResumeScreen
+import com.es.appmovil.viewmodel.DataViewModel.resetToday
 
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
@@ -84,14 +81,31 @@ fun BottomNavigationBar(navigator: Navigator) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEachIndexed { index, item ->
-                IconButton(onClick = {
-                    if (selected != index) {
-                        if (canClick) {
-                            canClick = false
-                            navigator.push(screenItems[index])
+                if (item != "Profile") {
+                    IconButton(onClick = {
+                        if (selected != index) {
+                            if (canClick) {
+                                canClick = false
+                                if (screenItems[index] !is ResumeScreen){
+                                    if (screenItems[index] is CalendarScreen)
+                                        resetToday()
+                                    navigator.push(screenItems[index])
+                                } else {
+                                    resetToday()
+                                    navigator.replaceAll(ResumeScreen())
+                                }
+
+                            }
                         }
+                    }) {
+                        Icon(
+                            imageVector = icons[index],
+                            contentDescription = item,
+                            tint = if (selected == index) Color(0xFFF4A900) else Color.Gray,
+                            modifier = Modifier.size(28.dp)
+                        )
                     }
-                }) {
+                } else { // PROVISIONAL CAMBIAR LUEGO
                     Icon(
                         imageVector = icons[index],
                         contentDescription = item,

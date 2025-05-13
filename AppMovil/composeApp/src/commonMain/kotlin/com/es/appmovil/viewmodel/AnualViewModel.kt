@@ -2,10 +2,9 @@ package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel.employee
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,13 +42,15 @@ class AnualViewModel {
 
     fun calcularHorasPorMes(): List<Double> {
         val hourMonth = employeeActivities.value
+            .filter { it.idEmployee == employee.idEmployee }
             .groupBy { it.date.split("-")[1].toInt() }
             .mapValues { (_, timeMonth) ->
                 timeMonth.sumOf { it.time.toDouble() }
             }
+        val teorico = calcularHorasTeoricasPorMes(generarCalendar())
 
-        return (1..12).map { mes ->
-            hourMonth[mes] ?: 0.0
+        return (0..11).map { mes ->
+            hourMonth[mes] ?: teorico[mes]
         }
     }
 
@@ -145,10 +146,10 @@ class AnualViewModel {
         return CalendarYearDTO(1, festivos2025)
     }
 
-    fun generarBarrasPorMes(i:Int) {
+    private fun generarBarrasPorMes(i:Int) {
         val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 
-        val actividadesPorMes = employeeActivities.value.groupBy {
+        val actividadesPorMes = employeeActivities.value.filter{it.idEmployee == employee.idEmployee}.groupBy {
             val fecha = LocalDate.parse(it.date)
             fecha.monthNumber to fecha.year
         }
@@ -162,13 +163,13 @@ class AnualViewModel {
             val claveMes = mes to year
             val actividadesDelMes = actividadesPorMes[claveMes]
 
-            val dataPorTimeCode = actividadesDelMes?.groupBy { it.idTimeCode }
+            val dataPorTimeCode = actividadesDelMes?.groupBy { it.idTimeCode  }
                 ?.mapNotNull { (idTimeCode, listaActividades) ->
                     val timeCode = timeCodeMap[idTimeCode] ?: return@mapNotNull null
                     Bars.Data(
                         label = timeCode.desc,
                         value = listaActividades.sumOf { it.time.toDouble() },
-                        color = SolidColor(Color(timeCode.color.toLong()))
+                        color = SolidColor(Color(timeCode.color))
                     )
                 } ?: emptyList()
 

@@ -19,35 +19,7 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 
 @Composable
 fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
-
-//  val actividades by calendarViewModel.employeeActivity.collectAsState()
-//  val activity = actividades.find { it.date == calendarViewModel.today.value.toString() }
-//  val hours = activity?.time?.toDouble() ?: 0.0
-//  val color = activity?.let { colorPorTimeCode(it.idTimeCode) } ?: Color.LightGray
     val data by calendarViewModel.bars.collectAsState()
-
-//    val activiti = EmployeeActivity(
-//        idEmployee = 1,
-//        idWorkOrder = 101,
-//        idTimeCode = 3,
-//        idActivity = 45,
-//        time = 7.5f,
-//        date = "2025-04-25",
-//        comment = "Trabajo en campo"
-//    )
-
-//    val bars = listOf(
-//        Bars.Data(
-//            label = activiti.idTimeCode.toString(),
-//            value = activiti.time.toDouble(),
-//            color = SolidColor(Color.Green)
-//        ),
-//        Bars.Data(
-//            label = "900",
-//            value = 10.0,
-//            color = SolidColor(Color.Yellow)
-//        ),
-//    )
 
     ColumnChart(
         modifier = Modifier.padding(16.dp).height(300.dp),
@@ -57,14 +29,6 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
             count = IndicatorCount.CountBased(7),
         ),
         data = data,
-//        remember {
-//            listOf(
-//                Bars(
-//                    label = activiti.date,
-//                    values = bars,
-//                )
-//            )
-//        },
         barProperties = BarProperties(
             cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
             spacing = 3.dp,

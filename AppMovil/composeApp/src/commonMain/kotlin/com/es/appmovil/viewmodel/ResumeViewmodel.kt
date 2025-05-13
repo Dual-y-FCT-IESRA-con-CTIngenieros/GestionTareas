@@ -3,25 +3,52 @@ package com.es.appmovil.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import com.es.appmovil.model.Employee
-import com.es.appmovil.model.EmployeeActivity
-import com.es.appmovil.model.TimeCode
-import ir.ehsannarmani.compose_charts.models.Pie
+import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel.changeMonth
+import com.es.appmovil.viewmodel.DataViewModel.getPie
+import com.es.appmovil.viewmodel.DataViewModel.today
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.forEach
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 class ResumeViewmodel {
 
     private val employeeActivities = MutableStateFlow(DataViewModel.employeeActivities.value)
     private val employee = DataViewModel.employee
-    private val timeCodes = DataViewModel.timeCodes
+    private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
     private var _dailyHours = MutableStateFlow(8)
     val dailyHours: StateFlow<Int> = _dailyHours
 
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
+
+    fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
+        val selectedDate = LocalDate(year, month, day)
+        val dayOfWeek = selectedDate.dayOfWeek.isoDayNumber // 1 (Lunes) a 7 (Domingo)
+
+        val firstDayOfWeek = selectedDate.minus(dayOfWeek - 1, DateTimeUnit.DAY)
+
+        return (0..6).map { firstDayOfWeek.plus(it, DateTimeUnit.DAY) }
+    }
+
+    fun onMonthChangePrevious(period: DatePeriod) {
+        today.value = today.value.minus(period)
+        changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
+        getPie()
+    }
+
+    fun onWeekChangeFordward(period: DatePeriod) {
+        today.value = today.value.plus(period)
+        changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
+        getPie()
+    }
 
     
     private fun getDays():Int {
@@ -38,11 +65,11 @@ class ResumeViewmodel {
         return days
     }
 
-    fun getLegend(): MutableState<MutableMap<String, ULong>> {
-        val legend = mutableStateOf(mutableMapOf<String, ULong>())
+    fun getLegend(): MutableState<MutableMap<String, Long>> {
+        val legend = mutableStateOf(mutableMapOf<String, Long>())
 
         timeCodes.value.forEach {
-            legend.value[it.desc] = it.color
+            legend.value[it.desc.take(10)] = it.color
         }
         return legend
     }
@@ -55,14 +82,14 @@ class ResumeViewmodel {
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
-                    if (timeActivity.value.containsKey(timeCode.color.toLong())) {
-                        val hours = timeActivity.value[timeCode.color.toLong()]?.plus(it.time)
-                        timeActivity.value[timeCode.color.toLong()] = hours ?: 0f
+                    if (timeActivity.value.containsKey(timeCode.color)) {
+                        val hours = timeActivity.value[timeCode.color]?.plus(it.time)
+                        timeActivity.value[timeCode.color] = hours ?: 0f
                     } else {
-                        timeActivity.value[timeCode.color.toLong()] = it.time
+                        timeActivity.value[timeCode.color] = it.time
                     }
                 }
-        }
+            }
         return timeActivity
     }
 
@@ -75,7 +102,7 @@ class ResumeViewmodel {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 timeCode?.let { tc ->
                     val currentList = dayActivity.value[it.date] ?: mutableListOf()
-                    currentList.add(Color(tc.color.toLong()))
+                    currentList.add(Color(tc.color))
                     dayActivity.value[it.date] = currentList
                 }
             }
