@@ -10,6 +10,9 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 /**
  * Singelton con la conexión ha la base de datos supabase que gestiona los datos
@@ -40,18 +43,20 @@ object Database {
         }
     }
 
-    suspend fun getTablesNames(): List<String>{
-        try {
-            return supabase
-                .from("information_schema.tables")
-                .select(Columns.list("table_name"))
-                .decodeList<String>()
-                .sorted()
-        }catch (
-            e:Exception
-        ){
+
+    suspend fun getTablesNames(): List<String> {
+        return try {
+            val response = supabase
+                .from("tablas_disponibles")
+                .select()
+
+            Json.parseToJsonElement(response.data)
+                .jsonArray
+                .mapNotNull { it.jsonObject["table_name"]?.toString()?.trim('"') }
+
+        } catch (e: Exception) {
             println(e)
-            return emptyList()
+            emptyList()
         }
     }
 
