@@ -53,6 +53,7 @@ object Database {
             Json.parseToJsonElement(response.data)
                 .jsonArray
                 .mapNotNull { it.jsonObject["table_name"]?.toString()?.trim('"') }
+                .filter { it != "Config" }
 
         } catch (e: Exception) {
             println(e)
