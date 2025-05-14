@@ -9,6 +9,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 
 /**
  * Singelton con la conexión ha la base de datos supabase que gestiona los datos
@@ -34,6 +35,21 @@ object Database {
         }catch (
             e:Exception
         ) {
+            println(e)
+            return emptyList()
+        }
+    }
+
+    suspend fun getTablesNames(): List<String>{
+        try {
+            return supabase
+                .from("information_schema.tables")
+                .select(Columns.list("table_name"))
+                .decodeList<String>()
+                .sorted()
+        }catch (
+            e:Exception
+        ){
             println(e)
             return emptyList()
         }

@@ -205,6 +205,15 @@ object DataViewModel {
         }
     }
 
+    private val _tablesNames = MutableStateFlow<List<String>>(emptyList())
+    val tablesNames: StateFlow<List<String>> = _tablesNames
+
+    private fun cargarTablesNames() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getTablesNames()
+            _tablesNames.value = datos
+        }
+    }
 
 
     // Carga de los datos de la base de datos
@@ -234,6 +243,7 @@ object DataViewModel {
         cargarRoles()
         cargarTimeCodes()
         cargarWorkOrders()
+        cargarTablesNames()
     }
 
     // Funciones comunes a varias pantallas
