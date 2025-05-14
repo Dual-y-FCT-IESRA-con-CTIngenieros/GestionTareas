@@ -7,8 +7,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
+import androidx.compose.material.Button
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -18,56 +28,192 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValuw
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.model.dto.ProjectTimeCodeDTO
+import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.widgets.UserData
 
 class TableManageScreen : Screen {
     @Composable
     override fun Content() {
 
+        val navigator: Navigator = LocalNavigator.currentOrThrow
+        var showDialog by remember { mutableStateOf(false) }
+
+
         LaunchedEffect(Unit){
             DataViewModel.load_tables()
         }
 
-        val activities by DataViewModel.activities.collectAsState()
-        val aircraft by DataViewModel.aircraft.collectAsState()
-        val area by DataViewModel.area.collectAsState()
-        val calendar by DataViewModel.calendar.collectAsState()
-        val cliente by DataViewModel.cliente.collectAsState()
-        val employees by DataViewModel.employees.collectAsState()
-        val employeeWH by DataViewModel.employeeWH.collectAsState()
-        val employeeActivities by DataViewModel.employeeActivities.collectAsState()
-        val employeeWO by DataViewModel.employeeWO.collectAsState()
-        val manager by DataViewModel.manager.collectAsState()
-        val projects by DataViewModel.projects.collectAsState()
-        val projectTimeCodes by DataViewModel.projectTimeCodes.collectAsState()
-        val roles by DataViewModel.roles.collectAsState()
-        val timeCodes by DataViewModel.timeCodes.collectAsState()
-        val workOrders by DataViewModel.workOrders.collectAsState()
+        val tables = mutableMapOf<String, List<Any>>()
 
-        var filters by remember { mutableStateOf(columns.associateWith { "" }) }
-        var visibleRecords by remember { mutableStateOf(records.take(20)) }
-        val listState = rememberLazyListState()
+        val tablesData = listOf(
+            DataViewModel.activities.collectAsState(),
+            DataViewModel.aircraft.collectAsState(),
+            DataViewModel.area.collectAsState(),
+            DataViewModel.calendar.collectAsState(),
+            DataViewModel.cliente.collectAsState(),
+            DataViewModel.employees.collectAsState(),
+            DataViewModel.employeeWH.collectAsState(),
+            DataViewModel.employeeActivities.collectAsState(),
+            DataViewModel.employeeWO.collectAsState(),
+            DataViewModel.manager.collectAsState(),
+            DataViewModel.projects.collectAsState(),
+            DataViewModel.projectTimeCodes.collectAsState(),
+            DataViewModel.roles.collectAsState(),
+            DataViewModel.timeCodes.collectAsState(),
+            DataViewModel.workOrders.collectAsState(),
+        )
+        val tablesNames by DataViewModel.tablesNames.collectAsState()
 
-
-        LaunchedEffect(listState, filtered) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                .collect { lastVisible ->
-                    if (lastVisible == visibleRecords.lastIndex && visibleRecords.size < filtered.size) {
-                        visibleRecords = filtered.take(visibleRecords.size + 20)
-                    }
-                }
+        tablesNames.forEachIndexed() { index, tableName ->
+            tables[tableName] = tablesData[index].value
         }
 
-        LazyColumn(state = listState) {
-            items(loadedRecords) { }
+        Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {navigator.pop()}){
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
+                }
+                Text(
+                    "Tablas",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 25.sp
+                )
+                IconButton(onClick = { showDialog = true}){
+                    Icon(Icons.Filled.Download, contentDescription = "Download")
+                }
+            }
+            LazyColumn {
+                tables.forEach { (tableName, tableData) ->
+                    item {
+                        Text(tableName, fontWeight = FontWeight.Bold)
+                    }
+
+                }
+            }
+        }
+        csvDialog(showDialog, tables.toString()) { showDialog = false }
+
+
+
+//        var filters by remember { mutableStateOf(columns.associateWith { "" }) }
+//        var visibleRecords by remember { mutableStateOf(records.take(20)) }
+//        val listState = rememberLazyListState()
+//
+//
+//        LaunchedEffect(listState, filtered) {
+//            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+//                .collect { lastVisible ->
+//                    if (lastVisible == visibleRecords.lastIndex && visibleRecords.size < filtered.size) {
+//                        visibleRecords = filtered.take(visibleRecords.size + 20)
+//                    }
+//                }
+//        }
+//
+//        LazyColumn(state = listState) {
+//            items(loadedRecords) { }
+//        }
+    }
+
+    @Composable
+    fun csvDialog(showDialog: Boolean, tableSelected: String, onDismiss: () -> Unit){
+        if (showDialog) {
+            Dialog(
+                onDismissRequest = onDismiss,
+            ){
+                Card{
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Generar CSV de la tabla")
+                        Text("¿De qué tabla quieres generar el csv?")
+
+//                    TableSelector()
+
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Button(
+                                onClick = onDismiss,
+                                colors = customButtonColors(),
+                            ) {
+                                Text("Cancelar")
+                            }
+                            Button(
+                                onClick = {
+                                    onDismiss
+                                    /*generarCSV(tableSelected)*/
+                                },
+                                colors = customButtonColors(),
+                            ) {
+                                Text("Aceptar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TableSelector(
+        proyectTimecodesDTO: List<String>,
+        onTimeCodeSelected: (Int) -> Unit,
+        timeCodeSeleccionado: String?,
+        onTimeCodeChange: (String) -> Unit,
+        onProyectChange: (String?) -> Unit,
+    ){
+        var expandirTablas by remember { mutableStateOf(false) }
+        var tablaSeleccionada by remember { mutableStateOf("") }
+
+        // Dropdown de TimeCodes
+        ExposedDropdownMenuBox(
+            expanded = expandirTablas,
+            onExpandedChange = { expandirTablas = !expandirTablas },
+            modifier = Modifier.padding(end = 16.dp)
+        ) {
+            OutlinedTextField(
+                value = tablaSeleccionada,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Seleccione Tabla") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTablas) },
+                modifier = Modifier.menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expandirTablas,
+                onDismissRequest = { expandirTablas = false }
+            ) {
+                proyectTimecodesDTO
+                    .forEach { timeCode ->
+                        DropdownMenuItem(
+                            text = { Text(timeCode) },
+                            onClick = {
+                                onTimeCodeChange(timeCode)
+                                expandirTablas = false
+                            }
+                        )
+                    }
+            }
         }
     }
 
@@ -88,74 +234,74 @@ class TableManageScreen : Screen {
         }
     }
 
-    @Composable
-    fun AdminScreen() {
-        var filters by remember {
-            mutableStateOf(mapOf("Nombre" to "", "Edad" to ""))
-        }
-
-        var allRecords by remember {
-            mutableStateOf(
-                listOf(
-                    Record(1, mutableMapOf("Nombre" to "Juan", "Edad" to "25")),
-                    Record(2, mutableMapOf("Nombre" to "Ana", "Edad" to "30"))
-                    // más registros...
-                )
-            )
-        }
-
-        val filteredRecords = allRecords.filter { record ->
-            filters.all { (col, filter) ->
-                record.data[col]?.contains(filter, ignoreCase = true) ?: true
-            }
-        }
-
-        Column {
-            FilterBar(filters) { column, newValue ->
-                filters = filters.toMutableMap().also { it[column] = newValue }
-            }
-            EditableTable(filteredRecords) { id, column, newValue ->
-                allRecords = allRecords.map {
-                    if (it.id == id) {
-                        it.copy(
-                            data = it.data.toMutableMap().also { map -> map[column] = newValue })
-                    } else it
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun EditableTable(records: List<Any>, onValueChange: (Int, String, String) -> Unit) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(records.size) { record ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    record.data.forEach { (column, value) ->
-                        TextField(
-                            value = value,
-                            onValueChange = { newValue ->
-                                onValueChange(
-                                    record.id,
-                                    column,
-                                    newValue
-                                )
-                            },
-                            label = { Text(column) },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    Button(onClick = { /* Guardar cambios */ }) {
-                        Text("💾")
-                    }
-                }
-            }
-        }
-    }
+//    @Composable
+//    fun AdminScreen() {
+//        var filters by remember {
+//            mutableStateOf(mapOf("Nombre" to "", "Edad" to ""))
+//        }
+//
+//        var allRecords by remember {
+//            mutableStateOf(
+//                listOf(
+//                    Record(1, mutableMapOf("Nombre" to "Juan", "Edad" to "25")),
+//                    Record(2, mutableMapOf("Nombre" to "Ana", "Edad" to "30"))
+//                    // más registros...
+//                )
+//            )
+//        }
+//
+//        val filteredRecords = allRecords.filter { record ->
+//            filters.all { (col, filter) ->
+//                record.data[col]?.contains(filter, ignoreCase = true) ?: true
+//            }
+//        }
+//
+//        Column {
+//            FilterBar(filters) { column, newValue ->
+//                filters = filters.toMutableMap().also { it[column] = newValue }
+//            }
+//            EditableTable(filteredRecords) { id, column, newValue ->
+//                allRecords = allRecords.map {
+//                    if (it.id == id) {
+//                        it.copy(
+//                            data = it.data.toMutableMap().also { map -> map[column] = newValue })
+//                    } else it
+//                }
+//            }
+//        }
+//    }
+//
+//    @Composable
+//    fun EditableTable(records: List<Any>, onValueChange: (Int, String, String) -> Unit) {
+//        LazyColumn(modifier = Modifier.fillMaxSize()) {
+//            items(records.size) { record ->
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    record.data.forEach { (column, value) ->
+//                        TextField(
+//                            value = value,
+//                            onValueChange = { newValue ->
+//                                onValueChange(
+//                                    record.id,
+//                                    column,
+//                                    newValue
+//                                )
+//                            },
+//                            label = { Text(column) },
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    }
+//                    Button(onClick = { /* Guardar cambios */ }) {
+//                        Text("💾")
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
 }
