@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Calendar(
     val idCalendar: Int,
-    val date: String
+    val date: String,
+    val idActivity: Activity
 )
