@@ -93,11 +93,9 @@ object Database {
         }
     }
 
-    suspend fun updateData(table:String, data:Any, idName:String, id:Any){
+    suspend fun updateData(table:String, data:Any){
         try {
-            supabase.from(table).update(data) {
-                filter { eq(idName, id) }
-            }
+            supabase.from(table).upsert(data)
         }catch (
             e:Exception
         ){

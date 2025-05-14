@@ -94,6 +94,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.foundation.android)
     debugImplementation(compose.uiTooling)
 }
 

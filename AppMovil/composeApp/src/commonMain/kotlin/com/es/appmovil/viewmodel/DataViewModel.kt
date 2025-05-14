@@ -3,13 +3,19 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Aircraft
+import com.es.appmovil.model.Area
+import com.es.appmovil.model.Calendar
+import com.es.appmovil.model.Client
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.EmployeeWO
-import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.EmployeeWorkHours
+import com.es.appmovil.model.Manager
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
+import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
@@ -21,14 +27,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 object DataViewModel {
 
-    var today = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
-    var currentToday = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+    var today =
+        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+    var currentToday =
+        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
     var employee = Employee(-1, "", "", "", "", null, -1)
 
@@ -44,73 +51,8 @@ object DataViewModel {
     val pieList: StateFlow<MutableList<Pie>> = _pieList
 
 
-    // Listas con todos los datos de las tablas
-    private val _timeCodes = MutableStateFlow<List<TimeCodeDTO>>(emptyList())
-    val timeCodes: StateFlow<List<TimeCodeDTO>> = _timeCodes
-
-    private val _employeeActivities =
-        MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
-    val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
-
-    private val _projects = MutableStateFlow<List<Project>>(emptyList())
-    //val projects: StateFlow<List<Project>> = _projects
-
-    private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
-    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
-
-    private val _workOrders = MutableStateFlow<List<WorkOrder>>(emptyList())
-    val workOrders: StateFlow<List<WorkOrder>> = _workOrders
-
     private val _activities = MutableStateFlow<List<Activity>>(emptyList())
     val activities: StateFlow<List<Activity>> = _activities
-
-    private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
-    val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
-
-    // Carga de los datos de la base de datos
-    init {
-        cargarTimeCodes()
-        cargarEmployeeActivities()
-        cargarProjects()
-        cargarProjectsTimeCode()
-        cargarWorkOrders()
-        cargarActivities()
-        cargarEmployeeWO()
-    }
-
-    private fun cargarTimeCodes() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<TimeCode>("TimeCode")
-            _timeCodes.value = datos.map { it.toDTO() }
-
-        }
-    }
-    private fun cargarEmployeeActivities() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
-            _employeeActivities.value = datos.toMutableList()
-        }
-    }
-
-    private fun cargarProjects() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Project>("Project")
-            _projects.value = datos
-        }
-    }
-
-    private fun cargarProjectsTimeCode() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<ProjectTimeCode>("ProjectTimeCode")
-            _projectTimeCodes.value = datos
-        }
-    }
-    private fun cargarWorkOrders() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<WorkOrder>("WorkOrder")
-            _workOrders.value = datos
-        }
-    }
 
     private fun cargarActivities() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -120,6 +62,80 @@ object DataViewModel {
         }
     }
 
+    private val _aircraft = MutableStateFlow<List<Aircraft>>(emptyList())
+    val aircraft: StateFlow<List<Aircraft>> = _aircraft
+
+    private fun cargarAircraft() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Aircraft>("Aircraft")
+            _aircraft.value = datos
+        }
+    }
+
+    private val _area = MutableStateFlow<List<Area>>(emptyList())
+    val area: StateFlow<List<Area>> = _area
+
+    private fun cargarArea() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Area>("Area")
+            _area.value = datos
+        }
+    }
+
+    private val _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    val calendar: StateFlow<List<Calendar>> = _calendar
+
+    private fun cargarCalendar() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Calendar>("Calendar")
+            _calendar.value = datos
+        }
+    }
+
+    private val _cliente = MutableStateFlow<List<Client>>(emptyList())
+    val cliente: StateFlow<List<Client>> = _cliente
+
+    private fun cargarCliente() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Client>("Client")
+            _cliente.value = datos
+        }
+    }
+
+    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
+    val employees: StateFlow<List<Employee>> = _employees
+
+    fun cargarEmployees() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Employee>("Employee")
+            _employees.value = datos
+        }
+    }
+
+    private val _employeeWH = MutableStateFlow<List<EmployeeWorkHours>>(emptyList())
+    val employeeWH: StateFlow<List<EmployeeWorkHours>> = _employeeWH
+
+    private fun cargarEmployeeWH() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<EmployeeWorkHours>("EmployeeWorkHours")
+            _employeeWH.value = datos
+        }
+    }
+
+    private val _employeeActivities =
+        MutableStateFlow<MutableList<EmployeeActivity>>(mutableListOf())
+    val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
+
+    private fun cargarEmployeeActivities() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
+            _employeeActivities.value = datos.toMutableList()
+        }
+    }
+
+    private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
+    val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
+
     private fun cargarEmployeeWO() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeWO>("EmployeeWO")
@@ -127,13 +143,33 @@ object DataViewModel {
         }
     }
 
-    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
-    val employees: StateFlow<List<Employee>> = _employees
+    private val _manager = MutableStateFlow<List<Manager>>(emptyList())
+    val manager: StateFlow<List<Manager>> = _manager
 
-    fun cargarEmployees(){
+    private fun cargarManager() {
         CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Employee>("Employee")
-            _employees.value = datos
+            val datos = Database.getData<Manager>("Manager")
+            _manager.value = datos
+        }
+    }
+
+    private val _projects = MutableStateFlow<List<Project>>(emptyList())
+    val projects: StateFlow<List<Project>> = _projects
+
+    private fun cargarProjects() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Project>("Project")
+            _projects.value = datos
+        }
+    }
+
+    private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
+    val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
+
+    private fun cargarProjectsTimeCode() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<ProjectTimeCode>("ProjectTimeCode")
+            _projectTimeCodes.value = datos
         }
     }
 
@@ -146,13 +182,58 @@ object DataViewModel {
             _roles.value = datos
         }
     }
+
+    // Listas con todos los datos de las tablas
+    private val _timeCodes = MutableStateFlow<List<TimeCodeDTO>>(emptyList())
+    val timeCodes: StateFlow<List<TimeCodeDTO>> = _timeCodes
+
+    private fun cargarTimeCodes() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<TimeCode>("TimeCode")
+            _timeCodes.value = datos.map { it.toDTO() }
+
+        }
+    }
+
+    private val _workOrders = MutableStateFlow<List<WorkOrder>>(emptyList())
+    val workOrders: StateFlow<List<WorkOrder>> = _workOrders
+
+    private fun cargarWorkOrders() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<WorkOrder>("WorkOrder")
+            _workOrders.value = datos
+        }
+    }
+
+
+
+    // Carga de los datos de la base de datos
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
         cargarProjects()
         cargarProjectsTimeCode()
         cargarWorkOrders()
+        cargarActivities()
         cargarEmployeeWO()
+    }
+
+    fun load_tables(){
+        cargarActivities()
+        cargarAircraft()
+        cargarArea()
+        cargarCalendar()
+        cargarCliente()
+        cargarEmployees()
+        cargarEmployeeWH()
+        cargarEmployeeActivities()
+        cargarEmployeeWO()
+        cargarManager()
+        cargarProjects()
+        cargarProjectsTimeCode()
+        cargarRoles()
+        cargarTimeCodes()
+        cargarWorkOrders()
     }
 
     // Funciones comunes a varias pantallas
@@ -197,7 +278,7 @@ object DataViewModel {
         _pieList.value = pies
     }
 
-    private fun createPie(pies:MutableList<Pie>, activity:EmployeeActivity) {
+    private fun createPie(pies: MutableList<Pie>, activity: EmployeeActivity) {
         val timeCode = timeCodes.value.find { time -> time.idTimeCode == activity.idTimeCode }
         if (timeCode != null) {
             val pie = pies.find { p -> p.label == timeCode.idTimeCode.toString() }
@@ -223,4 +304,6 @@ object DataViewModel {
             }
         }
     }
+
+
 }
