@@ -97,7 +97,7 @@ object DataViewModel {
 
     private fun cargarCliente() {
         CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Client>("Cliente")
+            val datos = Database.getData<Client>("Client")
             _cliente.value = datos
         }
     }
@@ -117,7 +117,7 @@ object DataViewModel {
 
     private fun cargarEmployeeWH() {
         CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<EmployeeWorkHours>("Employee WorkHours")
+            val datos = Database.getData<EmployeeWorkHours>("EmployeeWorkHours")
             _employeeWH.value = datos
         }
     }
