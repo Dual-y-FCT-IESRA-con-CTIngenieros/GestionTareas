@@ -1,9 +1,7 @@
 package com.es.appmovil.viewmodel
 
-import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
 import com.es.appmovil.database.Database.supabase
-import com.es.appmovil.screens.LoginScreen
 import com.russhwolf.settings.Settings
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
