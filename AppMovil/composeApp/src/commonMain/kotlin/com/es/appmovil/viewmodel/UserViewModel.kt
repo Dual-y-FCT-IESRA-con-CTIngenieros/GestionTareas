@@ -1,7 +1,9 @@
 package com.es.appmovil.viewmodel
 
+import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
 import com.es.appmovil.database.Database.supabase
+import com.es.appmovil.screens.LoginScreen
 import com.russhwolf.settings.Settings
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -110,6 +112,7 @@ class UserViewModel {
                     tokenType = "Bearer",
                     user = user // opcional, Supabase puede refrescarlo luego
                 )
+                supabase.auth.refreshSession(refreshToken)
                 supabase.auth.importSession(session)
                 withContext(Dispatchers.IO) {
                     Database.getEmployee(user.email ?: "")
@@ -123,11 +126,13 @@ class UserViewModel {
         }
     }
 
-//    fun signOut() {
+//    fun signOut(navigator:Navigator) {
 //        supabase.auth.signOut()
 //        settings.remove("access_token")
 //        settings.remove("refresh_token")
+//        navigator.replaceAll(LoginScreen(this))
 //    }
+
     fun resetVar() {
         _visibility.value = false
         _login.value = false
