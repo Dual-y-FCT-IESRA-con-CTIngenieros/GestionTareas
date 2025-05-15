@@ -106,7 +106,7 @@ class UserViewModel {
                 val session = UserSession(
                     accessToken = accessToken,
                     refreshToken = refreshToken,
-                    expiresIn = 3600, // o cualquier valor razonable si no lo tienes exacto
+                    expiresIn = 2678400, // o cualquier valor razonable si no lo tienes exacto
                     tokenType = "Bearer",
                     user = user // opcional, Supabase puede refrescarlo luego
                 )
