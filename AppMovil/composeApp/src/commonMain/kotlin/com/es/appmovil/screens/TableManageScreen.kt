@@ -1,24 +1,30 @@
 package com.es.appmovil.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -30,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,10 +45,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.utils.customButtonColors
+import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
-import com.es.appmovil.widgets.UserData
+import com.es.appmovil.viewmodel.TableManageViewModel
+import com.es.appmovil.widgets.claseTabla
 
 class TableManageScreen : Screen {
     @Composable
@@ -51,7 +59,7 @@ class TableManageScreen : Screen {
         var showDialog by remember { mutableStateOf(false) }
 
 
-        LaunchedEffect(Unit){
+        LaunchedEffect(Unit) {
             DataViewModel.load_tables()
         }
 
@@ -86,29 +94,38 @@ class TableManageScreen : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {navigator.pop()}){
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
+                IconButton(onClick = { navigator.pop() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Return")
                 }
                 Text(
                     "Tablas",
                     fontWeight = FontWeight.Black,
                     fontSize = 25.sp
                 )
-                IconButton(onClick = { showDialog = true}){
+                IconButton(onClick = { showDialog = true }) {
                     Icon(Icons.Filled.Download, contentDescription = "Download")
                 }
             }
             LazyColumn {
                 tables.forEach { (tableName, tableData) ->
                     item {
-                        Text(tableName, fontWeight = FontWeight.Bold)
+                        TableItem(
+                            tableName,
+                            onEditClick = {
+                                navigator.push(
+                                    TableManageDataScreen(
+                                        tableName,
+                                        tableData
+                                    )
+                                )
+                            }
+                        )
                     }
 
                 }
             }
         }
-        csvDialog(showDialog, tables.toString()) { showDialog = false }
-
+        csvDialog(showDialog, tablesNames) { showDialog = false }
 
 
 //        var filters by remember { mutableStateOf(columns.associateWith { "" }) }
@@ -131,20 +148,75 @@ class TableManageScreen : Screen {
     }
 
     @Composable
-    fun csvDialog(showDialog: Boolean, tableSelected: String, onDismiss: () -> Unit){
+    fun TableItem(
+        tableName: String,
+        onEditClick: () -> Unit
+    ) {
+
+        var showEditor by remember { mutableStateOf(false) }
+
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            .background(Color(0xFFF2F2F2), RoundedCornerShape(12.dp))
+            .padding(16.dp)){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = tableName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.DarkGray
+                )
+                Row {
+                    IconButton(onClick = onEditClick) {
+                        Icon(Icons.Default.Edit, contentDescription = "Editar")
+                    }
+                    IconButton(onClick = { showEditor = !showEditor }) {
+                        Icon(Icons.Default.AddCircleOutline, contentDescription = "Agregar")
+                    }
+                }
+            }
+            if (showEditor) {
+                claseTabla(tableName)
+            }
+        }
+    }
+
+    @Composable
+    fun csvDialog(showDialog: Boolean, tables: List<String>, onDismiss: () -> Unit) {
+
+        var tableSelected by remember { mutableStateOf("") }
+
         if (showDialog) {
             Dialog(
                 onDismissRequest = onDismiss,
-            ){
-                Card{
+            ) {
+                Card {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Generar CSV de la tabla")
-                        Text("¿De qué tabla quieres generar el csv?")
+                        Text(
+                            text = "Generar CSV de la tabla",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp,
+                            color = Color.Black
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "¿De qué tabla quieres generar el csv?",
+                            fontSize = 16.sp,
+                            color = Color.DarkGray
+                        )
 
-//                    TableSelector()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TableSelector(
+                            tables,
+                            tableSelected,
+                            onTableSelection = { tableSelected = it })
 
                         Row(
                             modifier = Modifier.padding(16.dp),
@@ -175,23 +247,20 @@ class TableManageScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TableSelector(
-        proyectTimecodesDTO: List<String>,
-        onTimeCodeSelected: (Int) -> Unit,
-        timeCodeSeleccionado: String?,
-        onTimeCodeChange: (String) -> Unit,
-        onProyectChange: (String?) -> Unit,
-    ){
+        tablesNames: List<String>,
+        tableSelected: String,
+        onTableSelection: (String) -> Unit,
+    ) {
         var expandirTablas by remember { mutableStateOf(false) }
-        var tablaSeleccionada by remember { mutableStateOf("") }
-
-        // Dropdown de TimeCodes
+        // Dropdown de Tablas
         ExposedDropdownMenuBox(
             expanded = expandirTablas,
             onExpandedChange = { expandirTablas = !expandirTablas },
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(end = 16.dp, start = 16.dp)
         ) {
             OutlinedTextField(
-                value = tablaSeleccionada,
+                colors = customTextFieldColors(),
+                value = tableSelected,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Seleccione Tabla") },
@@ -203,12 +272,12 @@ class TableManageScreen : Screen {
                 expanded = expandirTablas,
                 onDismissRequest = { expandirTablas = false }
             ) {
-                proyectTimecodesDTO
-                    .forEach { timeCode ->
+                tablesNames
+                    .forEach {
                         DropdownMenuItem(
-                            text = { Text(timeCode) },
+                            text = { Text(it) },
                             onClick = {
-                                onTimeCodeChange(timeCode)
+                                onTableSelection(it)
                                 expandirTablas = false
                             }
                         )
