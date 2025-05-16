@@ -8,6 +8,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.utils.customButtonColors
@@ -39,11 +43,17 @@ fun claseTabla(tableName: String): Unit? {
 
 @Composable
 fun ActivityDataEditor() {
+    var idActivity by remember { mutableStateOf("") }
+    var idTimeCode by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var dateFrom by remember { mutableStateOf("") }
+    var dateTo by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idActivity,
+            onValueChange = { idActivity = it },
             label = { Text("idActivity") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,8 +61,8 @@ fun ActivityDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idTimeCode,
+            onValueChange = { idTimeCode = it },
             label = { Text("idTimeCode") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,8 +70,8 @@ fun ActivityDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = descripcion,
+            onValueChange = { descripcion = it },
             label = { Text("Descripcion") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,8 +79,8 @@ fun ActivityDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = dateFrom,
+            onValueChange = { dateFrom = it },
             label = { Text("Date From") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,8 +88,8 @@ fun ActivityDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = dateTo,
+            onValueChange = { dateTo = it },
             label = { Text("Date to") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,339 +97,159 @@ fun ActivityDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick ={ TODO() }){
+            onClick = { /* Use the variables here */ }
+        ){
             Text("Crear")
         }
     }
-
 }
 
 @Composable
 fun AircraftDataEditor() {
+    var idAircraft by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
+            value = idAircraft,
+            onValueChange = { idAircraft = it },
+            label = { Text("idAircraft") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun AreaDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun CalendarDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun ClientDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Nombre del cliente") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-
-}
-
-@Composable
-fun EmployeeDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun EmployeeActivityDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Comentario") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun EmployeeWODataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdWorkOrder") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("idEmployee") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = descripcion,
+            onValueChange = { descripcion = it },
             label = { Text("Descripcion") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Date From") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Date To") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
     }
 }
 
 @Composable
-fun EmployeeWorkHoursDataEditor() {
+fun AreaDataEditor() {
+    var idArea by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdEmployee") },
+            value = idArea,
+            onValueChange = { idArea = it },
+            label = { Text("idArea") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Horas") },
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = { Text("Descripcion") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("DateFrom") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Date to") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
     }
 }
 
 @Composable
-fun ManagerDataEditor() {
+fun CalendarDataEditor() {
+    var idCalendar by remember { mutableStateOf("") }
+    var fecha by remember { mutableStateOf("") }
+    var idActivity by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idCalendar,
+            onValueChange = { idCalendar = it },
+            label = { Text("idCalendar") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = fecha,
+            onValueChange = { fecha = it },
+            label = { Text("Fecha") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idActivity,
+            onValueChange = { idActivity = it },
+            label = { Text("idActivity") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun ClientDataEditor() {
+    var nombreCliente by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = nombreCliente,
+            onValueChange = { nombreCliente = it },
+            label = { Text("Nombre del cliente") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun EmployeeDataEditor() {
+    var nombre by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var dateFrom by remember { mutableStateOf("") }
+    var dateTo by remember { mutableStateOf("") }
+    var rol by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = nombre,
+            onValueChange = { nombre = it },
             label = { Text("Nombre") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -427,105 +257,91 @@ fun ManagerDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = apellidos,
+            onValueChange = { apellidos = it },
             label = { Text("Apellidos") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-
-    }
-}
-
-@Composable
-fun ProjectDataEditor() {
-    Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdProject") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Descripcion") },
+            value = dateFrom,
+            onValueChange = { dateFrom = it },
+            label = { Text("Date From") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdCliente") },
+            value = dateTo,
+            onValueChange = { dateTo = it },
+            label = { Text("Date To") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdArea") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun ProjectTimeCodeDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdProject") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("IdTimeCode") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-fun RolDataEditor() {
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = rol,
+            onValueChange = { rol = it },
             label = { Text("Rol") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
     }
 }
 
 @Composable
-fun TimeCodeDataEditor() {
+fun EmployeeActivityDataEditor() {
+    var idEmployee by remember { mutableStateOf("") }
+    var idWorkOrder by remember { mutableStateOf("") }
+    var idTimeCode by remember { mutableStateOf("") }
+    var idActivity by remember { mutableStateOf("") }
+    var horas by remember { mutableStateOf("") }
+    var fecha by remember { mutableStateOf("") }
+    var comentario by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idEmployee,
+            onValueChange = { idEmployee = it },
+            label = { Text("idEmployee") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idWorkOrder,
+            onValueChange = { idWorkOrder = it },
+            label = { Text("idWorkOrder") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idTimeCode,
+            onValueChange = { idTimeCode = it },
             label = { Text("idTimeCode") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -533,32 +349,62 @@ fun TimeCodeDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Descripcion") },
+            value = idActivity,
+            onValueChange = { idActivity = it },
+            label = { Text("idActivity") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
-            label = { Text("Color") },
+            value = horas,
+            onValueChange = { horas = it },
+            label = { Text("Horas") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = fecha,
+            onValueChange = { fecha = it },
+            label = { Text("Fecha") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = comentario,
+            onValueChange = { comentario = it },
+            label = { Text("Comentario") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
     }
 }
 
 @Composable
-fun WorkOrderDataEditor() {
+fun EmployeeWODataEditor() {
+    var idWorkOrder by remember { mutableStateOf("") }
+    var idEmployee by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var dateFrom by remember { mutableStateOf("") }
+    var dateTo by remember { mutableStateOf("") }
+
     Column {
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idWorkOrder,
+            onValueChange = { idWorkOrder = it },
             label = { Text("IdWorkOrder") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -566,8 +412,17 @@ fun WorkOrderDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idEmployee,
+            onValueChange = { idEmployee = it },
+            label = { Text("idEmployee") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = descripcion,
+            onValueChange = { descripcion = it },
             label = { Text("Descripcion") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -575,8 +430,300 @@ fun WorkOrderDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = dateFrom,
+            onValueChange = { dateFrom = it },
+            label = { Text("Date From") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = dateTo,
+            onValueChange = { dateTo = it },
+            label = { Text("Date To") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun EmployeeWorkHoursDataEditor() {
+    var idEmployee by remember { mutableStateOf("") }
+    var horas by remember { mutableStateOf("") }
+    var dateFrom by remember { mutableStateOf("") }
+    var dateTo by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idEmployee,
+            onValueChange = { idEmployee = it },
+            label = { Text("IdEmployee") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = horas,
+            onValueChange = { horas = it },
+            label = { Text("Horas") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = dateFrom,
+            onValueChange = { dateFrom = it },
+            label = { Text("DateFrom") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = dateTo,
+            onValueChange = { dateTo = it },
+            label = { Text("Date to") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun ManagerDataEditor() {
+    var nombre by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Nombre") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = apellidos,
+            onValueChange = { apellidos = it },
+            label = { Text("Apellidos") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun ProjectDataEditor() {
+    var idProject by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var idCliente by remember { mutableStateOf("") }
+    var idArea by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idProject,
+            onValueChange = { idProject = it },
+            label = { Text("IdProject") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = { Text("Descripcion") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idCliente,
+            onValueChange = { idCliente = it },
+            label = { Text("IdCliente") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idArea,
+            onValueChange = { idArea = it },
+            label = { Text("IdArea") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun ProjectTimeCodeDataEditor() {
+    var idProject by remember { mutableStateOf("") }
+    var idTimeCode by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idProject,
+            onValueChange = { idProject = it },
+            label = { Text("IdProject") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idTimeCode,
+            onValueChange = { idTimeCode = it },
+            label = { Text("IdTimeCode") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun RolDataEditor() {
+    var rol by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = rol,
+            onValueChange = { rol = it },
+            label = { Text("Rol") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun TimeCodeDataEditor() {
+    var idTimeCode by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var color by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idTimeCode,
+            onValueChange = { idTimeCode = it },
+            label = { Text("idTimeCode") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = { Text("Descripcion") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = color,
+            onValueChange = { color = it },
+            label = { Text("Color") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
+    }
+}
+
+@Composable
+fun WorkOrderDataEditor() {
+    var idWorkOrder by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var projectManager by remember { mutableStateOf("") }
+    var idProject by remember { mutableStateOf("") }
+    var idAircraft by remember { mutableStateOf("") }
+
+    Column {
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = idWorkOrder,
+            onValueChange = { idWorkOrder = it },
+            label = { Text("IdWorkOrder") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = { Text("Descripcion") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        OutlinedTextField(
+            colors = customTextFieldColors(),
+            value = projectManager,
+            onValueChange = { projectManager = it },
             label = { Text("Project Manager") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -584,8 +731,8 @@ fun WorkOrderDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idProject,
+            onValueChange = { idProject = it },
             label = { Text("idProject") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -593,12 +740,18 @@ fun WorkOrderDataEditor() {
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
-            value = "",
-            onValueChange = {},
+            value = idAircraft,
+            onValueChange = { idAircraft = it },
             label = { Text("idAircraft") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
+        Button(
+            colors = customButtonColors(),
+            onClick = { /* Use the variables here */ }
+        ){
+            Text("Crear")
+        }
     }
 }
