@@ -1,7 +1,5 @@
 package com.es.appmovil.viewmodel
 
-import com.es.appmovil.viewmodel.DataViewModel.changeMonth
-import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +11,6 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
 class CalendarManageViewModel {
-
-    private var _reset = MutableStateFlow(false)
 
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
