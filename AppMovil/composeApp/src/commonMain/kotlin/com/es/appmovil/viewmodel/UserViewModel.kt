@@ -1,5 +1,7 @@
 package com.es.appmovil.viewmodel
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.es.appmovil.database.Database
 import com.es.appmovil.database.Database.supabase
 import com.russhwolf.settings.Settings
@@ -18,7 +20,7 @@ import kotlinx.coroutines.withContext
 /**
  * Clase viewmodel para el usuario, donde guardaremos los datos del usuario y sus posibles funciones
  */
-class UserViewModel {
+class UserViewModel: ViewModel() {
 
     // Nombre de usuario del trabajador con el que iniciará sesión.
     private var _username = MutableStateFlow("")
@@ -92,31 +94,36 @@ class UserViewModel {
         }
     }
 
-    suspend fun checkSession() {
+    fun checkSession() {
         _checkSess.value = true
         val settings = Settings()
         val emailUser = settings.getStringOrNull("email_user")
         val accessToken = settings.getStringOrNull("access_token")
         val refreshToken = settings.getStringOrNull("refresh_token")
         try {
-            if (accessToken != null &&refreshToken != null) {
+            viewModelScope.launch{
+                FullScreenLoadingManager.showLoader()
+                if (accessToken != null && refreshToken != null) {
 
-                val user = supabase.auth.retrieveUser(accessToken)
+                    val user = supabase.auth.retrieveUser(accessToken)
 
-                val session = UserSession(
-                    accessToken = accessToken,
-                    refreshToken = refreshToken,
-                    expiresIn = 3600, // o cualquier valor razonable si no lo tienes exacto
-                    tokenType = "Bearer",
-                    user = user // opcional, Supabase puede refrescarlo luego
-                )
-                supabase.auth.importSession(session)
-                withContext(Dispatchers.IO) {
-                    Database.getEmployee(user.email ?: "")
+                    val session = UserSession(
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                        expiresIn = 3600, // o cualquier valor razonable si no lo tienes exacto
+                        tokenType = "Bearer",
+                        user = user // opcional, Supabase puede refrescarlo luego
+                    )
+                    supabase.auth.importSession(session)
+                    withContext(Dispatchers.IO) {
+                        Database.getEmployee(user.email ?: "")
+                    }
+                    _login.value = true
+                } else {
+                    if (emailUser != null) _username.value = emailUser
                 }
-                _login.value = true
-            } else {
-                if (emailUser != null) _username.value = emailUser
+                //Fetch todos from api
+                FullScreenLoadingManager.hideLoader()
             }
         } catch (e:Exception) {
             println(e)

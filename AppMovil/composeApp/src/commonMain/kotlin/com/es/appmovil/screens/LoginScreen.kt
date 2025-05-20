@@ -46,7 +46,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
+import com.es.appmovil.widgets.FullScreenLoader
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
