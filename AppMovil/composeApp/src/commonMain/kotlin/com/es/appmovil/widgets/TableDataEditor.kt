@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,8 +49,8 @@ fun ActivityDataEditor() {
     var idActivity by remember { mutableStateOf("") }
     var idTimeCode by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var dateFrom by remember { mutableStateOf("") }
-    var dateTo by remember { mutableStateOf("") }
+    val dateFrom = remember { mutableStateOf("") }
+    val dateTo = remember { mutableStateOf("") }
 
     Column {
         OutlinedTextField(
@@ -77,24 +80,8 @@ fun ActivityDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateFrom,
-            onValueChange = { dateFrom = it },
-            label = { Text("Date From") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateTo,
-            onValueChange = { dateTo = it },
-            label = { Text("Date to") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Date From",dateFrom)
+        DatePickerDialogSample("Date To",dateTo)
         Button(
             colors = customButtonColors(),
             onClick = { /* Use the variables here */ }
@@ -173,7 +160,7 @@ fun AreaDataEditor() {
 @Composable
 fun CalendarDataEditor() {
     var idCalendar by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("") }
+    val fecha = remember { mutableStateOf("") }
     var idActivity by remember { mutableStateOf("") }
 
     Column {
@@ -186,15 +173,7 @@ fun CalendarDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = fecha,
-            onValueChange = { fecha = it },
-            label = { Text("Fecha") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Fecha", fecha)
         OutlinedTextField(
             colors = customTextFieldColors(),
             value = idActivity,
@@ -241,8 +220,8 @@ fun EmployeeDataEditor() {
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var dateFrom by remember { mutableStateOf("") }
-    var dateTo by remember { mutableStateOf("") }
+    val dateFrom = remember { mutableStateOf("") }
+    val dateTo = remember { mutableStateOf("") }
     var rol by remember { mutableStateOf("") }
 
     Column {
@@ -273,24 +252,8 @@ fun EmployeeDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateFrom,
-            onValueChange = { dateFrom = it },
-            label = { Text("Date From") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateTo,
-            onValueChange = { dateTo = it },
-            label = { Text("Date To") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Date From", dateFrom)
+        DatePickerDialogSample("Date To", dateTo)
         OutlinedTextField(
             colors = customTextFieldColors(),
             value = rol,
@@ -316,7 +279,7 @@ fun EmployeeActivityDataEditor() {
     var idTimeCode by remember { mutableStateOf("") }
     var idActivity by remember { mutableStateOf("") }
     var horas by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("") }
+    val fecha = remember { mutableStateOf("") }
     var comentario by remember { mutableStateOf("") }
 
     Column {
@@ -365,15 +328,7 @@ fun EmployeeActivityDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = fecha,
-            onValueChange = { fecha = it },
-            label = { Text("Fecha") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Fecha", fecha)
         OutlinedTextField(
             colors = customTextFieldColors(),
             value = comentario,
@@ -397,8 +352,8 @@ fun EmployeeWODataEditor() {
     var idWorkOrder by remember { mutableStateOf("") }
     var idEmployee by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var dateFrom by remember { mutableStateOf("") }
-    var dateTo by remember { mutableStateOf("") }
+    val dateFrom = remember { mutableStateOf("") }
+    val dateTo = remember { mutableStateOf("") }
 
     Column {
         OutlinedTextField(
@@ -428,24 +383,8 @@ fun EmployeeWODataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateFrom,
-            onValueChange = { dateFrom = it },
-            label = { Text("Date From") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateTo,
-            onValueChange = { dateTo = it },
-            label = { Text("Date To") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Date From", dateFrom)
+        DatePickerDialogSample("Date To", dateTo)
         Button(
             colors = customButtonColors(),
             onClick = { /* Use the variables here */ }
@@ -459,8 +398,8 @@ fun EmployeeWODataEditor() {
 fun EmployeeWorkHoursDataEditor() {
     var idEmployee by remember { mutableStateOf("") }
     var horas by remember { mutableStateOf("") }
-    var dateFrom by remember { mutableStateOf("") }
-    var dateTo by remember { mutableStateOf("") }
+    val dateFrom = remember { mutableStateOf("") }
+    val dateTo = remember { mutableStateOf("") }
 
     Column {
         OutlinedTextField(
@@ -481,24 +420,8 @@ fun EmployeeWorkHoursDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateFrom,
-            onValueChange = { dateFrom = it },
-            label = { Text("DateFrom") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = dateTo,
-            onValueChange = { dateTo = it },
-            label = { Text("Date to") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample("Date From", dateFrom)
+        DatePickerDialogSample("Date To", dateTo)
         Button(
             colors = customButtonColors(),
             onClick = { /* Use the variables here */ }

@@ -147,7 +147,7 @@ fun UserData(
                     onValueChange = {},
                     label = { Text("Correo electrónico") },
                 )
-                DatePickerDialogSample(dateFrom)
+                DatePickerDialogSample("Date From",dateFrom)
                 ExposedDropdownMenuBox(
                     expanded = expandido,
                     onExpandedChange = { expandido = !expandido },
@@ -247,6 +247,7 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
                     )
 
                     DatePickerDialogSample(
+                        "Date to",
                         dateTo
                     )
 
@@ -281,7 +282,7 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogSample(dateFrom: MutableState<String>) {
+fun DatePickerDialogSample(label: String, dateFrom: MutableState<String>) {
     var showDatePicker by remember { mutableStateOf(false) }
 
     val initialMillis = remember(dateFrom.value) {
@@ -299,7 +300,7 @@ fun DatePickerDialogSample(dateFrom: MutableState<String>) {
         value = dateFrom.value,
         colors = customTextFieldColors(),
         onValueChange = {},
-        label = { Text("Fecha") },
+        label = { Text(label) },
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { showDatePicker = true }) {

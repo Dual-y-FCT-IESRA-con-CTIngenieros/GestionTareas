@@ -147,7 +147,7 @@ class UserManageScreen : Screen {
                         onValueChange = { email = it },
                         label = { Text("Correo electrónico") },
                     )
-                    DatePickerDialogSample(dateFrom)
+                    DatePickerDialogSample("Date From",dateFrom)
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido }
