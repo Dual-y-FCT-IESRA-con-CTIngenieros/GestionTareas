@@ -46,14 +46,14 @@ class ManageCSV {
         }
     }
 
-    fun generateCSV1() {
+    fun generateCSV1(idEmployee:Int) {
         CoroutineScope(Dispatchers.Default).launch {
             val json = Json { ignoreUnknownKeys = true }
 
             // 1. Obtener datos desde Supabase
             val employeeActivities: List<EmployeeActivity> = json.decodeFromString(
                 supabase.from("EmployeeActivity").select(){
-                    filter { eq("idEmployee", 1) }
+                    filter { eq("idEmployee", idEmployee) }
                 }.data
             )
             val activities: List<Activity> = json.decodeFromString(
