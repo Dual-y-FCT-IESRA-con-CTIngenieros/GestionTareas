@@ -21,9 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-
 
 object DataViewModel {
 
@@ -85,7 +85,6 @@ object DataViewModel {
 
         }
     }
-
     private fun cargarEmployeeActivities() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
@@ -112,18 +111,19 @@ object DataViewModel {
             _workOrders.value = datos
         }
     }
-    private fun cargarEmployeeWO() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<EmployeeWO>("EmployeeWO")
-            _employeeWO.value = datos
-        }
-    }
 
     private fun cargarActivities() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Activity>("Activity")
             _activities.value = datos
 
+        }
+    }
+
+    private fun cargarEmployeeWO() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<EmployeeWO>("EmployeeWO")
+            _employeeWO.value = datos
         }
     }
 
@@ -145,6 +145,14 @@ object DataViewModel {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
         }
+    }
+    init {
+        cargarTimeCodes()
+        cargarEmployeeActivities()
+        cargarProjects()
+        cargarProjectsTimeCode()
+        cargarWorkOrders()
+        cargarEmployeeWO()
     }
 
     // Funciones comunes a varias pantallas
@@ -215,6 +223,4 @@ object DataViewModel {
             }
         }
     }
-
-
 }
