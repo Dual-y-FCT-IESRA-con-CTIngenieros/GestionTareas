@@ -110,7 +110,6 @@ class UserViewModel {
                     tokenType = "Bearer",
                     user = user // opcional, Supabase puede refrescarlo luego
                 )
-                supabase.auth.refreshSession(refreshToken)
                 supabase.auth.importSession(session)
                 withContext(Dispatchers.IO) {
                     Database.getEmployee(user.email ?: "")
@@ -124,11 +123,10 @@ class UserViewModel {
         }
     }
 
-//    fun signOut(navigator:Navigator) {
+//    fun signOut() {
 //        supabase.auth.signOut()
 //        settings.remove("access_token")
 //        settings.remove("refresh_token")
-//        navigator.replaceAll(LoginScreen(this))
 //    }
 
     fun resetVar() {
