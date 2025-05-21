@@ -24,3 +24,5 @@ fun App() {
 //        }
     }
 }
+
+expect suspend fun saveToDownloads(data: String, filename: String): Boolean
