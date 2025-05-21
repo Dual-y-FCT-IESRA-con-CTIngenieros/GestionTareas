@@ -1,8 +1,22 @@
 package com.es.appmovil.viewmodel
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.es.appmovil.database.Database
+import com.es.appmovil.model.Employee
+import com.es.appmovil.model.dto.EmployeeUpdateDTO
+import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.today
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -15,8 +29,17 @@ class CalendarManageViewModel {
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
+    private var _employeeModifie = MutableStateFlow(false)
+    val employeeModifie: StateFlow<Boolean> = _employeeModifie
+
     private var _weekIndex = MutableStateFlow(0)
     val weekIndex: StateFlow<Int> = _weekIndex
+
+    private var _blockDate:MutableStateFlow<String?> = MutableStateFlow("")
+    val blockDate: StateFlow<String?> = _blockDate
+
+    private var _filter:MutableStateFlow<String> = MutableStateFlow("")
+    val filter: StateFlow<String> = _filter
 
     private val _weeksInMonth = MutableStateFlow(generateWeeksForMonth(today.value.year, today.value.month))
     val weeksInMonth:StateFlow<List<Pair<LocalDate, LocalDate>>> = _weeksInMonth
@@ -32,12 +55,12 @@ class CalendarManageViewModel {
         _weekIndex.value = index
     }
 
-    fun lockWeek(week: Pair<LocalDate, LocalDate>) {
-        _locked.value += week
+    fun changeEmployeesModifie(bool:Boolean) {
+        _employeeModifie.value = bool
     }
 
-    fun unlockWeek(week: Pair<LocalDate, LocalDate>) {
-        _locked.value -= week
+    fun changeFilter(value:String) {
+        _filter.value = value
     }
 
     /**
@@ -47,6 +70,7 @@ class CalendarManageViewModel {
     fun onMonthChangePrevious(month: DatePeriod) {
         today.value = today.value.minus(month)
         _weeksInMonth.value = generateWeeksForMonth(today.value.year, today.value.month)
+        changeEmployeesModifie(false)
     }
 
     /**
@@ -56,6 +80,56 @@ class CalendarManageViewModel {
     fun onMonthChangeFordward(month: DatePeriod) {
         today.value = today.value.plus(month)
         _weeksInMonth.value = generateWeeksForMonth(today.value.year, today.value.month)
+        changeEmployeesModifie(false)
+    }
+
+    fun getWeekColor(week: Pair<LocalDate, LocalDate>, employees:List<Employee>): Pair<ImageVector, Color> {
+        val weekEnd = week.second
+
+        val states = employees.mapNotNull {
+            it.blockDate?.let { dateStr ->
+                runCatching { LocalDate.parse(dateStr) }.getOrNull()
+            }?.let { blockDate ->
+                blockDate >= weekEnd
+            }
+        }
+
+        return when {
+            states.all { it } -> Pair(Icons.Filled.Lock, Color.Red)      // Todos bloqueados >= semana
+            states.none { it } -> Pair(Icons.Filled.LockOpen, Color.Green)        // Ninguno bloqueado >= semana
+            else ->  Pair(Icons.Filled.LockOpen,  Color(0xFFFFA500))            // Parcialmente bloqueados (naranja)
+        }
+    }
+
+    fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee) {
+        val updated = employee.copy(blockDate = week.second.toString())
+        employees.update { list ->
+            list.map { if (it.idEmployee == updated.idEmployee) updated else it }
+        }
+    }
+
+    fun lockWeek(week: Pair<LocalDate, LocalDate>) {
+        employees.value.forEach {
+            it.blockDate = week.second.toString()
+            CoroutineScope(Dispatchers.IO).launch {
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate))
+            }
+        }
+        generateLock()
+    }
+
+    fun lockWeekEmployees() {
+        employees.value.forEach {
+            CoroutineScope(Dispatchers.IO).launch {
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate))
+            }
+        }
+        generateLock()
+    }
+
+    fun generateLock() {
+        val e = employees.value.maxBy { it.blockDate ?:"" }
+        _blockDate.value = e.blockDate
     }
 
     private fun generateWeeksForMonth(year: Int, month: Month): List<Pair<LocalDate, LocalDate>> {
