@@ -128,7 +128,6 @@ class UserViewModel {
 //        settings.remove("access_token")
 //        settings.remove("refresh_token")
 //    }
-
     fun resetVar() {
         _visibility.value = false
         _login.value = false
