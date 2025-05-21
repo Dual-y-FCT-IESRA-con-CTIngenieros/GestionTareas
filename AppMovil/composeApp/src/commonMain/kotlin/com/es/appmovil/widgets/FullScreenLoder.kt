@@ -3,6 +3,10 @@ package com.es.appmovil.widgets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,14 +35,25 @@ fun FullScreenLoader(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(bgColor),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    strokeWidth = 8.dp,
-                    color = Color(0xFFF4A900)
-                )
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.size(100.dp) // Tamaño un poco más grande que el indicador
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(bgColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            strokeWidth = 8.dp,
+                            color = Color(0xFFF4A900)
+                        )
+                    }
+                }
             }
         }
     }
