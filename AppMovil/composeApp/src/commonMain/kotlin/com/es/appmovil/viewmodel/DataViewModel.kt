@@ -3,7 +3,6 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
-import com.es.appmovil.database.Database.supabase
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.EmployeeWO
@@ -14,7 +13,6 @@ import com.es.appmovil.model.Rol
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
-import io.github.jan.supabase.postgrest.from
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,15 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import okio.FileSystem
-import okio.Path.Companion.toPath
-import okio.SYSTEM
+
 
 object DataViewModel {
 
@@ -152,47 +144,6 @@ object DataViewModel {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
-        }
-    }
-
-
-    fun uwu() {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val jsonData = supabase.from("Employee").select().data
-
-            println("Raw json: $jsonData")
-
-            val jsonArray = Json.parseToJsonElement(jsonData).jsonArray
-            println("Json object: $jsonArray")
-
-            val headers = jsonArray.first().jsonObject.keys
-            println("Headers: $headers")
-
-            var rows = ""
-
-            for ((i, elemento) in jsonArray.withIndex()) {
-                println("Ojeto $i:")
-                val jsonObject = elemento.jsonObject
-                for (clave in headers) {
-                    rows += jsonObject[clave].toString() + ","
-                    println("$clave: ${jsonObject[clave]}")
-                }
-                rows += "\n"
-            }
-//        val rows = dataTable.map { emp ->
-//            listOf(
-//                emp.nombre,
-//                emp.apellidos,
-//                emp.email,
-//                emp.dateFrom,
-//                emp.dateTo ?: "",
-//                emp.idRol.toString(),
-//                emp.idEmployee.toString()
-//            ).joinToString(",")
-//        }
-            val csv = listOf(headers, rows)
-            println(csv)
         }
     }
 
