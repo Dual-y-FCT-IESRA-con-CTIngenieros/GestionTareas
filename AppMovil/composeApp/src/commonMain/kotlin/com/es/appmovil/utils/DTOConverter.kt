@@ -1,6 +1,9 @@
 package com.es.appmovil.utils
 
+import com.es.appmovil.model.Employee
 import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.dto.EmployeeInsertDTO
+import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 
 object DTOConverter {
@@ -22,5 +25,26 @@ object DTOConverter {
         )
     }
 
+    fun Employee.toInsertDTO(): EmployeeInsertDTO {
+        return EmployeeInsertDTO(
+            nombre = nombre,
+            apellidos = apellidos,
+            email = email,
+            dateFrom = dateFrom,
+            idRol = idRol
+        )
+    }
+
+    fun EmployeeUpdateDTO.toEntity(): Employee {
+        return Employee(
+            idEmployee = idEmployee,
+            nombre = nombre,
+            apellidos = apellidos,
+            email = email,
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+            idRol = idRol
+        )
+    }
 
 }
