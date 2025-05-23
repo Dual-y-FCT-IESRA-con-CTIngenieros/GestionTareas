@@ -81,22 +81,6 @@ class CalendarViewModel {
         }
     }
 
-    fun updateEmployeeActivity(updated: EmployeeActivity) {
-//        employeeActivities.update { currentList ->
-//            currentList.map {
-//                if (
-//                    it.idEmployee == updated.idEmployee &&
-//                    it.date == updated.date &&
-//                    it.idWorkOrder == updated.idWorkOrder // o algún otro identificador
-//                ) {
-//                    updated
-//                } else {
-//                    it
-//                }
-//            }
-//        }
-    }
-
     private fun resetBars() {
         _bars.value = listOf(Bars(
             label = "",
