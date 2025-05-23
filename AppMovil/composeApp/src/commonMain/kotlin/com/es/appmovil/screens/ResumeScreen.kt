@@ -87,7 +87,9 @@ class ResumeScreen: Screen{
                             }
                         }
 
-                        Column(Modifier.clickable {
+                        Spacer(Modifier.size(16.dp))
+
+                        Column(Modifier.weight(1f).clickable {
                             if (canClick) {
                                 canClick = false
                                 navigator.push(CalendarScreen())

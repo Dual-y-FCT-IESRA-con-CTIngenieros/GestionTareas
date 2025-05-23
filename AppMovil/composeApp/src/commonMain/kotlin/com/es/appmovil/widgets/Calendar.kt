@@ -50,6 +50,7 @@ fun Calendar(
     dayMenuViewModel: DayMenuViewModel,
     fechaActual: LocalDate,
     showDialog: Boolean,
+    showDialogConfig:Boolean,
     actividades: List<EmployeeActivity>,
     timeCodes: List<TimeCodeDTO>
 ) {
@@ -80,6 +81,10 @@ fun Calendar(
 
     DayDialog(showDialog, date,dayMenuViewModel, calendarViewmodel) {
         calendarViewmodel.changeDialog(it)
+    }
+
+    DayConfigDialog(showDialogConfig, date, calendarViewmodel, dayMenuViewModel) {
+        calendarViewmodel.changeDialogConfig(it)
     }
 
     Column(
