@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -30,23 +33,34 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
+import com.es.appmovil.database.Database.supabase
 import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
+import com.es.appmovil.screens.LoginScreen
 import com.es.appmovil.screens.ResumeScreen
+import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
+import com.es.appmovil.viewmodel.UserViewModel
+import com.russhwolf.settings.Settings
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
     val selected by remember { selectScreen(navigator) }
     val items = listOf("Home", "Calendar", "Anual", "Profile")
     var canClick by remember { mutableStateOf(true) }
+    var showDialog by remember { mutableStateOf(false) }
     val icons = listOf(
         Icons.Filled.Home,
         Icons.Filled.DateRange,
         Icons.Filled.Notifications,
         Icons.Filled.Person
     )
-    val screenItems:List<Screen> = listOf(ResumeScreen(), CalendarScreen(), AnualScreen())
+    val screenItems: List<Screen> = listOf(ResumeScreen(), CalendarScreen(), AnualScreen())
 
     Box(
         modifier = Modifier
@@ -81,12 +95,16 @@ fun BottomNavigationBar(navigator: Navigator) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEachIndexed { index, item ->
-                if (item != "Profile") {
-                    IconButton(onClick = {
-                        if (selected != index) {
-                            if (canClick) {
+
+                IconButton(onClick = {
+                    if (selected != index) {
+                        if (canClick) {
+                            if (index == 3) {
+                                canClick = true
+                                showDialog = true
+                            } else {
                                 canClick = false
-                                if (screenItems[index] !is ResumeScreen){
+                                if (screenItems[index] !is ResumeScreen) {
                                     if (screenItems[index] is CalendarScreen)
                                         resetToday()
                                     navigator.push(screenItems[index])
@@ -94,18 +112,12 @@ fun BottomNavigationBar(navigator: Navigator) {
                                     resetToday()
                                     navigator.replaceAll(ResumeScreen())
                                 }
-
                             }
+
+
                         }
-                    }) {
-                        Icon(
-                            imageVector = icons[index],
-                            contentDescription = item,
-                            tint = if (selected == index) Color(0xFFF4A900) else Color.Gray,
-                            modifier = Modifier.size(28.dp)
-                        )
                     }
-                } else { // PROVISIONAL CAMBIAR LUEGO
+                }) {
                     Icon(
                         imageVector = icons[index],
                         contentDescription = item,
@@ -116,14 +128,47 @@ fun BottomNavigationBar(navigator: Navigator) {
             }
         }
     }
+
+    DialogSession(showDialog,
+        {
+            CoroutineScope(Dispatchers.IO).launch {
+                signOut(navigator)
+            }
+            showDialog = false
+        }
+    ) {showDialog = false}
 }
 
-fun selectScreen(navigator: Navigator):MutableState<Int> {
+@Composable
+fun DialogSession(showDialog:Boolean, onAccept:()-> Unit, onDismiss:()->  Unit) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss ,
+            confirmButton = {
+                Button(onClick = onAccept, colors = customButtonColors()) {
+                    Text("Cerrar Sesión")
+                }
+            },
+            title = { Text("Sesión") },
+            text = { Text("¿Quieres cerrar sesión?") }
+        )
+    }
+}
+
+    suspend fun signOut(navigator: Navigator) {
+        val settings = Settings()
+        supabase.auth.signOut()
+        settings.remove("access_token")
+        settings.remove("refresh_token")
+        navigator.replaceAll(LoginScreen(UserViewModel()))
+    }
+
+fun selectScreen(navigator: Navigator): MutableState<Int> {
     val currentScreen = navigator.lastItem
-    return when(currentScreen) {
+    return when (currentScreen) {
         is ResumeScreen -> mutableStateOf(0)
         is CalendarScreen -> mutableStateOf(1)
         is AnualScreen -> mutableStateOf(2)
-        else -> mutableStateOf(0)
+        else -> mutableStateOf(-1)
     }
 }

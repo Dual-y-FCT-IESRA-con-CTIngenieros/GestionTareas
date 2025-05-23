@@ -6,6 +6,7 @@ import com.es.appmovil.database.Database
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
+import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -37,12 +38,20 @@ class CalendarViewModel {
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
+    private var _showDialogConfig = MutableStateFlow(false)
+    val showDialogConfig: StateFlow<Boolean> = _showDialogConfig
+
     private var _reset = MutableStateFlow(false)
 
 
     fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
+
+    fun changeDialogConfig(bool: Boolean) {
+        _showDialogConfig.value = bool
+    }
+
 
     /**
      * Función para cambiar el mes que se muestra en el calendario
@@ -64,6 +73,12 @@ class CalendarViewModel {
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
         _reset.value = true
+    }
+
+    fun getActivitiesForDate(fechaSeleccionada: LocalDate): List<EmployeeActivity> {
+        return employeeActivity.value.filter {
+            LocalDate.parse(it.date) == fechaSeleccionada && it.idEmployee == employee.idEmployee
+        }
     }
 
     private fun resetBars() {
@@ -109,7 +124,7 @@ class CalendarViewModel {
         val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 
         val actividadesDelDia = employeeActivity.value.filter {
-            LocalDate.parse(it.date) == fechaSeleccionada
+            LocalDate.parse(it.date) == fechaSeleccionada && it.idEmployee == employee.idEmployee
         }
 
         if (actividadesDelDia.isEmpty() || _reset.value) {

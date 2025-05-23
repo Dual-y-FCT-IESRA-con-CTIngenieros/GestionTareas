@@ -24,6 +24,7 @@ fun ResumenAnual(anualViewModel: AnualViewModel) {
             spacing = 1.dp,
             thickness = 8.dp
         ),
-        labelHelperProperties = LabelHelperProperties(enabled = false)
+        labelHelperProperties = LabelHelperProperties(enabled = false),
+        maxValue = 160.0
     )
 }

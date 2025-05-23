@@ -1,5 +1,6 @@
 package com.es.appmovil.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,9 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.FabPosition
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -18,7 +19,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -48,17 +48,20 @@ class CalendarScreen() : Screen {
 
         // Creamos la variable que nos permite mostrar el dialogo
         val showDialog by calendarViewmodel.showDialog.collectAsState()
+        val showDialogConfig by calendarViewmodel.showDialogConfig.collectAsState()
 
         DataViewModel.getPie()
 
         MaterialTheme {
-            Scaffold(bottomBar = {
-                BottomNavigationBar(navigator)
-            }) { innerPadding ->
+            Scaffold(
+                bottomBar = { BottomNavigationBar(navigator) },
+                floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },
+                floatingActionButtonPosition = FabPosition.Center, // o End
+                isFloatingActionButtonDocked = false) { innerPadding ->
 
                 Box(Modifier.padding(innerPadding).fillMaxSize()) {
                     Column {
-                        Calendar(calendarViewmodel, dayMenuViewModel, fechaActual, showDialog, actividades, timeCodes)
+                        Calendar(calendarViewmodel, dayMenuViewModel, fechaActual, showDialog, showDialogConfig, actividades, timeCodes)
                         Row {
                             ElevatedCard(
                                 colors = CardColors(
@@ -67,23 +70,20 @@ class CalendarScreen() : Screen {
                                     disabledContainerColor = Color.Gray,
                                     disabledContentColor = Color.Black
                                 ),
-                                modifier = Modifier.weight(1f).padding(20.dp),
+                                modifier = Modifier.weight(1f).padding(start = 20.dp, bottom = 20.dp).clickable {
+                                    calendarViewmodel.changeDialogConfig(true)
+                                },
                                 elevation = CardDefaults.elevatedCardElevation(5.dp)
 
                             ) {
                                 ResumenHorasDia(calendarViewmodel)
                             }
-                            Spacer(Modifier.size(1.dp))
-                            Column {
-                                Row {
-                                    Text("Resumen del mes", fontWeight = FontWeight.SemiBold)
-                                }
-                                Spacer(Modifier.size(20.dp))
-                                ResumenHorasMensual()
+
+                            Spacer(Modifier.size(16.dp))
+
+                            Column(modifier = Modifier.weight(1f).padding(end = 20.dp, bottom = 10.dp)) {
+                                ResumenHorasMensual() // ya no tiene medidas fijas dentro
                             }
-                        }
-                        ActionButton {
-                            calendarViewmodel.changeDialog(true)
                         }
                     }
                 }
