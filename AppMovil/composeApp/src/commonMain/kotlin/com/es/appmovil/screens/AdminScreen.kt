@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
 
@@ -45,6 +46,7 @@ class AdminScreen : Screen {
         var canClick by remember { mutableStateOf(true) }
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
+        val employeesDataViewModel = EmployeesDataViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
@@ -79,7 +81,7 @@ class AdminScreen : Screen {
                             ),
                             modifier = Modifier.size(180.dp).clickable {
                                 if (canClick) {
-                                    //navigator.push(UserManageScreen())
+                                    navigator.push(UserManageScreen(employeesDataViewModel = employeesDataViewModel))
                                     canClick = false
                                 }
                             },
@@ -123,7 +125,7 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.TableView,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Tabla",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
@@ -160,7 +162,7 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Summarize,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Informe",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
@@ -190,7 +192,7 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.EditCalendar,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Calendario",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )

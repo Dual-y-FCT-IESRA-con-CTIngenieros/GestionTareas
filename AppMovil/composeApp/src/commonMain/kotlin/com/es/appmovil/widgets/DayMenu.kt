@@ -1,5 +1,6 @@
 package com.es.appmovil.widgets
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
+import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DayMenuViewModel
@@ -66,6 +68,7 @@ fun DayDialog(
     val horas by dayMenuViewModel.hours.collectAsState()
 
     val timeCode by dayMenuViewModel.timeCode.collectAsState()
+    val timeCodes by dayMenuViewModel.timeCodes.collectAsState()
     val timeCodeSeleccionado by dayMenuViewModel.timeCodeSeleccionado.collectAsState()
 
     val workOrder by dayMenuViewModel.workOrder.collectAsState()
@@ -96,6 +99,7 @@ fun DayDialog(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 NumberInputField(value = horas, onValueChange = { dayMenuViewModel.onHours(it) })
                 ProyectoYTimeCodeSelector(
+                    timeCodes,
                     workOrdersTimeCodes,
                     { dayMenuViewModel.onTimeCode(it) },
                     timeCodeSeleccionado,
@@ -128,7 +132,8 @@ fun DayDialog(
                 value = comentario,
                 onValueChange = { dayMenuViewModel.onComment(it) },
                 label = { Text("Comentario") },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).height(100.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+                    .height(100.dp)
             )
 
             Save(timeCode, workOrder, activity, { onChangeDialog(false) }, {
@@ -145,6 +150,7 @@ fun DayDialog(
                         )
                     )
                 }
+                dayMenuViewModel.clear()
             })
             Spacer(modifier = Modifier.size(16.dp))
         }
@@ -179,6 +185,7 @@ fun Save(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProyectoYTimeCodeSelector(
+    timecodeData: List<TimeCodeDTO>,
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
     onTimeCodeSelected: (Int) -> Unit,
     timeCodeSeleccionado: Int?,
@@ -209,7 +216,10 @@ fun ProyectoYTimeCodeSelector(
             proyectTimecodesDTO.sortedBy { it.idTimeCode }.map { it.idTimeCode }.distinct()
                 .forEach { timeCode ->
                     DropdownMenuItem(
-                        text = { Text(timeCode.toString()) },
+                        text = {
+                            timecodeData.find { it.idTimeCode == timeCode }?.let { Text(it.desc) }
+
+                        },
                         onClick = {
                             onTimeCodeChange(timeCode)
                             onProyectChange(null)
@@ -228,7 +238,7 @@ fun ProjectsSelected(
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
     timeCodeSeleccionado: Int?,
     proyectoSeleccionado: String?,
-    placeholder:String,
+    placeholder: String,
     modifier: Modifier,
     onChangeProyect: (String) -> Unit,
     onProjectSelected: (String) -> Unit
@@ -263,6 +273,7 @@ fun ProjectsSelected(
         ) {
             proyectosDisponibles.forEach { proyecto ->
                 DropdownMenuItem(
+                    modifier = Modifier.border(0.5.dp, Color.LightGray),
                     text = { Text(proyecto) },
                     onClick = {
                         onChangeProyect(proyecto)

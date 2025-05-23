@@ -12,6 +12,7 @@ class DayMenuViewModel {
     // Cargamos los projectsTimeCode de la base de datos
     private val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = DataViewModel.projectTimeCodes
     private val activities: StateFlow<List<Activity>> = DataViewModel.activities
+    val timeCodes = DataViewModel.timeCodes
 
     // Variables para que se guarden las horas y el comentario
     private var _comment = MutableStateFlow("")
@@ -78,6 +79,15 @@ class DayMenuViewModel {
         _activitySelected.value = newActivity
     }
 
+    fun clear() {
+        _comment.value = ""
+        _hours.value = 8
+        _timeCode.value = 0
+        _timeCodeSelected.value = null
+        _workSelected.value = null
+        _activitySelected.value = null
+    }
+
     fun generateWorkOrders() {
         val workOrdersPorTimeCode = mutableListOf<ProjectTimeCodeDTO>()
         val timeCodeProcesados = mutableSetOf<Int>()
@@ -119,39 +129,13 @@ class DayMenuViewModel {
                 // Filtramos los activities que tienen este timeCode
                 val activitiesTimeCode = activities.value
                     .filter { it.idTimeCode == activity.idTimeCode }
-                    .map { it.idActivity.toString() }
+                    .map { it.desc }
 
                 val dto = ProjectTimeCodeDTO(activity.idTimeCode, activitiesTimeCode.toMutableList())
                 activitiesPorTimeCode.add(dto)
             }
         }
         activityTimeCode.value = activitiesPorTimeCode
-
-//        projectTimeCodes.value.forEach { code ->
-//            if (code.idTimeCode !in timeCodeProcesados) {
-//                timeCodeProcesados.add(code.idTimeCode)
-//
-//                // Filtramos los proyectos que tienen este timeCode
-//                val proyectosAsociados = projectTimeCodes.value
-//                    .filter { it.idTimeCode == code.idTimeCode }
-//                    .map { it.idProject }
-//
-//                // Obtenemos los workOrders de esos proyectos
-//                val workOrdersAsociados = DataViewModel.workOrders.value
-//                    .filter { it.idProject in proyectosAsociados }
-//                    .map { it.idWorkOrder }
-//
-//                // Filtramos por los workOrders en los que participa el empleado
-//                val workOrdersEmpleado = employeeWO.value
-//                    .filter { it.idWorkOrder in workOrdersAsociados && it.idEmployee == employee.idEmployee }
-//                    .map { it.idWorkOrder }
-//
-//                val dto = ProjectTimeCodeDTO(code.idTimeCode, workOrdersEmpleado.toMutableList())
-//                activitiesPorTimeCode.add(dto)
-//            }
-//        }
-//
-//        activityTimeCode.value = activitiesPorTimeCode
     }
 
 }

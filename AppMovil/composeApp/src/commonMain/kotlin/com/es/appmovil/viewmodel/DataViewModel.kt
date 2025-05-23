@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -76,6 +75,8 @@ object DataViewModel {
         cargarWorkOrders()
         cargarActivities()
         cargarEmployeeWO()
+        cargarEmployees()
+        cargarRoles()
     }
 
     private fun cargarTimeCodes() {
@@ -127,13 +128,12 @@ object DataViewModel {
         }
     }
 
-    private val _employees = MutableStateFlow<List<Employee>>(emptyList())
-    val employees: StateFlow<List<Employee>> = _employees
+     val employees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
 
-    fun cargarEmployees(){
+    private fun cargarEmployees(){
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Employee>("Employee")
-            _employees.value = datos
+            employees.value = datos.toMutableList()
         }
     }
 
@@ -145,14 +145,6 @@ object DataViewModel {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
         }
-    }
-    init {
-        cargarTimeCodes()
-        cargarEmployeeActivities()
-        cargarProjects()
-        cargarProjectsTimeCode()
-        cargarWorkOrders()
-        cargarEmployeeWO()
     }
 
     // Funciones comunes a varias pantallas
