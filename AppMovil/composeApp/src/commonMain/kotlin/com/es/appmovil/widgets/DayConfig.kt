@@ -178,58 +178,6 @@ fun EditableActivityCard(
                 )
             }
         })
-
-
-
-//        OutlinedTextField(
-//            value = timeCode.toString(),
-//            onValueChange = {
-//                timeCode = it.toIntOrNull() ?: 0
-//                onUpdate(activity.copy(idTimeCode = timeCode))
-//            },
-//            label = { Text("TimeCode") },
-//            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        OutlinedTextField(
-//            value = workOrder,
-//            onValueChange = {
-//                workOrder = it
-//                onUpdate(activity.copy(idWorkOrder = it))
-//            },
-//            label = { Text("WorkOrder") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        OutlinedTextField(
-//            value = act,
-//            onValueChange = {
-//                act = it
-//                onUpdate(activity.copy(idActivity = it.toIntOrNull() ?: activity.idActivity))
-//            },
-//            label = { Text("Actividad") },
-//            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        OutlinedTextField(
-//            value = comentario,
-//            onValueChange = {
-//                comentario = it
-//                onUpdate(activity.copy(comment = it))
-//            },
-//            label = { Text("Comentario") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        NumberInputField(value = horas, onValueChange = { dayMenuViewModel.onHours(it) })
     }
 }
 
