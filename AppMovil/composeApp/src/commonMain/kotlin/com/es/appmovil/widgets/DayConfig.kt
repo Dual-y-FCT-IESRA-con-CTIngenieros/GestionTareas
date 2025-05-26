@@ -29,7 +29,6 @@ import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
-import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.timeCodes
 import com.es.appmovil.viewmodel.DayMenuViewModel
 import kotlinx.coroutines.CoroutineScope
