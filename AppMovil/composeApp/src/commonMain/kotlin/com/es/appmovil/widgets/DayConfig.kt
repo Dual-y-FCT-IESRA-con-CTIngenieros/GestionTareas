@@ -23,11 +23,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.es.appmovil.database.Database
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
+import com.es.appmovil.viewmodel.DataViewModel.employees
+import com.es.appmovil.viewmodel.DataViewModel.timeCodes
 import com.es.appmovil.viewmodel.DayMenuViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 
@@ -61,7 +69,6 @@ fun DayConfigDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             ) {
                 items(activities.size) { index ->
                     val activity = activities.sortedBy { it.idTimeCode }[index]
@@ -72,10 +79,7 @@ fun DayConfigDialog(
                         calendarViewModel,
                         workOrdersTimeCodes,
                         activitiesTimeCodes,
-                        { onChangeDialog(false) },
-                        onUpdate = { updated ->
-                            calendarViewModel.updateEmployeeActivity(updated)
-                        }
+                        { onChangeDialog(false) }, {}
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -108,11 +112,12 @@ fun EditableActivityCard(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text("TimeCode: ${activity.idTimeCode}", modifier = Modifier.padding(bottom = 8.dp))
+        Text("TimeCode: ${activity.idTimeCode}", modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             NumberInputField(value = horas.toInt(), onValueChange = { horas = it.toFloat() })
             ProyectoYTimeCodeSelector(
+                timeCodes.value,
                 workOrdersTimeCodes,
                 {
                     timeCodeSeleccionado = it
@@ -123,11 +128,11 @@ fun EditableActivityCard(
                     onUpdate(activity.copy(idActivity = 0))
                 },
                 timeCodeSeleccionado,
+                {},
                 { if (it!= null){
                     workSeleccionado = it
                     onUpdate(activity.copy(idWorkOrder = it))}
                 }
-
             )
         }
 
@@ -137,7 +142,8 @@ fun EditableActivityCard(
                 timeCodeSeleccionado,
                 workSeleccionado,
                 "WorkOrder",
-                Modifier.weight(1f).padding(start = 16.dp, top = 8.dp)
+                Modifier.weight(1f).padding(start = 16.dp, top = 8.dp),
+                {}
             ) {
                 workSeleccionado = it
                 onUpdate(activity.copy(idWorkOrder = it))
@@ -147,7 +153,8 @@ fun EditableActivityCard(
                 timeCodeSeleccionado,
                 activitySeleccionado,
                 "Activity",
-                Modifier.weight(1f).padding(end = 16.dp, top = 8.dp)
+                Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
+                {}
             ) {
                 activitySeleccionado = it
                 onUpdate(activity.copy(idActivity = it.toIntOrNull() ?: 59))
@@ -157,7 +164,6 @@ fun EditableActivityCard(
             value = comentario,
             onValueChange = {
                 comentario = it
-                onUpdate(activity.copy(comment = it))
             },
             label = { Text("Comentario") },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -165,6 +171,10 @@ fun EditableActivityCard(
 
         Save(timeCodeSeleccionado, workSeleccionado , activitySeleccionado, { onChangeDialog(false) }, {
             dates.value.forEach { date ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.deleteEmployeeActivity(activity)
+                }
+                employeeActivities.value.remove(activity)
                 calendarViewModel.addEmployeeActivity(
                     EmployeeActivity(
                         employee.idEmployee,
@@ -177,7 +187,7 @@ fun EditableActivityCard(
                     )
                 )
             }
-        }
+        })
     }
 }
 

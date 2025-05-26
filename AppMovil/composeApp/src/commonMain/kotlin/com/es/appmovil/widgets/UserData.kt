@@ -188,7 +188,8 @@ fun UserData(
                                     email,
                                     dateFrom.value,
                                     dateTo.value,
-                                    roles.find { it.rol == seleccion }?.idRol ?: -1
+                                    roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                    null
                                 )
                             )
                         }
@@ -214,7 +215,8 @@ fun UserData(
                         email,
                         dateFrom.value,
                         dateTo.value,
-                        roles.find { it.rol == seleccion }?.idRol ?: -1
+                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                        null
                     )
                 ) { alertOpen = it }
             }

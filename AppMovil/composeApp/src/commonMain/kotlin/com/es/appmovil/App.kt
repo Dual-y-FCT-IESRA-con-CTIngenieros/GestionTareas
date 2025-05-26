@@ -18,7 +18,7 @@ fun App() {
         val userViewmodel = UserViewModel()
         DataViewModel
         getMonth()
-        FullScreenLoader()
+        //FullScreenLoader()
 
         Navigator(screen = LoginScreen(userViewmodel))
 //        { navigator: Navigator ->

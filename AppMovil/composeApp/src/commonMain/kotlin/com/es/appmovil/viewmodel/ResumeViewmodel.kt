@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel.calendarFest
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
@@ -51,18 +53,39 @@ class ResumeViewmodel {
     }
 
     
-    private fun getDays():Int {
-        var fc = ""
-        var days = 0
-        employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee }
-            .forEach {
-                if (fc != it.date) {
-                    days += 1
-                    fc = it.date
-                }
+//    private fun getDays():Int {
+//        var fc = ""
+//        var days = 0
+//        employeeActivities.value
+//            .filter { employee.idEmployee == it.idEmployee }
+//            .forEach {
+//                if (fc != it.date) {
+//                    days += 1
+//                    fc = it.date
+//                }
+//            }
+//        return days
+//    }
+
+    private fun getDays(): Int {
+        val year = today.value.year
+
+        val holidays = calendarFest.value.date.map { LocalDate.parse(it) }.toSet()
+
+        var workingDays = 0
+
+        for (date in generateSequence(LocalDate(year, 1, 1)) { it.plus(DatePeriod(days = 1)) }
+            .takeWhile { it <= today.value }) {
+
+            val isWeekend = date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY
+            val isHoliday = holidays.contains(date)
+
+            if (!isWeekend && !isHoliday) {
+                workingDays++
             }
-        return days
+        }
+
+        return workingDays
     }
 
     fun getLegend(): MutableState<MutableMap<String, Long>> {

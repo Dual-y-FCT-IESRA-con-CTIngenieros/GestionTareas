@@ -218,7 +218,8 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                                         employeesDataViewModel.email.value,
                                         employeesDataViewModel.dateFrom.value,
                                         null,
-                                        roles.find { it.rol == seleccion }?.idRol ?: -1
+                                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                        null
                                     )
                                 )
                             }

@@ -104,7 +104,10 @@ fun DayDialog(
                     { dayMenuViewModel.onTimeCode(it) },
                     timeCodeSeleccionado,
                     { dayMenuViewModel.onTimeSelected(it) },
-                    { dayMenuViewModel.onWorkSelected(it) })
+                    {
+                        dayMenuViewModel.onWorkSelected(it)
+                        dayMenuViewModel.onActivitySelected(it)
+                    })
             }
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -258,7 +261,7 @@ fun ProjectsSelected(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = proyectoSeleccionado ?: "",
+            value = if(proyectoSeleccionado != null) if(proyectoSeleccionado.length > 10)  "${proyectoSeleccionado.take(11)}..." else proyectoSeleccionado else "",
             onValueChange = {},
             readOnly = true,
             label = { Text(placeholder) },

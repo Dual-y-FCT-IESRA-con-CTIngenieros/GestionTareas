@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
@@ -47,6 +49,7 @@ class AdminScreen : Screen {
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
         val employeesDataViewModel = EmployeesDataViewModel()
+        val calendarManageViewModel = CalendarManageViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
@@ -79,7 +82,7 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     navigator.push(UserManageScreen(employeesDataViewModel = employeesDataViewModel))
                                     canClick = false
@@ -103,6 +106,7 @@ class AdminScreen : Screen {
 
                         }
 
+                        Spacer(Modifier.size(16.dp))
 
                         ElevatedCard(
                             colors = CardColors(
@@ -111,7 +115,7 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
                                 }
@@ -135,7 +139,7 @@ class AdminScreen : Screen {
                         }
                     }
 
-                    Spacer(Modifier.size(30.dp))
+                    Spacer(Modifier.size(16.dp))
 
                     Row(
                         Modifier.fillMaxWidth(),
@@ -148,9 +152,10 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
+                                    navigator.push(GenerateCSVScreen())
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
@@ -171,6 +176,8 @@ class AdminScreen : Screen {
 
                         }
 
+                        Spacer(Modifier.size(16.dp))
+
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
@@ -178,9 +185,10 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
+                                    navigator.push(CalendarManageScreen(calendarManageViewModel))
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
@@ -198,11 +206,9 @@ class AdminScreen : Screen {
                                 )
                                 Text("Gestión de calendario")
                             }
-
                         }
                     }
                 }
-
             }
         }
     }

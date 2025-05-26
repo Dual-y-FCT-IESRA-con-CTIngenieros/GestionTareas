@@ -3,6 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.EmployeeWO
@@ -11,6 +12,7 @@ import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
 import com.es.appmovil.model.WorkOrder
+import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
 import ir.ehsannarmani.compose_charts.models.Pie
@@ -21,7 +23,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
 object DataViewModel {
@@ -29,7 +35,7 @@ object DataViewModel {
     var today = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
     var currentToday = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
-    var employee = Employee(-1, "", "", "", "", null, -1)
+    var employee = Employee(-1, "", "", "", "", null, -1,null)
 
 
     // Variables comunes a varias pantallas
@@ -77,6 +83,7 @@ object DataViewModel {
         cargarEmployeeWO()
         cargarEmployees()
         cargarRoles()
+        cargarCalendar()
     }
 
     private fun cargarTimeCodes() {
@@ -145,6 +152,28 @@ object DataViewModel {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
         }
+    }
+
+    private var _calendarFest = MutableStateFlow(CalendarYearDTO(0, mutableListOf()))
+    val calendarFest = _calendarFest
+
+    private var _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    val calendar = _calendar
+
+    private fun cargarCalendar() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Calendar>("Calendar")
+            _calendar.value = datos
+        }
+    }
+
+    fun cargarCalendarFest() {
+        val festivos = calendar.value.map { it.date }
+
+        _calendarFest.value = CalendarYearDTO(
+            idCalendar = today.value.year,
+            date = festivos
+        )
     }
 
     // Funciones comunes a varias pantallas

@@ -104,7 +104,7 @@ class CalendarManageViewModel {
     fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee) {
         val updated = employee.copy(blockDate = week.second.toString())
         employees.update { list ->
-            list.map { if (it.idEmployee == updated.idEmployee) updated else it }
+            list.map { if (it.idEmployee == updated.idEmployee) updated else it }.toMutableList()
         }
     }
 
@@ -125,6 +125,12 @@ class CalendarManageViewModel {
             }
         }
         generateLock()
+    }
+
+    fun getPreviousWeek(week: Pair<LocalDate, LocalDate>): Pair<LocalDate, LocalDate> {
+        val previousWeekEnd = week.first.minus(DatePeriod(days = 1)) // día anterior al primer día de la semana actual
+        val previousWeekStart = previousWeekEnd.minus(DatePeriod(days = 6))
+        return previousWeekStart to previousWeekEnd
     }
 
     fun generateLock() {
