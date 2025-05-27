@@ -171,7 +171,9 @@ fun EditableActivityCard(
         Save(timeCodeSeleccionado, workSeleccionado , activitySeleccionado, { onChangeDialog(false) }, {
             dates.value.forEach { date ->
                 CoroutineScope(Dispatchers.IO).launch {
+                    FullScreenLoadingManager.showLoader()
                     Database.deleteEmployeeActivity(activity)
+                    FullScreenLoadingManager.hideLoader()
                 }
                 employeeActivities.value.remove(activity)
                 calendarViewModel.addEmployeeActivity(
