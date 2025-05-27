@@ -31,6 +31,7 @@ import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.timeCodes
 import com.es.appmovil.viewmodel.DayMenuViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
