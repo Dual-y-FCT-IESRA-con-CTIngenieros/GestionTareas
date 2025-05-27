@@ -88,6 +88,36 @@ class DayMenuViewModel {
         _activitySelected.value = null
     }
 
+    private fun getIndexCode(code:Int):Int {
+        return when (code) {
+            100 -> 0
+            200 -> 1
+            555 -> 2
+            900 -> 3
+            901 -> 4
+            else -> 0
+        }
+    }
+
+    fun loadTimes(code:Int) {
+        val tc = timeCodes.value.find { it.idTimeCode == code }
+        onTimeCode(code)
+        onTimeSelected("${tc?.idTimeCode} - ${tc?.desc}")
+
+        val indexedValue = getIndexCode(code)
+
+        onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+        onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+
+        val a = activityTimeCode.value[indexedValue].projects.first()
+
+        val idActivity = DataViewModel.activities.value.find { act -> act.idActivity.toString() == a.split("-")[0].trim()  }
+        val activityInt = idActivity?.idActivity ?: 0
+
+        onActivity(activityInt)
+        onActivitySelected(activityTimeCode.value[indexedValue].projects.first())
+    }
+
     fun generateWorkOrders() {
         val workOrdersPorTimeCode = mutableListOf<ProjectTimeCodeDTO>()
         val timeCodeProcesados = mutableSetOf<Int>()
@@ -116,7 +146,7 @@ class DayMenuViewModel {
             }
         }
 
-        workOrderTimeCodeDTO.value = workOrdersPorTimeCode
+        workOrderTimeCodeDTO.value = workOrdersPorTimeCode.sortedBy { it.idTimeCode }.toMutableList()
     }
 
     fun generateActivities() {
@@ -125,7 +155,7 @@ class DayMenuViewModel {
 
         activities.value.forEach { activity ->
             if (activity.idTimeCode !in timeCodeProcesados) {
-
+                timeCodeProcesados.add(activity.idTimeCode)
                 // Filtramos los activities que tienen este timeCode
                 val activitiesTimeCode = activities.value
                     .filter { it.idTimeCode == activity.idTimeCode }
@@ -133,9 +163,14 @@ class DayMenuViewModel {
 
                 val dto = ProjectTimeCodeDTO(activity.idTimeCode, activitiesTimeCode.toMutableList())
                 activitiesPorTimeCode.add(dto)
+
+                if (activity.idTimeCode == 100) {
+                    val dto2 = ProjectTimeCodeDTO(555, activitiesTimeCode.toMutableList())
+                    activitiesPorTimeCode.add(dto2)
+                }
             }
         }
-        activityTimeCode.value = activitiesPorTimeCode
+        activityTimeCode.value = activitiesPorTimeCode.sortedBy { it.idTimeCode }.toMutableList()
     }
 
 }

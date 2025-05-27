@@ -80,6 +80,8 @@ fun DayDialog(
     val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
     val activitySeleccionado by dayMenuViewModel.activitySelected.collectAsState()
 
+    dayMenuViewModel.loadTimes(100)
+
 
     if (showDialog) {
         ModalBottomSheet(
@@ -102,12 +104,10 @@ fun DayDialog(
                 ProyectoYTimeCodeSelector(
                     timecodeData = timeCodes,
                     proyectTimecodesDTO = workOrdersTimeCodes,
-                    onTimeCodeChange = { dayMenuViewModel.onTimeCode(it) },
+                    onTimeCodeChange = { dayMenuViewModel.loadTimes(it) },
                     timeCodeSeleccionado = timeCodeSeleccionado,
                     onTimeCodeSelected = { dayMenuViewModel.onTimeSelected(it) },
                     onProyectChange = {
-                        dayMenuViewModel.onWorkSelected(it)
-                        dayMenuViewModel.onActivitySelected(it)
                     })
             }
 
