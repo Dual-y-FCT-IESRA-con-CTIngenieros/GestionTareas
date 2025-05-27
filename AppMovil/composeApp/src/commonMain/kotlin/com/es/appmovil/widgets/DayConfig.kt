@@ -27,6 +27,7 @@ import com.es.appmovil.database.Database
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
+import com.es.appmovil.viewmodel.DataViewModel.activities
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
 import com.es.appmovil.viewmodel.DataViewModel.timeCodes
@@ -102,8 +103,10 @@ fun EditableActivityCard(
 ) {
     var horas by remember { mutableStateOf(activity.time) }
     var timeCodeSeleccionado by remember { mutableStateOf(activity.idTimeCode) }
+    var timeCodeString by remember { mutableStateOf("$timeCodeSeleccionado") }
     var workSeleccionado by remember { mutableStateOf(activity.idWorkOrder) }
-    var activitySeleccionado by remember { mutableStateOf(activity.idActivity.toString()) }
+    var activitySeleccionado by remember { mutableStateOf("${activity.idActivity} - ${activities.value.find { activity.idActivity == it.idActivity }?.desc ?: ""}") }
+    var activityInt by remember { mutableStateOf(activity.idActivity) }
     var comentario by remember { mutableStateOf(activity.comment ?: "") }
     val dates = remember { mutableStateOf(listOf(day)) }
 
@@ -116,22 +119,25 @@ fun EditableActivityCard(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             NumberInputField(value = horas.toInt(), onValueChange = { horas = it.toFloat() })
+
             ProyectoYTimeCodeSelector(
-                timeCodes.value,
-                workOrdersTimeCodes,
-                {
+                timecodeData = timeCodes.value,
+                proyectTimecodesDTO = workOrdersTimeCodes,
+                onTimeCodeChange = {
                     timeCodeSeleccionado = it
-                    onUpdate(activity.copy(idTimeCode = it))
                     workSeleccionado = ""
-                    onUpdate(activity.copy(idWorkOrder = ""))
                     activitySeleccionado = ""
-                    onUpdate(activity.copy(idActivity = 0))
+                    onUpdate(activity.copy(idTimeCode = it, idWorkOrder = "", idActivity = 0))
                 },
-                timeCodeSeleccionado,
-                {},
-                { if (it!= null){
-                    workSeleccionado = it
-                    onUpdate(activity.copy(idWorkOrder = it))}
+                timeCodeSeleccionado = timeCodeString,
+                onTimeCodeSelected = {timeCodeString = it ?: ""},
+                onProyectChange = {
+                    workSeleccionado = it ?: ""
+                    activitySeleccionado = it ?: ""
+                    onUpdate(activity.copy(
+                        idWorkOrder = workSeleccionado,
+                        idActivity = it?.toIntOrNull() ?: 0
+                    ))
                 }
             )
         }
@@ -154,11 +160,12 @@ fun EditableActivityCard(
                 activitySeleccionado,
                 "Activity",
                 Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
-                {}
-            ) {
-                activitySeleccionado = it
-                onUpdate(activity.copy(idActivity = it.toIntOrNull() ?: 59))
-            }
+                {
+                    val idActivity = activities.value.find { act -> it.split("-")[1].trim() == act.desc }
+                    activityInt = idActivity?.idActivity ?: 0
+                    onUpdate(activity.copy(idActivity = activityInt))
+                }
+            ) { activitySeleccionado = it }
         }
         OutlinedTextField(
             value = comentario,
@@ -169,7 +176,7 @@ fun EditableActivityCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
 
-        Save(timeCodeSeleccionado, workSeleccionado , activitySeleccionado, { onChangeDialog(false) }, {
+        Save(timeCodeSeleccionado, workSeleccionado , activityInt, { onChangeDialog(false) }, {
             dates.value.forEach { date ->
                 CoroutineScope(Dispatchers.IO).launch {
                     FullScreenLoadingManager.showLoader()
@@ -182,7 +189,7 @@ fun EditableActivityCard(
                         employee.idEmployee,
                         workSeleccionado ,
                         timeCodeSeleccionado,
-                        activitySeleccionado.toIntOrNull() ?: 59,
+                        activityInt,
                         horas,
                         date.toString(),
                         comentario
