@@ -120,13 +120,15 @@ class UserViewModel : ViewModel() {
                         Database.getEmployee(user.email ?: "")
                     }
                     _login.value = true
-                    FullScreenLoadingManager.hideLoader()
                 } else {
                     if (emailUser != null) _username.value = emailUser
                 }
 
             } catch (e: Exception) {
                 _password.value = ""
+            }
+            finally {
+                FullScreenLoadingManager.hideLoader()
             }
         }
 

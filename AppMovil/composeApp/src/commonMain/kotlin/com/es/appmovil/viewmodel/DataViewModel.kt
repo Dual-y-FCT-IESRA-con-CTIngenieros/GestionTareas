@@ -39,7 +39,7 @@ object DataViewModel {
     val currentHours: StateFlow<Int> = _currentHours
 
     private var _currentMonth = MutableStateFlow("0")
-    private var _currentYear = MutableStateFlow("0")
+    var _currentYear = MutableStateFlow("0")
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList

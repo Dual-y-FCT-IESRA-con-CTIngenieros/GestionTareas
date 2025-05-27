@@ -43,7 +43,7 @@ class AnualViewModel {
     fun calcularHorasPorMes(): List<Double> {
         val hourMonth = employeeActivities.value
             .filter { it.idEmployee == employee.idEmployee }
-            .groupBy { it.date.split("-")[1].toInt() }
+            .groupBy { it.date.split("-")[1].toInt() -1 }
             .mapValues { (_, timeMonth) ->
                 timeMonth.sumOf { it.time.toDouble() }
             }
