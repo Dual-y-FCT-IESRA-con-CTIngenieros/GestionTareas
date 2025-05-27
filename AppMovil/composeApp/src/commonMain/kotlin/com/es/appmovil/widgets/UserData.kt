@@ -131,7 +131,7 @@ fun UserData(
                     modifier = Modifier.weight(2f),
                     value = lastName,
                     onValueChange = {},
-                    label = { Text("Primer apellido") },
+                    label = { Text("Apellidos") },
                 )
             }
             OutlinedTextField(
@@ -141,7 +141,7 @@ fun UserData(
                 onValueChange = {},
                 label = { Text("Correo electrónico") },
             )
-            DatePickerDialogSample(dateFrom)
+            DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
             ExposedDropdownMenuBox(
                 expanded = expandido,
                 onExpandedChange = { expandido = !expandido },
@@ -251,6 +251,7 @@ fun confirmRemove(
 
                     DatePickerDialogSample(
                         dateTo
+                        ,"Fecha de fin de contrato"
                     )
 
                     Row(
@@ -280,7 +281,7 @@ fun confirmRemove(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogSample(dateFrom: MutableState<String>) {
+fun DatePickerDialogSample(dateFrom: MutableState<String>, titulo: String = "Fecha") {
     var showDatePicker by remember { mutableStateOf(false) }
 
     val initialMillis = remember(dateFrom.value) {
@@ -298,7 +299,7 @@ fun DatePickerDialogSample(dateFrom: MutableState<String>) {
         value = dateFrom.value,
         colors = customTextFieldColors(),
         onValueChange = {},
-        label = { Text("Fecha") },
+        label = { Text(titulo) },
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { showDatePicker = true }) {

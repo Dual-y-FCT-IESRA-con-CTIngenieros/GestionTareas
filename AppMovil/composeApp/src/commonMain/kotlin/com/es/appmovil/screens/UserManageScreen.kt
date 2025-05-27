@@ -69,7 +69,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         val roles by DataViewModel.roles.collectAsState()
 
         val opciones = roles.map { it.rol }
-        val seleccionInicial = if (opciones.isNotEmpty()) opciones[1] else ""
+        val seleccionInicial = if (opciones.isNotEmpty()) opciones[0] else ""
         var seleccion by remember { mutableStateOf(seleccionInicial) }
 
         var changeEmployees by remember { mutableStateOf(true) }
@@ -158,7 +158,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             colors = customTextFieldColors(),
                             value = employeesDataViewModel.lastName.value,
                             onValueChange = { employeesDataViewModel.lastName.value = it },
-                            label = { Text("Primer apellido") },
+                            label = { Text("Apellidos") },
                         )
                     }
                     OutlinedTextField(
@@ -168,7 +168,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         onValueChange = { employeesDataViewModel.email.value = it },
                         label = { Text("Correo electrónico") },
                     )
-                    DatePickerDialogSample(employeesDataViewModel.dateFrom)
+                    DatePickerDialogSample(employeesDataViewModel.dateFrom, "Fecha de antigüedad")
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido }
