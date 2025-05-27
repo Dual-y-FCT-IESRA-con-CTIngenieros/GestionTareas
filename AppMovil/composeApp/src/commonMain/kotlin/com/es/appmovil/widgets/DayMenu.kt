@@ -145,17 +145,21 @@ fun DayDialog(
 
             Save(timeCode, workOrder, activity, { onChangeDialog(false) }, {
                 dates.value.forEach { date ->
-                    calendarViewModel.addEmployeeActivity(
-                        EmployeeActivity(
-                            employee.idEmployee,
-                            workOrder,
-                            timeCode,
-                            activity,
-                            horas.toFloat(),
-                            date.toString(),
-                            comentario
+                    val blockDate = employee.blockDate?.let { LocalDate.parse(it) }
+                    if (blockDate == null || date > blockDate) { // PONER BLOCK DATE NO NULO
+                        calendarViewModel.addEmployeeActivity(
+                            EmployeeActivity(
+                                employee.idEmployee,
+                                workOrder,
+                                timeCode,
+                                activity,
+                                horas.toFloat(),
+                                date.toString(),
+                                comentario
+                            )
                         )
-                    )
+                    }
+
                 }
                 dayMenuViewModel.clear()
             })

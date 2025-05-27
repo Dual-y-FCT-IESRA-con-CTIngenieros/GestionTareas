@@ -178,23 +178,26 @@ fun EditableActivityCard(
 
         Save(timeCodeSeleccionado, workSeleccionado , activityInt, { onChangeDialog(false) }, {
             dates.value.forEach { date ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    FullScreenLoadingManager.showLoader()
-                    Database.deleteEmployeeActivity(activity)
-                    FullScreenLoadingManager.hideLoader()
-                }
-                employeeActivities.value.remove(activity)
-                calendarViewModel.addEmployeeActivity(
-                    EmployeeActivity(
-                        employee.idEmployee,
-                        workSeleccionado ,
-                        timeCodeSeleccionado,
-                        activityInt,
-                        horas,
-                        date.toString(),
-                        comentario
+                val blockDate = employee.blockDate?.let { LocalDate.parse(it) }
+                if (blockDate == null || date > blockDate) { // PONER BLOCK DATE NO NULO
+                    CoroutineScope(Dispatchers.IO).launch {
+                        FullScreenLoadingManager.showLoader()
+                        Database.deleteEmployeeActivity(activity)
+                        FullScreenLoadingManager.hideLoader()
+                    }
+                    employeeActivities.value.remove(activity)
+                    calendarViewModel.addEmployeeActivity(
+                        EmployeeActivity(
+                            employee.idEmployee,
+                            workSeleccionado,
+                            timeCodeSeleccionado,
+                            activityInt,
+                            horas,
+                            date.toString(),
+                            comentario
+                        )
                     )
-                )
+                }
             }
         })
     }

@@ -160,12 +160,17 @@ fun Calendar(
 
 
                 otherMonthModifier = otherMonthModifier.clickable {
-                    calendarViewmodel.changeDialog(true)
                     date = LocalDate(
                         fechaActual.year,
                         fechaActual.monthNumber.minus(1),
                         ultimoDia
                     )
+                    if (tieneMenosDe8Horas(
+                            currentDate,
+                            actividades
+                        ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
+                    ) calendarViewmodel.changeDialog(true)
+
                     calendarViewmodel.generarBarrasPorDia(date)
                 }
 
@@ -201,12 +206,14 @@ fun Calendar(
                     .padding(4.dp)
                     .background(color)
                     .clickable {
+                        date = currentDate
+
                         if (tieneMenosDe8Horas(
                                 currentDate,
                                 actividades
-                            )
+                            ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
                         ) calendarViewmodel.changeDialog(true)
-                        date = currentDate
+
                         calendarViewmodel.generarBarrasPorDia(date)
                     }
 
@@ -242,12 +249,17 @@ fun Calendar(
                     } ?: Color.LightGray
 
                 otherMonthModifier = otherMonthModifier.clickable {
-                    calendarViewmodel.changeDialog(true)
                     date = LocalDate(
                             fechaActual.year,
                             fechaActual.monthNumber.plus(1),
                             dayNextMonth
                         )
+                    if (tieneMenosDe8Horas(
+                            currentDate,
+                            actividades
+                        ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
+                    ) calendarViewmodel.changeDialog(true)
+
                     calendarViewmodel.generarBarrasPorDia(date)
                 }.background(color)
 
