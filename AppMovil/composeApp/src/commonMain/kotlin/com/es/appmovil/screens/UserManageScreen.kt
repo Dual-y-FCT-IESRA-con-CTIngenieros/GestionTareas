@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,14 +45,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.database.Database
 import com.es.appmovil.model.Employee
-import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
-import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.widgets.DatePickerDialogSample
 import com.es.appmovil.widgets.UserData
 import kotlinx.coroutines.CoroutineScope
@@ -218,7 +214,8 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                                         employeesDataViewModel.email.value,
                                         employeesDataViewModel.dateFrom.value,
                                         null,
-                                        roles.find { it.rol == seleccion }?.idRol ?: -1
+                                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                        null
                                     )
                                 )
                             }

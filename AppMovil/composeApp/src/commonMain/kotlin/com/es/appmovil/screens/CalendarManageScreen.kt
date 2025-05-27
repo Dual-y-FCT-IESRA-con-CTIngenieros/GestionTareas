@@ -90,7 +90,10 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                     )
                     else {
                         if (weekIndex > 0) calendarManageViewModel.lockWeek(weeksInMonth[weekIndex - 1])
-                        else calendarManageViewModel.lockWeek(weeksInMonth[weekIndex])
+                        else {
+                            val previousWeek = calendarManageViewModel.getPreviousWeek(weeksInMonth[0])
+                            calendarManageViewModel.lockWeek(previousWeek)
+                        }
                     }
                     calendarManageViewModel.changeDialog(false)
                 },
@@ -290,11 +293,10 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                                     employeesOrder[employee]
                                                 )
                                             } else {
+                                                val previousWeek = calendarManageViewModel.getPreviousWeek(weeksInMonth[0])
                                                 calendarManageViewModel.lockWeekEmployee(
-                                                    Pair(
-                                                        fechaActual,
-                                                        fechaActual
-                                                    ), employeesOrder[employee]
+                                                    previousWeek,
+                                                    employeesOrder[employee]
                                                 )
                                             }
                                         } else {

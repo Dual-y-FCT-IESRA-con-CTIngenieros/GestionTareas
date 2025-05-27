@@ -49,7 +49,7 @@ class AnualScreen : Screen {
                 BottomNavigationBar(navigator)
             }) { innerPadding ->
                 Column(Modifier.padding(innerPadding).fillMaxWidth()) {
-                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp, modifier = Modifier.padding(horizontal = 16.dp))
+                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp, modifier = Modifier.padding(horizontal = 16.dp).padding(top =16.dp))
 
                     Spacer(Modifier.size(30.dp))
                     LazyColumn {

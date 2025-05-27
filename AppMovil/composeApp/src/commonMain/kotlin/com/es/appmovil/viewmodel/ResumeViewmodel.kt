@@ -4,6 +4,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.viewmodel.DataViewModel._currentYear
+import com.es.appmovil.viewmodel.DataViewModel.calendarFest
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
@@ -29,6 +32,9 @@ class ResumeViewmodel {
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
 
+    private var _timeActivity = MutableStateFlow(mutableMapOf<Long, Float>())
+    val timeActivity: StateFlow<MutableMap<Long, Float>> = _timeActivity
+
     fun getWeekDaysWithNeighbors(year: Int, month: Int, day: Int): List<LocalDate> {
         val selectedDate = LocalDate(year, month, day)
         val dayOfWeek = selectedDate.dayOfWeek.isoDayNumber // 1 (Lunes) a 7 (Domingo)
@@ -42,27 +48,36 @@ class ResumeViewmodel {
         today.value = today.value.minus(period)
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
+        getTimeActivity()
     }
 
     fun onWeekChangeFordward(period: DatePeriod) {
         today.value = today.value.plus(period)
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
         getPie()
+        getTimeActivity()
     }
 
-    
-    private fun getDays():Int {
-        var fc = ""
-        var days = 0
-        employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee }
-            .forEach {
-                if (fc != it.date) {
-                    days += 1
-                    fc = it.date
-                }
+    private fun getDays(): Int {
+        val year = today.value.year
+
+        val holidays = calendarFest.value.date.map { LocalDate.parse(it) }.toSet()
+
+        var workingDays = 0
+
+        for (date in generateSequence(LocalDate(year, 1, 1)) { it.plus(DatePeriod(days = 1)) }
+            .takeWhile { it <= today.value }) {
+
+            val isWeekend =
+                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY
+            val isHoliday = holidays.contains(date)
+
+            if (!isWeekend && !isHoliday) {
+                workingDays++
             }
-        return days
+        }
+
+        return workingDays
     }
 
     fun getLegend(): MutableState<MutableMap<String, Long>> {
@@ -74,11 +89,9 @@ class ResumeViewmodel {
         return legend
     }
 
-    fun getTimeActivity() : MutableState<MutableMap<Long, Float>> {
-        val timeActivity = mutableStateOf(mutableMapOf<Long, Float>())
-
+    fun getTimeActivity() {
         employeeActivities.value
-            .filter { employee.idEmployee == it.idEmployee }
+            .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[0] == _currentYear.value }
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
@@ -90,10 +103,9 @@ class ResumeViewmodel {
                     }
                 }
             }
-        return timeActivity
     }
 
-    fun getDayActivity(): MutableState<MutableMap<String, MutableList<Color>>>  {
+    fun getDayActivity(): MutableState<MutableMap<String, MutableList<Color>>> {
         val dayActivity = mutableStateOf(mutableMapOf<String, MutableList<Color>>())
 
         employeeActivities.value
@@ -108,5 +120,4 @@ class ResumeViewmodel {
             }
         return dayActivity
     }
-
 }

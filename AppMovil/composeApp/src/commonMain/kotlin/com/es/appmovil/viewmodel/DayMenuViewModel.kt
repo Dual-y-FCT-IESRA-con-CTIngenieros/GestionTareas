@@ -75,7 +75,7 @@ class DayMenuViewModel {
         _activity.value = newActivity
     }
 
-    fun onActivitySelected(newActivity:String) {
+    fun onActivitySelected(newActivity:String?) {
         _activitySelected.value = newActivity
     }
 

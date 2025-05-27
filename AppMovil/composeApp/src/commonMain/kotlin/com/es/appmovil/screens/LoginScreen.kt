@@ -45,10 +45,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
-import com.es.appmovil.viewmodel.DataViewModel
-import com.es.appmovil.viewmodel.FullScreenLoadingManager
+import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
 import com.es.appmovil.viewmodel.UserViewModel
-import com.es.appmovil.widgets.FullScreenLoader
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
@@ -76,10 +74,10 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val checkSess by userViewmodel.checkSess.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
+        cargarCalendarFest()
+
         if (!checkSess) {
-            CoroutineScope(Dispatchers.IO).launch {
-                userViewmodel.checkSession()
-            }
+            userViewmodel.checkSession()
         }
 
         if (loginError) {

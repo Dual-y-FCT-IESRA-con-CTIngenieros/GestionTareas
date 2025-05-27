@@ -43,7 +43,8 @@ object DTOConverter {
             email = email,
             dateFrom = dateFrom,
             dateTo = dateTo,
-            idRol = idRol
+            idRol = idRol,
+            blockDate = blockDate
         )
     }
 

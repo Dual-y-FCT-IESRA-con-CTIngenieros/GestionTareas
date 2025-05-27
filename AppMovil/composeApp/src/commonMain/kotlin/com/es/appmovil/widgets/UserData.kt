@@ -52,7 +52,6 @@ import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -188,7 +187,8 @@ fun UserData(
                                     email,
                                     dateFrom.value,
                                     dateTo.value,
-                                    roles.find { it.rol == seleccion }?.idRol ?: -1
+                                    roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                    null
                                 )
                             )
                         }
@@ -214,7 +214,8 @@ fun UserData(
                         email,
                         dateFrom.value,
                         dateTo.value,
-                        roles.find { it.rol == seleccion }?.idRol ?: -1
+                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                        null
                     )
                 ) { alertOpen = it }
             }

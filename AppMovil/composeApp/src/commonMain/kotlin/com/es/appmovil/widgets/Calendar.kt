@@ -343,7 +343,7 @@ fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
 
 fun tieneMenosDe8Horas(fecha: LocalDate, actividades: List<EmployeeActivity>): Boolean {
     val totalHoras = actividades
-        .filter { it.date == fecha.toString() }
+        .filter { it.date == fecha.toString() && it.idEmployee == employee.idEmployee }
         .sumOf { it.time.toDouble() }
 
     return totalHoras < 8.0

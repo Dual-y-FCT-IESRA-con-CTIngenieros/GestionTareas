@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -33,12 +34,17 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.getHours
+import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.viewmodel.DayMenuViewModel
 import com.es.appmovil.viewmodel.ResumeViewmodel
+import com.es.appmovil.widgets.ActionButton
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.ConteoHoras
+import com.es.appmovil.widgets.DayDialog
 import com.es.appmovil.widgets.LegendButton
 import com.es.appmovil.widgets.ResumenHorasAnual
 import com.es.appmovil.widgets.ResumenHorasMensual
@@ -53,15 +59,21 @@ class ResumeScreen: Screen{
         val navigator = LocalNavigator.currentOrThrow
         var canClick by remember { mutableStateOf(true) }
         val currentHours by currentHours.collectAsState()
+        val calendarViewmodel = CalendarViewModel()
+        val showDialog by calendarViewmodel.showDialog.collectAsState()
+        val dayMenuViewModel = DayMenuViewModel()
         val dailyHours by resumeViewmodel.dailyHours.collectAsState()
         val currentDay by resumeViewmodel.currentDay.collectAsState()
 
         MaterialTheme {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
-            }) {
+            },
+                floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },
+                floatingActionButtonPosition = FabPosition.Center, // o End
+                isFloatingActionButtonDocked = false){
                 getHours()
-                Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+                Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)
                         LegendButton(resumeViewmodel)
@@ -119,6 +131,9 @@ class ResumeScreen: Screen{
                             Text("ADMINISTRAR")
                         }
                     }
+                }
+                DayDialog(showDialog, today.value,dayMenuViewModel, calendarViewmodel) {
+                    calendarViewmodel.changeDialog(it)
                 }
             }
         }
