@@ -25,6 +25,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Minimize
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -72,12 +74,8 @@ class TableManageScreen : Screen {
             DataViewModel.calendar.collectAsState(),
             DataViewModel.cliente.collectAsState(),
             DataViewModel.employees.collectAsState(),
-            DataViewModel.employeeWH.collectAsState(),
-            DataViewModel.employeeActivities.collectAsState(),
-            DataViewModel.employeeWO.collectAsState(),
             DataViewModel.manager.collectAsState(),
             DataViewModel.projects.collectAsState(),
-            DataViewModel.projectTimeCodes.collectAsState(),
             DataViewModel.roles.collectAsState(),
             DataViewModel.timeCodes.collectAsState(),
             DataViewModel.workOrders.collectAsState(),
@@ -155,9 +153,11 @@ class TableManageScreen : Screen {
 
         var showEditor by remember { mutableStateOf(false) }
 
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-            .background(Color(0xFFF2F2F2), RoundedCornerShape(12.dp))
-            .padding(16.dp)){
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                .background(Color(0xFFF2F2F2), RoundedCornerShape(12.dp))
+                .padding(16.dp)
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -175,7 +175,11 @@ class TableManageScreen : Screen {
                         Icon(Icons.Default.Edit, contentDescription = "Editar")
                     }
                     IconButton(onClick = { showEditor = !showEditor }) {
-                        Icon(Icons.Default.AddCircleOutline, contentDescription = "Agregar")
+                        if (!showEditor) {
+                            Icon(Icons.Default.AddCircleOutline, contentDescription = "Agregar")
+                        } else {
+                            Icon(Icons.Default.Remove, contentDescription = "Menos")
+                        }
                     }
                 }
             }
