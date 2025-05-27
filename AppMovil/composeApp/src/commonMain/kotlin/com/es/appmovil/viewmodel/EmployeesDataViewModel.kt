@@ -9,6 +9,7 @@ import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.utils.DTOConverter.toEntity
 import com.es.appmovil.utils.DTOConverter.toInsertDTO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -24,6 +25,9 @@ class EmployeesDataViewModel : ViewModel() {
 
     private val _exEmployees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
     val exEmployees: MutableStateFlow<MutableList<Employee>> = _exEmployees
+
+    private var _filter:MutableStateFlow<String> = MutableStateFlow("")
+    val filter: StateFlow<String> = _filter
 
     private val _name = mutableStateOf("")
     val name = _name
@@ -97,5 +101,9 @@ class EmployeesDataViewModel : ViewModel() {
             FullScreenLoadingManager.hideLoader()
         }
 
+    }
+
+    fun changeFilter(value:String) {
+        _filter.value = value
     }
 }

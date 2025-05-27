@@ -52,6 +52,7 @@ import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.DatePickerDialogSample
 import com.es.appmovil.widgets.UserData
+import com.es.appmovil.widgets.genericFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +68,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         val actualEmployees by employeesDataViewModel.actualEmployees.collectAsState()
         val exEmployees by employeesDataViewModel.exEmployees.collectAsState()
         val roles by DataViewModel.roles.collectAsState()
+        val filter by employeesDataViewModel.filter.collectAsState()
 
         val opciones = roles.map { it.rol }
         val seleccionInicial = if (opciones.isNotEmpty()) opciones[0] else ""
@@ -76,6 +78,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         var showDialog by rememberSaveable { mutableStateOf(false) }
         var expandido by remember { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
+
         val employeeText = if (changeEmployees) "Empleados actuales" else "Antiguos empleados"
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
@@ -117,14 +120,32 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                 }
             }
 
+            genericFilter(true, filter) { employeesDataViewModel.changeFilter(it) }
+
             LazyColumn {
                 if (changeEmployees) {
-                    items(actualEmployees.size) { index ->
-                        UserData(index, actualEmployees[index], roles)
+                    val actualEmployeesFilter = if (filter.isNotBlank()) {
+                        actualEmployees.filter {
+                            val name = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in name
+                        }
+                    } else {
+                        actualEmployees
+                    }
+                    items(actualEmployeesFilter.size) { index ->
+                        UserData(index, actualEmployeesFilter[index], roles)
                     }
                 } else {
-                    items(exEmployees.size) { index ->
-                        UserData(index, exEmployees[index], roles)
+                    val exEmployeesFilter = if (filter.isNotBlank()) {
+                        exEmployees.filter {
+                            val name = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in name
+                        }
+                    } else {
+                        exEmployees
+                    }
+                    items(exEmployeesFilter.size) { index ->
+                        UserData(index, exEmployeesFilter[index], roles)
                     }
                 }
             }
