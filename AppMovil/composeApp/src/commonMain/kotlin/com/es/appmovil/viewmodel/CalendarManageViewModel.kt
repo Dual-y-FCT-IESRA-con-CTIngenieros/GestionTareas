@@ -87,7 +87,7 @@ class CalendarManageViewModel {
         changeEmployeesModifie(false)
     }
 
-    fun getWeekColor(week: Pair<LocalDate, LocalDate>, employees:List<Employee>): Pair<ImageVector, Color> {
+    fun getWeekColor(week: Pair<LocalDate, LocalDate>, employees: List<Employee>): Pair<ImageVector, Color> {
         val weekEnd = week.second
 
         val states = employees.mapNotNull {
@@ -98,15 +98,33 @@ class CalendarManageViewModel {
             }
         }
 
-        return when {
-            states.all { it } -> Pair(Icons.Filled.Lock, Color.Red)      // Todos bloqueados >= semana
-            states.none { it } -> Pair(Icons.Filled.LockOpen, Color.Green)        // Ninguno bloqueado >= semana
-            else ->  Pair(Icons.Filled.LockOpen,  Color(0xFFFFA500))            // Parcialmente bloqueados (naranja)
+        val unlockMatch = employees.any { employee ->
+            employee.unblockDate?.let { unlockRangeStr ->
+                val parts = unlockRangeStr.split("/")
+                if (parts.size == 2) {
+                    val start = runCatching { LocalDate.parse(parts[0]) }.getOrNull()
+                    val end = runCatching { LocalDate.parse(parts[1]) }.getOrNull()
+                    if (start != null && end != null) {
+                        weekEnd == start || weekEnd == end
+                    } else false
+                } else false
+            } ?: false
         }
+
+        val color: Color = when {
+            unlockMatch -> Color(0xFFFFA500)  // color especial si coincide con unlockDate
+            states.all { it } -> Color.Red
+            states.none { it } -> Color.Green
+            else -> Color.Red // naranja (parcialmente bloqueados)
+        }
+
+        val icon: ImageVector = if (color == Color.Red) Icons.Filled.Lock else Icons.Filled.LockOpen
+
+        return icon to color
     }
 
-    fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee) {
-        val updated = employee.copy(blockDate = week.second.toString())
+    fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee, unlock:Boolean) {
+        val updated = if(unlock) employee.copy(unblockDate = null) else employee.copy(unblockDate = "${week.first}/${week.second}")
         employees.update { list ->
             list.map { if (it.idEmployee == updated.idEmployee) updated else it }.toMutableList()
         }
@@ -116,7 +134,7 @@ class CalendarManageViewModel {
         employees.value.forEach {
             it.blockDate = week.second.toString()
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.blockDate))
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.unblockDate))
             }
         }
         generateLock()
@@ -125,7 +143,7 @@ class CalendarManageViewModel {
     fun lockWeekEmployees() {
         employees.value.forEach {
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.blockDate))
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.unblockDate))
             }
         }
         generateLock()
@@ -185,7 +203,5 @@ class CalendarManageViewModel {
     private fun isLeapYear(year: Int): Boolean {
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
     }
-
-
 
 }

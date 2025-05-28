@@ -260,7 +260,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                         }
 
                         items(employeesFilter.size) { employee ->
-                            val employeesOrder = if (!orderDescendant) employeesFilter.sortedBy { it.blockDate } else employeesFilter.sortedByDescending { it.blockDate }
+                            val employeesOrder = if (!orderDescendant) employeesFilter.sortedByDescending { it.unblockDate } else employeesFilter.sortedBy { it.unblockDate }
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -283,28 +283,29 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                     )
                                 } ?: LocalDate(2025, 1, 1)
 
+                                val unblockDate = employeesOrder[employee].unblockDate?.split("/")?.get(1)
+                                val dateUnblock = unblockDate?.let { LocalDate.parse(it) }
+
                                 Checkbox(
-                                    checked = date >= weeksInMonth[weekIndex].second,
+                                    checked = date >= weeksInMonth[weekIndex].second && weeksInMonth[weekIndex].second != dateUnblock,
                                     onCheckedChange = {
-                                        if (date >= weeksInMonth[weekIndex].second) {
-                                            if (weekIndex > 0) {
-                                                calendarManageViewModel.lockWeekEmployee(
-                                                    weeksInMonth[weekIndex - 1],
-                                                    employeesOrder[employee]
-                                                )
-                                            } else {
-                                                val previousWeek = calendarManageViewModel.getPreviousWeek(weeksInMonth[0])
-                                                calendarManageViewModel.lockWeekEmployee(
-                                                    previousWeek,
-                                                    employeesOrder[employee]
-                                                )
-                                            }
+                                        val currentWeek = weeksInMonth[weekIndex]
+                                        val employeeId = employeesOrder[employee]
+
+                                        val shouldUnlock = date >= currentWeek.second && currentWeek.second != dateUnblock
+
+                                        val targetWeek = if (shouldUnlock && weekIndex == 0) {
+                                            calendarManageViewModel.getPreviousWeek(currentWeek)
                                         } else {
-                                            calendarManageViewModel.lockWeekEmployee(
-                                                weeksInMonth[weekIndex],
-                                                employeesOrder[employee]
-                                            )
+                                            currentWeek
                                         }
+
+                                        calendarManageViewModel.lockWeekEmployee(
+                                            targetWeek,
+                                            employeeId,
+                                            !shouldUnlock
+                                        )
+
                                         changeDetected = true
                                     }
                                 )
