@@ -63,6 +63,10 @@ class CalendarManageViewModel {
         _filter.value = value
     }
 
+    fun resetWeeks() {
+        _weeksInMonth.value = generateWeeksForMonth(today.value.year, today.value.month)
+    }
+
     /**
      * Función para cambiar el mes que se muestra en el calendario
      * @param month Numero de meses que se van a cambiar hacia atras
