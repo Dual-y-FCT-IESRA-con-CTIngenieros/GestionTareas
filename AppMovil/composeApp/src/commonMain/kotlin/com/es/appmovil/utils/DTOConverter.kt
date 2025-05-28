@@ -31,7 +31,10 @@ object DTOConverter {
             apellidos = apellidos,
             email = email,
             dateFrom = dateFrom,
-            idRol = idRol
+            idRol = idRol,
+            idCT = idCT,
+            idAirbus = idAirbus,
+            unblockDate = unblockDate
         )
     }
 

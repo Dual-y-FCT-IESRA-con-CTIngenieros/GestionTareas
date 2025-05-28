@@ -27,14 +27,19 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.model.EmployeeActivity
@@ -44,6 +49,7 @@ import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.activities
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DayMenuViewModel
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 
@@ -131,7 +137,8 @@ fun DayDialog(
                     "Activity",
                     Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
                     {
-                        val idActivity = activities.value.find { act -> it.split("-")[1].trim() == act.desc }
+                        val idActivity =
+                            activities.value.find { act -> it.split("-")[1].trim() == act.desc }
                         dayMenuViewModel.onActivity(idActivity?.idActivity ?: 0)
                     },
                     { dayMenuViewModel.onActivitySelected(it) })
@@ -258,7 +265,6 @@ fun ProjectsSelected(
     onProjectSelected: (String) -> Unit
 ) {
     var expandirProyecto by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf("") }
 
     // Una vez que se selecciona el timeCode, filtrar los proyectos asociados
     val proyectosDisponibles = proyectTimecodesDTO
@@ -266,11 +272,6 @@ fun ProjectsSelected(
         ?.projects
         .orEmpty()
 
-    val proyectosFiltrados = if (searchText.isNotBlank()) {
-        proyectosDisponibles.filter { it.contains(searchText, ignoreCase = true) }
-    } else {
-        proyectosDisponibles
-    }
 
     // Dropdown de Proyectos (solo si ya se eligió un TimeCode)
     ExposedDropdownMenuBox(
@@ -279,13 +280,9 @@ fun ProjectsSelected(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = if (proyectoSeleccionado != null) if (proyectoSeleccionado.length > 10) "${
-                proyectoSeleccionado.take(
-                    11
-                )
-            }..." else proyectoSeleccionado else "",
-            onValueChange = {searchText = it
-                expandirProyecto = true},
+            value = if (proyectoSeleccionado != null) if (proyectoSeleccionado.length > 10)
+                "${proyectoSeleccionado.take(11)}..." else proyectoSeleccionado else "",
+            onValueChange = {},
             readOnly = true,
             label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
@@ -297,7 +294,7 @@ fun ProjectsSelected(
             expanded = expandirProyecto,
             onDismissRequest = { expandirProyecto = false }
         ) {
-            proyectosFiltrados.forEach { proyecto ->
+            proyectosDisponibles.forEach { proyecto ->
                 DropdownMenuItem(
                     modifier = Modifier.border(0.5.dp, Color.LightGray),
                     text = { Text(proyecto) },
