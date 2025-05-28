@@ -43,6 +43,10 @@ class EmployeesDataViewModel : ViewModel() {
     val dateTo = _dateTo
     private val _idEmployee = mutableStateOf("")
     val idEmployee = _idEmployee
+    private val _idCT = mutableStateOf("")
+    val idCT = _idCT
+    private val _idAirbus = mutableStateOf("")
+    val idAirbus = _idAirbus
 
     fun orderEmployees() {
         _actualEmployees.value.clear()

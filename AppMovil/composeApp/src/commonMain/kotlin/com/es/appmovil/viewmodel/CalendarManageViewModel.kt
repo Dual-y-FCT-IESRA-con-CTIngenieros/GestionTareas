@@ -112,7 +112,7 @@ class CalendarManageViewModel {
         employees.value.forEach {
             it.blockDate = week.second.toString()
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate))
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus))
             }
         }
         generateLock()
@@ -121,7 +121,7 @@ class CalendarManageViewModel {
     fun lockWeekEmployees() {
         employees.value.forEach {
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate))
+                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus))
             }
         }
         generateLock()

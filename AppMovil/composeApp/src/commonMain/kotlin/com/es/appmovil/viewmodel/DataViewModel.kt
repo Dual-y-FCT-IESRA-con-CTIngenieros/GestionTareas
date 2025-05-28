@@ -31,7 +31,7 @@ object DataViewModel {
     var today = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
     var currentToday = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
-    var employee = Employee(-1, "", "", "", "", null, -1,null)
+    var employee = Employee(-1, "", "", "", "", null, -1,null, "", "")
 
 
     // Variables comunes a varias pantallas

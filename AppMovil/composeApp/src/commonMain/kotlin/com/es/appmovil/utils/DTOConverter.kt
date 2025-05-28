@@ -31,7 +31,10 @@ object DTOConverter {
             apellidos = apellidos,
             email = email,
             dateFrom = dateFrom,
-            idRol = idRol
+            idRol = idRol,
+            idCT = idCT,
+            idAirbus = idAirbus
+
         )
     }
 
@@ -44,7 +47,9 @@ object DTOConverter {
             dateFrom = dateFrom,
             dateTo = dateTo,
             idRol = idRol,
-            blockDate = blockDate
+            blockDate = blockDate,
+            idCT = idCT,
+            idAirbus = idAirbus
         )
     }
 
