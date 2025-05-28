@@ -50,6 +50,7 @@ import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.widgets.DatePickerDialogSample
 import com.es.appmovil.widgets.UserData
 import com.es.appmovil.widgets.genericFilter
@@ -165,6 +166,20 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .padding(8.dp)
                 ) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = customTextFieldColors(),
+                        value = employeesDataViewModel.idCT.value,
+                        onValueChange = { employeesDataViewModel.email.value = it },
+                        label = { Text("ID CT") },
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = customTextFieldColors(),
+                        value = employeesDataViewModel.idAirbus.value,
+                        onValueChange = { employeesDataViewModel.email.value = it },
+                        label = { Text("ID Airbus") },
+                    )
                     Row {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
@@ -227,6 +242,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         shape = RoundedCornerShape(10.dp),
                         onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
+                                FullScreenLoadingManager.showLoader()
                                 employeesDataViewModel.addEmployee(
                                     Employee(
                                         employeesDataViewModel.employees.value.maxByOrNull { it.idEmployee }!!.idEmployee,
@@ -236,9 +252,12 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                                         employeesDataViewModel.dateFrom.value,
                                         null,
                                         roles.find { it.rol == seleccion }?.idRol ?: -1,
-                                        null
+                                        null,
+                                        employeesDataViewModel.idCT.value,
+                                        employeesDataViewModel.idAirbus.value
                                     )
                                 )
+                                FullScreenLoadingManager.hideLoader()
                             }
                             showDialog = false
                         }
