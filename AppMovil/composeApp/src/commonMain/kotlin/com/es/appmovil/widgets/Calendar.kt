@@ -50,7 +50,7 @@ fun Calendar(
     dayMenuViewModel: DayMenuViewModel,
     fechaActual: LocalDate,
     showDialog: Boolean,
-    showDialogConfig:Boolean,
+    showDialogConfig: Boolean,
     actividades: List<EmployeeActivity>,
     timeCodes: List<TimeCodeDTO>
 ) {
@@ -78,8 +78,11 @@ fun Calendar(
         .background(Color.LightGray.copy(alpha = 0.3f))
         .graphicsLayer { alpha = 0.3f }
 
+    val startUnblockDate = employee.unblockDate?.split("/")?.get(0) ?: ""
+    val endUnblockDate = employee.unblockDate?.split("/")?.get(1) ?: ""
 
-    DayDialog(showDialog, date,dayMenuViewModel, calendarViewmodel) {
+
+    DayDialog(showDialog, date, dayMenuViewModel, calendarViewmodel) {
         calendarViewmodel.changeDialog(it)
     }
 
@@ -152,7 +155,8 @@ fun Calendar(
                 }
 
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
+                val actividad =
+                    actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 val color =
                     actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
@@ -168,7 +172,12 @@ fun Calendar(
                     if (tieneMenosDe8Horas(
                             currentDate,
                             actividades
-                        ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
+                        )
+                    ) if (checkUnblockDate(
+                            date,
+                            startUnblockDate,
+                            endUnblockDate
+                        )
                     ) calendarViewmodel.changeDialog(true)
 
                     calendarViewmodel.generarBarrasPorDia(date)
@@ -176,7 +185,7 @@ fun Calendar(
 
                 val boxModifier = if (currentDate == currentToday.value) {
                     otherMonthModifier.border(3.dp, Color(0xFFF5B014))
-                } else if(currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
+                } else if (currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
                 else otherMonthModifier
 
                 Box(
@@ -194,7 +203,8 @@ fun Calendar(
                     LocalDate(fechaActual.year, fechaActual.monthNumber, dayActualMonth)
 
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
+                val actividad =
+                    actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 // Color por defecto o según actividad
                 val color =
@@ -211,7 +221,12 @@ fun Calendar(
                         if (tieneMenosDe8Horas(
                                 currentDate,
                                 actividades
-                            ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
+                            )
+                        ) if (checkUnblockDate(
+                                date,
+                                startUnblockDate,
+                                endUnblockDate
+                            )
                         ) calendarViewmodel.changeDialog(true)
 
                         calendarViewmodel.generarBarrasPorDia(date)
@@ -219,7 +234,7 @@ fun Calendar(
 
                 val boxModifier = if (currentDate == currentToday.value) {
                     modifier.border(3.dp, Color(0xFFF5B014))
-                } else if(currentDate == date) modifier.border(2.dp, Color.Black)
+                } else if (currentDate == date) modifier.border(2.dp, Color.Black)
                 else modifier
 
                 Box(
@@ -239,8 +254,10 @@ fun Calendar(
                     LocalDate(fechaActual.year, fechaActual.monthNumber.plus(1), dayNextMonth)
                 }
 
+
                 // Buscar si hay una actividad en esa fecha
-                val actividad = actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
+                val actividad =
+                    actividades.find { it.date == currentDate.toString() && it.idEmployee == employee.idEmployee }
 
                 // Color por defecto o según actividad
                 val color =
@@ -250,14 +267,19 @@ fun Calendar(
 
                 otherMonthModifier = otherMonthModifier.clickable {
                     date = LocalDate(
-                            fechaActual.year,
-                            fechaActual.monthNumber.plus(1),
-                            dayNextMonth
-                        )
+                        fechaActual.year,
+                        fechaActual.monthNumber.plus(1),
+                        dayNextMonth
+                    )
                     if (tieneMenosDe8Horas(
                             currentDate,
                             actividades
-                        ) && employee.blockDate == null || date.toString() > (employee.blockDate ?: "")
+                        )
+                    ) if (checkUnblockDate(
+                            date,
+                            startUnblockDate,
+                            endUnblockDate
+                        )
                     ) calendarViewmodel.changeDialog(true)
 
                     calendarViewmodel.generarBarrasPorDia(date)
@@ -265,7 +287,7 @@ fun Calendar(
 
                 val boxModifier = if (currentDate == currentToday.value) {
                     otherMonthModifier.border(3.dp, Color(0xFFF5B014))
-                } else if(currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
+                } else if (currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
                 else otherMonthModifier
 
                 Box(
@@ -351,6 +373,11 @@ fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
 
     val diaSemanaUltimoDia = ultimoDia.dayOfWeek.isoDayNumber // 1 (Lunes) - 7 (Domingo)
     return 7 - diaSemanaUltimoDia
+}
+
+fun checkUnblockDate(date: LocalDate, startUnblockDate: String, endUnblockDate: String): Boolean {
+    return employee.blockDate == null || date.toString() > (employee.blockDate
+        ?: "") || employee.unblockDate == null || date.toString() in (startUnblockDate..endUnblockDate)
 }
 
 fun tieneMenosDe8Horas(fecha: LocalDate, actividades: List<EmployeeActivity>): Boolean {

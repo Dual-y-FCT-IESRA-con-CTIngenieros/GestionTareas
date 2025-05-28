@@ -80,6 +80,9 @@ fun DayDialog(
     val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
     val activitySeleccionado by dayMenuViewModel.activitySelected.collectAsState()
 
+    val startUnblockDate = employee.unblockDate?.split("/")?.get(0) ?: ""
+    val endUnblockDate = employee.unblockDate?.split("/")?.get(1) ?: ""
+
     dayMenuViewModel.loadTimes(100)
 
 
@@ -146,7 +149,7 @@ fun DayDialog(
             Save(timeCode, workOrder, activity, { onChangeDialog(false) }, {
                 dates.value.forEach { date ->
                     val blockDate = employee.blockDate?.let { LocalDate.parse(it) }
-                    if (blockDate == null || date > blockDate) { // PONER BLOCK DATE NO NULO
+                    if (blockDate == null || date > blockDate || employee.unblockDate == null || date.toString() in (startUnblockDate..endUnblockDate)) { // PONER BLOCK DATE NO NULO
                         calendarViewModel.addEmployeeActivity(
                             EmployeeActivity(
                                 employee.idEmployee,
@@ -255,12 +258,19 @@ fun ProjectsSelected(
     onProjectSelected: (String) -> Unit
 ) {
     var expandirProyecto by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
 
     // Una vez que se selecciona el timeCode, filtrar los proyectos asociados
     val proyectosDisponibles = proyectTimecodesDTO
         .firstOrNull { it.idTimeCode == timeCodeSeleccionado }
         ?.projects
         .orEmpty()
+
+    val proyectosFiltrados = if (searchText.isNotBlank()) {
+        proyectosDisponibles.filter { it.contains(searchText, ignoreCase = true) }
+    } else {
+        proyectosDisponibles
+    }
 
     // Dropdown de Proyectos (solo si ya se eligió un TimeCode)
     ExposedDropdownMenuBox(
@@ -274,7 +284,8 @@ fun ProjectsSelected(
                     11
                 )
             }..." else proyectoSeleccionado else "",
-            onValueChange = {},
+            onValueChange = {searchText = it
+                expandirProyecto = true},
             readOnly = true,
             label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
@@ -286,7 +297,7 @@ fun ProjectsSelected(
             expanded = expandirProyecto,
             onDismissRequest = { expandirProyecto = false }
         ) {
-            proyectosDisponibles.forEach { proyecto ->
+            proyectosFiltrados.forEach { proyecto ->
                 DropdownMenuItem(
                     modifier = Modifier.border(0.5.dp, Color.LightGray),
                     text = { Text(proyecto) },

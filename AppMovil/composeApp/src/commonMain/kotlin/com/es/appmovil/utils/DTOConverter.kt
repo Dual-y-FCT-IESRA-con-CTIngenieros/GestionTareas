@@ -44,7 +44,10 @@ object DTOConverter {
             dateFrom = dateFrom,
             dateTo = dateTo,
             idRol = idRol,
-            blockDate = blockDate
+            blockDate = blockDate,
+            idCT = idCT,
+            idAirbus = idAirbus,
+            unblockDate = unblockDate
         )
     }
 
