@@ -38,7 +38,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
-import com.es.appmovil.viewmodel.DataViewModel.today
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
