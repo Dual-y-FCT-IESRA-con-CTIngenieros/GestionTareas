@@ -90,19 +90,22 @@ class ResumeViewmodel {
     }
 
     fun getTimeActivity() {
+        val updatedMap = mutableMapOf<Long, Float>()
+
         employeeActivities.value
             .filter { employee.idEmployee == it.idEmployee && it.date.split("-")[0] == _currentYear.value }
             .forEach {
                 val timeCode = timeCodes.value.find { time -> time.idTimeCode == it.idTimeCode }
                 if (timeCode != null) {
-                    if (timeActivity.value.containsKey(timeCode.color)) {
-                        val hours = timeActivity.value[timeCode.color]?.plus(it.time)
-                        timeActivity.value[timeCode.color] = hours ?: 0f
+                    if (updatedMap.containsKey(timeCode.color)) {
+                        val hours = updatedMap[timeCode.color]?.plus(it.time)
+                        updatedMap[timeCode.color] = hours ?: 0f
                     } else {
-                        timeActivity.value[timeCode.color] = it.time
+                        updatedMap[timeCode.color] = it.time
                     }
                 }
             }
+        _timeActivity.value = updatedMap
     }
 
     fun getDayActivity(): MutableState<MutableMap<String, MutableList<Color>>> {

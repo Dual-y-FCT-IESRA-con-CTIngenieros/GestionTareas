@@ -8,6 +8,7 @@ data class EmployeeInsertDTO(
     val email: String,
     val dateFrom: String,
     val idRol: Int,
-    val idCT: String,
-    val idAirbus: String,
+    val idCT:String,
+    val idAirbus:String,
+    val unblockDate:String?
 )

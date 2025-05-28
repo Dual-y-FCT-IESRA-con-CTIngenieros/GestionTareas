@@ -145,7 +145,7 @@ class CalendarViewModel {
 
         _bars.value = listOf(
             Bars(
-                label = fechaSeleccionada.dayOfMonth.toString(),
+                label = fechaSeleccionada.toString(),
                 values = dataPorTimeCode
             )
         )

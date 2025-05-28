@@ -12,6 +12,7 @@ data class Employee(
     val dateTo: String?,
     val idRol: Int,
     var blockDate:String?,
-    val idCT: String,
-    val idAirbus: String,
+    val idCT:String,
+    val idAirbus:String,
+    var unblockDate:String?
 )

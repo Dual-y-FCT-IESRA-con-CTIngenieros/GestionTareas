@@ -41,6 +41,7 @@ import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.ProjectTimeCodeDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.CalendarViewModel
+import com.es.appmovil.viewmodel.DataViewModel.activities
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DayMenuViewModel
 import kotlinx.datetime.LocalDate
@@ -79,6 +80,11 @@ fun DayDialog(
     val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
     val activitySeleccionado by dayMenuViewModel.activitySelected.collectAsState()
 
+    val startUnblockDate = employee.unblockDate?.split("/")?.get(0) ?: ""
+    val endUnblockDate = employee.unblockDate?.split("/")?.get(1) ?: ""
+
+    dayMenuViewModel.loadTimes(100)
+
 
     if (showDialog) {
         ModalBottomSheet(
@@ -99,21 +105,19 @@ fun DayDialog(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 NumberInputField(value = horas, onValueChange = { dayMenuViewModel.onHours(it) })
                 ProyectoYTimeCodeSelector(
-                    timeCodes,
-                    workOrdersTimeCodes,
-                    { dayMenuViewModel.onTimeCode(it) },
-                    timeCodeSeleccionado,
-                    { dayMenuViewModel.onTimeSelected(it) },
-                    {
-                        dayMenuViewModel.onWorkSelected(it)
-                        dayMenuViewModel.onActivitySelected(it)
+                    timecodeData = timeCodes,
+                    proyectTimecodesDTO = workOrdersTimeCodes,
+                    onTimeCodeChange = { dayMenuViewModel.loadTimes(it) },
+                    timeCodeSeleccionado = timeCodeSeleccionado,
+                    onTimeCodeSelected = { dayMenuViewModel.onTimeSelected(it) },
+                    onProyectChange = {
                     })
             }
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ProjectsSelected(
                     workOrdersTimeCodes,
-                    timeCodeSeleccionado,
+                    timeCode,
                     workSeleccionado,
                     "WorkOrder",
                     Modifier.weight(1f).padding(start = 16.dp, top = 8.dp),
@@ -122,11 +126,15 @@ fun DayDialog(
                 )
                 ProjectsSelected(
                     activitiesTimeCodes,
-                    timeCodeSeleccionado,
+                    timeCode,
                     activitySeleccionado,
                     "Activity",
                     Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
-                    { dayMenuViewModel.onActivity(it) },
+                    {
+                        val idActivity =
+                            activities.value.find { act -> it.split("-")[1].trim() == act.desc }
+                        dayMenuViewModel.onActivity(idActivity?.idActivity ?: 0)
+                    },
                     { dayMenuViewModel.onActivitySelected(it) })
             }
 
@@ -141,17 +149,21 @@ fun DayDialog(
 
             Save(timeCode, workOrder, activity, { onChangeDialog(false) }, {
                 dates.value.forEach { date ->
-                    calendarViewModel.addEmployeeActivity(
-                        EmployeeActivity(
-                            employee.idEmployee,
-                            workOrder,
-                            timeCode,
-                            activity.toIntOrNull() ?: 59,
-                            horas.toFloat(),
-                            date.toString(),
-                            comentario
+                    val blockDate = employee.blockDate?.let { LocalDate.parse(it) }
+                    if (blockDate == null || date > blockDate || employee.unblockDate == null || date.toString() in (startUnblockDate..endUnblockDate)) { // PONER BLOCK DATE NO NULO
+                        calendarViewModel.addEmployeeActivity(
+                            EmployeeActivity(
+                                employee.idEmployee,
+                                workOrder,
+                                timeCode,
+                                activity,
+                                horas.toFloat(),
+                                date.toString(),
+                                comentario
+                            )
                         )
-                    )
+                    }
+
                 }
                 dayMenuViewModel.clear()
             })
@@ -164,13 +176,13 @@ fun DayDialog(
 fun Save(
     timeCode: Int,
     workOrder: String,
-    activity: String,
+    activity: Int,
     onChangeDialog: () -> Unit,
     onSaveEmploye: () -> Unit
 ) {
     Button(
         onClick = {
-            if (timeCode != 0 && workOrder.isNotBlank() && activity.isNotBlank()) {
+            if (timeCode != 0 && workOrder.isNotBlank() && activity != 0) {
                 onChangeDialog()
                 onSaveEmploye()
             }
@@ -190,8 +202,8 @@ fun Save(
 fun ProyectoYTimeCodeSelector(
     timecodeData: List<TimeCodeDTO>,
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
-    onTimeCodeSelected: (Int) -> Unit,
-    timeCodeSeleccionado: Int?,
+    onTimeCodeSelected: (String?) -> Unit,
+    timeCodeSeleccionado: String?,
     onTimeCodeChange: (Int) -> Unit,
     onProyectChange: (String?) -> Unit,
 ) {
@@ -204,10 +216,10 @@ fun ProyectoYTimeCodeSelector(
         modifier = Modifier.padding(end = 16.dp)
     ) {
         OutlinedTextField(
-            value = timeCodeSeleccionado?.toString() ?: "",
+            value = if (timeCodeSeleccionado != null) if (timeCodeSeleccionado.isNotBlank()) "$timeCodeSeleccionado - ${timecodeData.find { it.idTimeCode == (timeCodeSeleccionado.toIntOrNull() ?: 0) }?.desc ?: ""}" else timeCodeSeleccionado else "",
             onValueChange = {},
             readOnly = true,
-            label = { Text("Seleccione TimeCode") },
+            label = { Text("TimeCode") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTimeCode) },
             modifier = Modifier.menuAnchor()
         )
@@ -226,7 +238,7 @@ fun ProyectoYTimeCodeSelector(
                         onClick = {
                             onTimeCodeChange(timeCode)
                             onProyectChange(null)
-                            onTimeCodeSelected(timeCode)
+                            onTimeCodeSelected("$timeCode")
                             expandirTimeCode = false
                         }
                     )
@@ -239,7 +251,7 @@ fun ProyectoYTimeCodeSelector(
 @Composable
 fun ProjectsSelected(
     proyectTimecodesDTO: List<ProjectTimeCodeDTO>,
-    timeCodeSeleccionado: Int?,
+    timeCodeSeleccionado: Int,
     proyectoSeleccionado: String?,
     placeholder: String,
     modifier: Modifier,
@@ -254,6 +266,7 @@ fun ProjectsSelected(
         ?.projects
         .orEmpty()
 
+
     // Dropdown de Proyectos (solo si ya se eligió un TimeCode)
     ExposedDropdownMenuBox(
         expanded = expandirProyecto,
@@ -261,13 +274,14 @@ fun ProjectsSelected(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = if(proyectoSeleccionado != null) if(proyectoSeleccionado.length > 10)  "${proyectoSeleccionado.take(11)}..." else proyectoSeleccionado else "",
+            value = if (proyectoSeleccionado != null) if (proyectoSeleccionado.length > 10)
+                "${proyectoSeleccionado.take(11)}..." else proyectoSeleccionado else "",
             onValueChange = {},
             readOnly = true,
             label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
             modifier = Modifier.menuAnchor(),
-            enabled = timeCodeSeleccionado != null
+            enabled = timeCodeSeleccionado != 0
         )
 
         ExposedDropdownMenu(
@@ -342,7 +356,6 @@ fun NumberInputField(
                     modifier = Modifier.size(25.dp)
                 )
             }
-
         }
     }
 }
