@@ -49,6 +49,7 @@ import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,6 +82,8 @@ fun UserData(
     val name by mutableStateOf(employee.nombre)
     val lastName by mutableStateOf(employee.apellidos)
     val email by mutableStateOf(employee.email)
+    val idCT by mutableStateOf(employee.idCT)
+    val idAirbus by mutableStateOf(employee.idAirbus)
     val dateFrom = remember { mutableStateOf(employee.dateFrom) }
     val dateTo = remember { mutableStateOf("") }
 
@@ -118,6 +121,20 @@ fun UserData(
                 .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
                 .padding(8.dp)
         ) {
+            OutlinedTextField(
+                colors = customTextFieldColors(),
+                modifier = Modifier.fillMaxWidth(),
+                value = idCT,
+                onValueChange = {},
+                label = { Text("ID CT") },
+            )
+            OutlinedTextField(
+                colors = customTextFieldColors(),
+                modifier = Modifier.fillMaxWidth(),
+                value = idAirbus,
+                onValueChange = {},
+                label = { Text("ID Airbus") },
+            )
             Row {
                 OutlinedTextField(
                     colors = customTextFieldColors(),
@@ -131,7 +148,7 @@ fun UserData(
                     modifier = Modifier.weight(2f),
                     value = lastName,
                     onValueChange = {},
-                    label = { Text("Primer apellido") },
+                    label = { Text("Apellidos") },
                 )
             }
             OutlinedTextField(
@@ -141,7 +158,7 @@ fun UserData(
                 onValueChange = {},
                 label = { Text("Correo electrónico") },
             )
-            DatePickerDialogSample(dateFrom)
+            DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
             ExposedDropdownMenuBox(
                 expanded = expandido,
                 onExpandedChange = { expandido = !expandido },
@@ -179,6 +196,7 @@ fun UserData(
                     colors = customButtonColors(),
                     onClick = {
                         CoroutineScope(Dispatchers.Main).launch {
+                            FullScreenLoadingManager.showLoader()
                             Database.updateEmployee(
                                 EmployeeUpdateDTO(
                                     employee.idEmployee,
@@ -188,9 +206,12 @@ fun UserData(
                                     dateFrom.value,
                                     dateTo.value,
                                     roles.find { it.rol == seleccion }?.idRol ?: -1,
-                                    null
+                                    null,
+                                    idCT,
+                                    idAirbus
                                 )
                             )
+                            FullScreenLoadingManager.hideLoader()
                         }
                     }) {
                     Text("Guardar")
@@ -215,7 +236,9 @@ fun UserData(
                         dateFrom.value,
                         dateTo.value,
                         roles.find { it.rol == seleccion }?.idRol ?: -1,
-                        null
+                        null,
+                        idCT,
+                        idAirbus
                     )
                 ) { alertOpen = it }
             }
@@ -251,6 +274,7 @@ fun confirmRemove(
 
                     DatePickerDialogSample(
                         dateTo
+                        ,"Fecha de fin de contrato"
                     )
 
                     Row(
@@ -280,7 +304,7 @@ fun confirmRemove(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogSample(dateFrom: MutableState<String>) {
+fun DatePickerDialogSample(dateFrom: MutableState<String>, titulo: String = "Fecha") {
     var showDatePicker by remember { mutableStateOf(false) }
 
     val initialMillis = remember(dateFrom.value) {
@@ -298,7 +322,7 @@ fun DatePickerDialogSample(dateFrom: MutableState<String>) {
         value = dateFrom.value,
         colors = customTextFieldColors(),
         onValueChange = {},
-        label = { Text("Fecha") },
+        label = { Text(titulo) },
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { showDatePicker = true }) {
