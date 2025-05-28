@@ -7,5 +7,7 @@ data class EmployeeInsertDTO(
     val apellidos: String,
     val email: String,
     val dateFrom: String,
-    val idRol: Int
+    val idRol: Int,
+    val idCT: String,
+    val idAirbus: String,
 )
