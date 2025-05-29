@@ -83,6 +83,14 @@ object DataViewModel {
         cargarRoles()
         cargarCalendar()
     }
+    suspend fun cargarYObtenerEmail(): String {
+        val datos = Database.getConfigData("email")
+        if (datos != null) {
+            _currentEmail.value = datos.valor
+            return datos.valor
+        }
+        return ""
+    }
 
     private fun cargarTimeCodes() {
         CoroutineScope(Dispatchers.IO).launch {
