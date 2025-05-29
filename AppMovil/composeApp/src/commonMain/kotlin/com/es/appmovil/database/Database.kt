@@ -39,6 +39,22 @@ object Database {
         }
     }
 
+    suspend fun getConfigData(clave: String): Config? {
+        try {
+            return supabase
+                .from("Config")
+                .select{
+                    filter { eq("clave", clave) }
+                }
+                .decodeSingle()
+        }catch (
+            e:Exception
+        ){
+            println(e)
+            return null
+        }
+    }
+
     suspend fun getEmployee(email:String){
         try {
             val employees = supabase.from("Employee").select().decodeList<Employee>()

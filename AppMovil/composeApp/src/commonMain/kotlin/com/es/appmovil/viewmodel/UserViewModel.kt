@@ -26,9 +26,16 @@ class UserViewModel : ViewModel() {
     private var _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
-    private var _email = MutableStateFlow( "@ctengineeringgroup.com")
+    private var _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
 
+    init {
+        viewModelScope.launch {
+            FullScreenLoadingManager.showLoader()
+            _email.value = DataViewModel.cargarYObtenerEmail()
+            FullScreenLoadingManager.hideLoader()
+        }
+    }
     // Contraseña del usuario con la que iniciará sesión.
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password

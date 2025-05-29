@@ -33,6 +33,8 @@ object DataViewModel {
 
     var employee = Employee(-1, "", "", "", "", null, -1,null, "", "")
 
+    private var _currentEmail = MutableStateFlow("")
+    val currentEmail: StateFlow<String> = _currentEmail
 
     // Variables comunes a varias pantallas
     private var _currentHours = MutableStateFlow(0)
