@@ -42,9 +42,7 @@ object Database {
     suspend fun getEmployee(email:String){
         try {
             val employees = supabase.from("Employee").select().decodeList<Employee>()
-
             DataViewModel.employee = employees.first { it.email == email }
-
         }catch (
             e:Exception
         ){

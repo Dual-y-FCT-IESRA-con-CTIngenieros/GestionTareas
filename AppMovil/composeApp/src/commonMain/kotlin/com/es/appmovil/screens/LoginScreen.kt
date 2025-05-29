@@ -46,6 +46,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
 import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
@@ -68,6 +69,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val navigator = LocalNavigator.current
         // Creamos las variables necesarias desde el viewmodel
         val username by userViewmodel.username.collectAsState("")
+        val email by userViewmodel.email.collectAsState("")
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
@@ -129,16 +131,18 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                 Boton { userViewmodel.checkLogin() }
                 if (login) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        doLogin(username, navigator)
+                        FullScreenLoadingManager.showLoader()
+                        doLogin(email,navigator)
+                        FullScreenLoadingManager.hideLoader()
                     }
                 }
             }
         }
     }
 
-    private suspend fun doLogin(username: String, navigator: Navigator) {
+    private suspend fun doLogin(email: String, navigator: Navigator) {
         withContext(Dispatchers.IO) {
-            Database.getEmployee(username)
+            Database.getEmployee(email)
         }
         userViewmodel.resetVar()
         userViewmodel.resetError()
@@ -166,7 +170,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         OutlinedTextField(
             value = username,
             onValueChange = { onChangeValue(it, password) },
-            label = { Text("Correo") },
+            label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
