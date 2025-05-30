@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,9 +25,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -170,7 +166,6 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                     showDialog = false
                 },
                 sheetState = sheetState,
-                modifier = Modifier.fillMaxHeight()
             ) {
                 Column(
                     Modifier

@@ -88,7 +88,7 @@ class EmployeesDataViewModel : ViewModel() {
         _employees.value.forEach { employee ->
             val dateTo = employee.dateTo
 
-            if (dateTo == null) {
+            if (dateTo.isNullOrEmpty()) {
                 _actualEmployees.value.add(employee)
             } else {
                 try {
@@ -108,14 +108,12 @@ class EmployeesDataViewModel : ViewModel() {
 
     fun addEmployee(newEmployee: Employee) {
         viewModelScope.launch {
-            FullScreenLoadingManager.showLoader()
             Database.addEmployee(
                 newEmployee.toInsertDTO()
             )
-
+            Database.register(newEmployee.email, "ct1234")
             DataViewModel.employees.value.add(newEmployee)
             orderEmployees()
-            FullScreenLoadingManager.hideLoader()
         }
     }
 

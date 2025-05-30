@@ -1,11 +1,14 @@
 package com.es.appmovil.database
 
+import com.es.appmovil.model.Config
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -23,6 +26,13 @@ object Database {
         install(Auth)
         install(Postgrest)
         //install other modules
+    }
+
+    suspend fun register(correo: String, contrasenia: String){
+        supabase.auth.signUpWith(Email) {
+            email = correo
+            password = contrasenia
+        }
     }
 
     suspend inline fun <reified T : Any> getData(table: String): List<T> {
