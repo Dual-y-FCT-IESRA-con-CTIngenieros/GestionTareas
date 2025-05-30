@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import com.es.appmovil.utils.customTextFieldColors
-import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.CalendarWeekViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
