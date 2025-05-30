@@ -15,8 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -78,7 +81,16 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         var changeEmployees by remember { mutableStateOf(true) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
         var expandido by remember { mutableStateOf(false) }
-        val sheetState = rememberModalBottomSheetState()
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        val name by employeesDataViewModel.name.collectAsState("")
+        val lastName by employeesDataViewModel.lastName.collectAsState("")
+        val user by employeesDataViewModel.user.collectAsState("")
+        val domain by employeesDataViewModel.domain.collectAsState("")
+        val dateFrom = employeesDataViewModel.dateFrom
+        val idCT by employeesDataViewModel.idCT.collectAsState("")
+        val idAirbus by employeesDataViewModel.idAirbus.collectAsState("")
+
 
         val employeeText = if (changeEmployees) "Empleados actuales" else "Antiguos empleados"
 
@@ -127,8 +139,8 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                 if (changeEmployees) {
                     val actualEmployeesFilter = if (filter.isNotBlank()) {
                         actualEmployees.filter {
-                            val name = (it.nombre + " " + it.apellidos).lowercase()
-                            filter.lowercase() in name
+                            val nombre = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in nombre
                         }
                     } else {
                         actualEmployees
@@ -139,8 +151,8 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                 } else {
                     val exEmployeesFilter = if (filter.isNotBlank()) {
                         exEmployees.filter {
-                            val name = (it.nombre + " " + it.apellidos).lowercase()
-                            filter.lowercase() in name
+                            val nombre = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in nombre
                         }
                     } else {
                         exEmployees
@@ -169,22 +181,22 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         colors = customTextFieldColors(),
-                        value = employeesDataViewModel.idCT.value,
-                        onValueChange = { employeesDataViewModel.email.value = it },
+                        value = idCT,
+                        onValueChange = { employeesDataViewModel.onChangeIdCT(it) },
                         label = { Text("ID CT") },
                     )
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         colors = customTextFieldColors(),
-                        value = employeesDataViewModel.idAirbus.value,
-                        onValueChange = { employeesDataViewModel.email.value = it },
+                        value = idAirbus,
+                        onValueChange = { employeesDataViewModel.onChangeIdAirbus(it) },
                         label = { Text("ID Airbus") },
                     )
                     Row {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = employeesDataViewModel.name.value,
-                            onValueChange = { employeesDataViewModel.name.value = it },
+                            value = name,
+                            onValueChange = { employeesDataViewModel.onChangeName(it) },
                             label = { Text("Nombre") },
                             colors = customTextFieldColors(),
                         )
@@ -192,19 +204,31 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         OutlinedTextField(
                             modifier = Modifier.weight(2f),
                             colors = customTextFieldColors(),
-                            value = employeesDataViewModel.lastName.value,
-                            onValueChange = { employeesDataViewModel.lastName.value = it },
+                            value = lastName,
+                            onValueChange = { employeesDataViewModel.onChangeLastName(it) },
                             label = { Text("Apellidos") },
                         )
                     }
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = customTextFieldColors(),
-                        value = employeesDataViewModel.email.value,
-                        onValueChange = { employeesDataViewModel.email.value = it },
-                        label = { Text("Correo electrónico") },
-                    )
-                    DatePickerDialogSample(employeesDataViewModel.dateFrom, "Fecha de antigüedad")
+                    Row(Modifier.fillMaxWidth()){
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            colors = customTextFieldColors(),
+                            value = user,
+                            onValueChange = {
+                                employeesDataViewModel.onChangeUser(it)
+                                            },
+                            label = { Text("Usuario") },
+                        )
+                        OutlinedTextField(
+                            modifier = Modifier.weight(2f),
+                            readOnly = true,
+                            colors = customTextFieldColors(),
+                            value = domain,
+                            onValueChange = {},
+                            label = { Text("Correo electrónico") },
+                        )
+                    }
+                    DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido }
@@ -243,18 +267,20 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 FullScreenLoadingManager.showLoader()
+                                employeesDataViewModel.onChangeEmail(user)
                                 employeesDataViewModel.addEmployee(
                                     Employee(
                                         employeesDataViewModel.employees.value.maxByOrNull { it.idEmployee }!!.idEmployee,
-                                        employeesDataViewModel.name.value,
-                                        employeesDataViewModel.lastName.value,
+                                        name,
+                                        lastName,
                                         employeesDataViewModel.email.value,
-                                        employeesDataViewModel.dateFrom.value,
+                                        dateFrom.value,
                                         null,
                                         roles.find { it.rol == seleccion }?.idRol ?: -1,
                                         null,
-                                        employeesDataViewModel.idCT.value,
-                                        employeesDataViewModel.idAirbus.value
+                                        idCT,
+                                        idAirbus,
+                                        null
                                     )
                                 )
                                 FullScreenLoadingManager.hideLoader()
