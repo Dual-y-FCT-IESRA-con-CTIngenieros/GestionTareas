@@ -53,7 +53,7 @@ object Database {
 
     }
 
-    suspend fun addData(table: String, data: Any) {
+    suspend inline fun <reified T : Any>  addData(table: String, data: T) {
         try {
             supabase.from(table).insert(data)
         }catch (
@@ -93,11 +93,9 @@ object Database {
         }
     }
 
-    suspend fun updateData(table:String, data:Any, idName:String, id:Any){
+    suspend inline fun <reified T : Any> updateData(table:String, data:T){
         try {
-            supabase.from(table).update(data) {
-                filter { eq(idName, id) }
-            }
+            supabase.from(table).upsert(data)
         }catch (
             e:Exception
         ){

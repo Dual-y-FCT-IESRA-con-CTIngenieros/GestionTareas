@@ -11,6 +11,7 @@ import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
+import com.es.appmovil.model.UserYearData
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
@@ -33,6 +34,7 @@ object DataViewModel {
 
     var employee = Employee(-1, "", "", "", "", null, -1,null, "", "", null)
 
+    var employeesYearData = MutableStateFlow<List<UserYearData>>(emptyList())
 
     // Variables comunes a varias pantallas
     private var _currentHours = MutableStateFlow(0)
@@ -80,6 +82,7 @@ object DataViewModel {
         cargarEmployees()
         cargarRoles()
         cargarCalendar()
+        cargarUserYearData()
     }
 
     private fun cargarTimeCodes() {
@@ -162,6 +165,13 @@ object DataViewModel {
             _calendar.value = datos
         }
     }
+    private fun cargarUserYearData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<UserYearData>("UserYearData")
+            employeesYearData.value = datos
+        }
+    }
+
 
     fun cargarCalendarFest() {
         val festivos = calendar.value.map { it.date }
