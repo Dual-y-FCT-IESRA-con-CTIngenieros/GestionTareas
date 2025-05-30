@@ -107,6 +107,16 @@ object Database {
         }
     }
 
+    suspend fun sendResetPass(email: String){
+        try {
+            supabase.auth.resetPasswordForEmail(email)
+        }catch (
+            _:Exception
+        ) {
+            println("Error al enviar el correo")
+        }
+    }
+
     suspend fun addEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").insert(data)

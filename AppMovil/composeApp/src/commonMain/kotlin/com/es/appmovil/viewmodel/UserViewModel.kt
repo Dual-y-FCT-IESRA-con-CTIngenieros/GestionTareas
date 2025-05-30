@@ -40,6 +40,9 @@ class UserViewModel : ViewModel() {
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password
 
+    private var _passForgot = MutableStateFlow(false)
+    val passForgot: StateFlow<Boolean> = _passForgot
+
     // Contraseña del usuario con la que iniciará sesión.
     private var _visibility = MutableStateFlow(false)
     val visibility: StateFlow<Boolean> = _visibility
@@ -65,6 +68,10 @@ class UserViewModel : ViewModel() {
     fun onChangeValue(name: String, pass: String) {
         _username.value = name
         _password.value = pass
+    }
+
+    fun onPassForgotChange(value: Boolean) {
+        _passForgot.value = value
     }
 
     private fun completeEmail() {

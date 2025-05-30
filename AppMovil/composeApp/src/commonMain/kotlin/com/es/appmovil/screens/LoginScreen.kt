@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
@@ -27,10 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +50,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
+import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
@@ -74,6 +80,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
         val checkSess by userViewmodel.checkSess.collectAsState(false)
+        val passForgot by userViewmodel.passForgot.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
         cargarCalendarFest()
@@ -120,7 +127,12 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = Color(0xFFF4A900),
-                    modifier = Modifier.clickable {})
+                    modifier = Modifier.clickable {
+                            userViewmodel.onPassForgotChange(!passForgot)
+                    })
+                DialogResetPass(passForgot){
+                    userViewmodel.onPassForgotChange(!passForgot)
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -246,6 +258,60 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             unfocusedLabelColor = Color.Gray,
             cursorColor = Color(0xFFF4A900)
         )
+    }
+
+    @Composable
+    fun DialogResetPass(alertOpen: Boolean,onDismiss: (Boolean) -> Unit) {
+        val user = remember { mutableStateOf("") }
+
+        if (alertOpen) {
+            Dialog(onDismissRequest = { onDismiss(false) }) {
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            "Escriba su usuario",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        OutlinedTextField(
+                            value = user.value,
+                            colors = customTextFieldColors(),
+                            onValueChange = { user.value = it},
+                            label = { Text("Usuario") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextButton(onClick = { onDismiss(false) }) {
+                                Text("Cancelar")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                colors = com.es.appmovil.utils.customButtonColors(),
+                                onClick = {
+                                    onDismiss(false)
+                                    user.value = ""
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        Database.sendResetPass(user.value + DataViewModel.currentEmail.value)
+                                    }
+                                }) {
+                                Text("Aceptar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
