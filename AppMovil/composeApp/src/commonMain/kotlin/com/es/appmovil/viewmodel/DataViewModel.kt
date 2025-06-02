@@ -34,7 +34,7 @@ object DataViewModel {
 
     var employee = Employee(-1, "", "", "", "", null, -1,null, "", "", null)
 
-    var employeesYearData = MutableStateFlow<List<UserYearData>>(emptyList())
+    var employeesYearData = MutableStateFlow<MutableList<UserYearData>>(mutableListOf())
 
     // Variables comunes a varias pantallas
     private var _currentHours = MutableStateFlow(0)
@@ -165,10 +165,10 @@ object DataViewModel {
             _calendar.value = datos
         }
     }
-    private fun cargarUserYearData() {
+    fun cargarUserYearData() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<UserYearData>("UserYearData")
-            employeesYearData.value = datos
+            employeesYearData.value = datos.toMutableList()
         }
     }
 

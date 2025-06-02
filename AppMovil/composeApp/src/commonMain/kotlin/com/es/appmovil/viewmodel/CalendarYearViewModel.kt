@@ -1,8 +1,11 @@
 package com.es.appmovil.viewmodel
 
 import com.es.appmovil.database.Database
+import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.UserYearData
 import com.es.appmovil.viewmodel.DataViewModel._currentYear
+import com.es.appmovil.viewmodel.DataViewModel.calendar
+import com.es.appmovil.viewmodel.DataViewModel.cargarUserYearData
 import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.employeesYearData
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -61,9 +64,9 @@ class CalendarYearViewModel {
         }
     }
 
-    fun closeYear(){
+    fun closeYear(generateNewYear:Boolean){
 
-        val blockDate = employees.value.filter { (it.blockDate ?: "") > "$_currentYear/12/31" }
+        val blockDate = employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
         if (blockDate.isNotEmpty()) {
             val currentYear = _currentYear.value.toIntOrNull() ?: 0
             val nextYear = currentYear + 1
@@ -76,14 +79,27 @@ class CalendarYearViewModel {
                 }
             }
 
-            employees.value.forEach {
-                val enjooyedHours = employeesYearData.value.find {data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays ?: 0
-                val holidaysHours = hours + (hours - enjooyedHours)
-                CoroutineScope(Dispatchers.IO).launch {
-                    val employeeData = UserYearData(it.idEmployee, nextYear, days, holidaysHours, 0, 0, 0, false)
-                    Database.addData("UserYearData", employeeData)
+            if (generateNewYear) {
+                employees.value.forEach {
+                    val enjooyedHours = employeesYearData.value.find {data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays ?: 0
+                    val holidaysHours = hours + (hours - enjooyedHours)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val employeeData = UserYearData(it.idEmployee, nextYear, days, holidaysHours, 0, 0, 0, false)
+                        Database.addData("UserYearData", employeeData)
+                    }
                 }
+
+                calendar.value.forEach {
+                    val year = (_currentYear.value.toIntOrNull() ?: 2025)+ 1
+                    val newCalendar = Calendar(year, it.date)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        Database.addData("Calendar", newCalendar)
+                    }
+                }
+
+                cargarUserYearData()
             }
+
         } else {
             _showDialog.value = true
         }

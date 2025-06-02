@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
@@ -288,31 +290,45 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
 
         if (showCloseYearDialog) {
             var vacationDaysInput by remember { mutableStateOf("") }
+            var generateNewYear by remember { mutableStateOf(false) }
 
             AlertDialog(
                 onDismissRequest = { showCloseYearDialog = false },
                 title = { Text("Cerrar año") },
                 text = {
                     Column {
-                        Text("Introduce los días de vacaciones para el nuevo año:")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = vacationDaysInput,
-                            onValueChange = { vacationDaysInput = it },
-                            label = { Text("Días de vacaciones") },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("¿Generar nuevo año con el mismo calendario?")
+                            Checkbox(
+                                checked = generateNewYear,
+                                onCheckedChange = {
+                                    generateNewYear = !generateNewYear
+                                    vacationDaysInput = ""
+                                }
+                            )
+                        }
+                        Spacer(Modifier.size(5.dp))
+                        if(generateNewYear) {
+                            Text("Introduce los días de vacaciones para el nuevo año:")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = vacationDaysInput,
+                                onValueChange = { vacationDaysInput = it },
+                                label = { Text("Días de vacaciones") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+                        }
                     }
                 },
                 confirmButton = {
                     Button(onClick = {
                         val dias = vacationDaysInput.toIntOrNull() ?: 0
                         calendarYearViewModel.setNextHolidaysDays(dias)
-                        calendarYearViewModel.closeYear()
+                        calendarYearViewModel.closeYear(generateNewYear)
                         showCloseYearDialog = false
-                    }) {
-                        Text("Crear nuevo año")
+                    }, enabled = if(!generateNewYear || generateNewYear && (vacationDaysInput.toIntOrNull() ?: 0) > 0) true else false) {
+                        Text("Cerrar año")
                     }
                 },
                 dismissButton = {
