@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import com.es.appmovil.utils.customTextFieldColors
-import com.es.appmovil.viewmodel.CalendarWeekViewModel
+import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -52,23 +52,23 @@ import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 
-class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewModel) : Screen {
+class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBlockWeekViewModel) : Screen {
     @Composable
     override fun Content() {
         var monthChangeFlag = true
         val fechaActual by today.collectAsState()
-        val showDialog by calendarWeekViewModel.showDialog.collectAsState()
-        val weekIndex by calendarWeekViewModel.weekIndex.collectAsState()
-        val locked by calendarWeekViewModel.locked.collectAsState()
-        val employeeModifie by calendarWeekViewModel.employeeModifie.collectAsState()
-        val weeksInMonth by calendarWeekViewModel.weeksInMonth.collectAsState()
+        val showDialog by calendarBlockWeekViewModel.showDialog.collectAsState()
+        val weekIndex by calendarBlockWeekViewModel.weekIndex.collectAsState()
+        val locked by calendarBlockWeekViewModel.locked.collectAsState()
+        val employeeModifie by calendarBlockWeekViewModel.employeeModifie.collectAsState()
+        val weeksInMonth by calendarBlockWeekViewModel.weeksInMonth.collectAsState()
         val employees by employees.collectAsState()
-        val filter by calendarWeekViewModel.filter.collectAsState()
-        calendarWeekViewModel.generateLock()
+        val filter by calendarBlockWeekViewModel.filter.collectAsState()
+        calendarBlockWeekViewModel.generateLock()
 
 
         if (showDialog) {
-            val generateBlock by calendarWeekViewModel.blockDate.collectAsState()
+            val generateBlock by calendarBlockWeekViewModel.blockDate.collectAsState()
             val date = generateBlock?.let {
                 runCatching { LocalDate.parse(it) }.getOrDefault(
                     LocalDate(
@@ -85,22 +85,22 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                 date = date,
                 locked = locked,
                 onAdd = {
-                    if (weeksInMonth[weekIndex].second > date) calendarWeekViewModel.lockWeek(
+                    if (weeksInMonth[weekIndex].second > date) calendarBlockWeekViewModel.lockWeek(
                         weeksInMonth[weekIndex]
                     )
                     else {
-                        if (weekIndex > 0) calendarWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
+                        if (weekIndex > 0) calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
                         else {
-                            val previousWeek = calendarWeekViewModel.getPreviousWeek(weeksInMonth[0])
-                            calendarWeekViewModel.lockWeek(previousWeek)
+                            val previousWeek = calendarBlockWeekViewModel.getPreviousWeek(weeksInMonth[0])
+                            calendarBlockWeekViewModel.lockWeek(previousWeek)
                         }
                     }
-                    calendarWeekViewModel.changeDialog(false)
+                    calendarBlockWeekViewModel.changeDialog(false)
                 },
                 onRemove = {
-                    calendarWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
-                    calendarWeekViewModel.changeDialog(false)
-                }) { calendarWeekViewModel.changeDialog(false) }
+                    calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
+                    calendarBlockWeekViewModel.changeDialog(false)
+                }) { calendarBlockWeekViewModel.changeDialog(false) }
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
@@ -112,7 +112,7 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                 IconButton(onClick = {
                     if (monthChangeFlag) {
                         monthChangeFlag = false
-                        calendarWeekViewModel.onMonthChangePrevious(DatePeriod(months = 1))
+                        calendarBlockWeekViewModel.onMonthChangePrevious(DatePeriod(months = 1))
                     }
                 }) {
                     Text("<", fontSize = 24.sp)
@@ -124,7 +124,7 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                 IconButton(onClick = {
                     if (monthChangeFlag) {
                         monthChangeFlag = false
-                        calendarWeekViewModel.onMonthChangeFordward(DatePeriod(months = 1))
+                        calendarBlockWeekViewModel.onMonthChangeFordward(DatePeriod(months = 1))
                     }
                 }) {
                     Text(">", fontSize = 24.sp)
@@ -132,7 +132,7 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
             }
 
             weeksInMonth.forEachIndexed { index, pair ->
-                val generateBlock by calendarWeekViewModel.blockDate.collectAsState()
+                val generateBlock by calendarBlockWeekViewModel.blockDate.collectAsState()
                 val date = generateBlock?.let {
                     runCatching { LocalDate.parse(it) }.getOrDefault(
                         LocalDate(
@@ -161,11 +161,11 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                     ) {
                         Text("Semana del ${pair.first.dayOfMonth} al ${pair.second.dayOfMonth}")
                         Row {
-                            val colors = calendarWeekViewModel.getWeekColor(pair, employees)
+                            val colors = calendarBlockWeekViewModel.getWeekColor(pair, employees)
                             IconButton(onClick = {
-                                calendarWeekViewModel.changeDialog(true)
-                                calendarWeekViewModel.changeWeekIndex(index)
-                                calendarWeekViewModel.changeEmployeesModifie(false)
+                                calendarBlockWeekViewModel.changeDialog(true)
+                                calendarBlockWeekViewModel.changeWeekIndex(index)
+                                calendarBlockWeekViewModel.changeEmployeesModifie(false)
                             }) {
                                 if (weeksInMonth[index].second <= date) Icon(
                                     imageVector = colors.first,
@@ -179,10 +179,10 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                                 )
                             }
                             IconButton(onClick = {
-                                if (employeeModifie && index == weekIndex) calendarWeekViewModel.changeEmployeesModifie(
+                                if (employeeModifie && index == weekIndex) calendarBlockWeekViewModel.changeEmployeesModifie(
                                     false
-                                ) else calendarWeekViewModel.changeEmployeesModifie(true)
-                                calendarWeekViewModel.changeWeekIndex(index)
+                                ) else calendarBlockWeekViewModel.changeEmployeesModifie(true)
+                                calendarBlockWeekViewModel.changeWeekIndex(index)
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.MoreVert,
@@ -239,7 +239,7 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
                             OutlinedTextField(
                                 value = filter,
-                                onValueChange = { calendarWeekViewModel.changeFilter(it) },
+                                onValueChange = { calendarBlockWeekViewModel.changeFilter(it) },
                                 label = { Text("Filtro") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
@@ -295,12 +295,12 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
                                         val shouldUnlock = date >= currentWeek.second && currentWeek.second != dateUnblock
 
                                         val targetWeek = if (shouldUnlock && weekIndex == 0) {
-                                            calendarWeekViewModel.getPreviousWeek(currentWeek)
+                                            calendarBlockWeekViewModel.getPreviousWeek(currentWeek)
                                         } else {
                                             currentWeek
                                         }
 
-                                        calendarWeekViewModel.lockWeekEmployee(
+                                        calendarBlockWeekViewModel.lockWeekEmployee(
                                             targetWeek,
                                             employeeId,
                                             !shouldUnlock
@@ -315,7 +315,7 @@ class CalendarWeekScreen(private val calendarWeekViewModel: CalendarWeekViewMode
 
                     if (changeDetected) {
                         Button({
-                            calendarWeekViewModel.lockWeekEmployees()
+                            calendarBlockWeekViewModel.lockWeekEmployees()
                             changeDetected = false
                         }, modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Text("Guardar")

@@ -3,6 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Area
 import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
@@ -83,6 +84,7 @@ object DataViewModel {
         cargarRoles()
         cargarCalendar()
         cargarUserYearData()
+        cargarArea()
     }
 
     private fun cargarTimeCodes() {
@@ -165,6 +167,18 @@ object DataViewModel {
             _calendar.value = datos
         }
     }
+
+    private var _area = MutableStateFlow<List<Area>>(emptyList())
+    val area = _area
+
+
+    private fun cargarArea() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Area>("Area")
+            _area.value = datos
+        }
+    }
+
     fun cargarUserYearData() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<UserYearData>("UserYearData")

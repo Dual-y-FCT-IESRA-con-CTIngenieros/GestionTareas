@@ -34,7 +34,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarManageViewModel
-import com.es.appmovil.viewmodel.CalendarWeekViewModel
+import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
 import com.es.appmovil.viewmodel.CalendarYearViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.widgets.BottomNavigationBar
@@ -47,7 +47,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
 
-        val calendarWeekViewModel = CalendarWeekViewModel()
+        val calendarBlockWeekViewModel = CalendarBlockWeekViewModel()
         val calendarYearViewModel = CalendarYearViewModel()
 
         MaterialTheme {
@@ -55,7 +55,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                 BottomNavigationBar(navigator)
             }) {
                 resetToday()
-                calendarWeekViewModel.resetWeeks()
+                calendarBlockWeekViewModel.resetWeeks()
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Row(
@@ -85,7 +85,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                             ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    navigator.push(CalendarWeekScreen(calendarWeekViewModel))
+                                    navigator.push(CalendarBlockWeekScreen(calendarBlockWeekViewModel))
                                     canClick = false
                                 }
                             },
