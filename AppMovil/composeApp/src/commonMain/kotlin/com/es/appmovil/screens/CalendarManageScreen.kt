@@ -201,7 +201,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                androidx.compose.material.Icon(
+                                Icon(
                                     imageVector = Icons.Filled.TableView,
                                     contentDescription = "Anual",
                                     modifier = Modifier.size(size.dp),
