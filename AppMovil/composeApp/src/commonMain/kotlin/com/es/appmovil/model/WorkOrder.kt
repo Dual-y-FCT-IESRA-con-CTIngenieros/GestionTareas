@@ -9,5 +9,5 @@ data class WorkOrder(
     val projectManager: Int?,
     val idProject: String,
     val idAircraft: Int?,
-    val idArea:Int
+    val idArea:Int?
 )

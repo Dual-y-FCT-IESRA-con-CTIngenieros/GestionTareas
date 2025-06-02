@@ -168,14 +168,14 @@ object DataViewModel {
         }
     }
 
-    private var _area = MutableStateFlow<List<Area>>(emptyList())
-    val area = _area
+    private var _areas = MutableStateFlow<List<Area>>(emptyList())
+    val areas = _areas
 
 
     private fun cargarArea() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Area>("Area")
-            _area.value = datos
+            _areas.value = datos
         }
     }
 

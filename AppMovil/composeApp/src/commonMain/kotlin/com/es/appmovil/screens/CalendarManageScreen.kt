@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.CardColors
@@ -37,6 +38,7 @@ import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
 import com.es.appmovil.viewmodel.CalendarYearViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
+import com.es.appmovil.viewmodel.UserWeekViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
 class CalendarManageScreen(private val calendarManageViewModel: CalendarManageViewModel) : Screen {
@@ -49,6 +51,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
 
         val calendarBlockWeekViewModel = CalendarBlockWeekViewModel()
         val calendarYearViewModel = CalendarYearViewModel()
+        val userWeekViewModel = UserWeekViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
@@ -96,13 +99,82 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                androidx.compose.material.Icon(
+                                Icon(
                                     imageVector = Icons.Filled.SupervisedUserCircle,
                                     contentDescription = "Semanal",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
-                                androidx.compose.material3.Text("Gestión Semanal")
+                                Text("Bloqueo Semanal")
+                            }
+
+                        }
+
+                        Spacer(Modifier.size(16.dp))
+
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
+                                if (canClick) {
+                                    canClick = false
+                                    navigator.push(CalendarYearScreen(calendarYearViewModel))
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.TableView,
+                                    contentDescription = "Anual",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Gestión Anual")
+                            }
+
+                        }
+                    }
+
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        ElevatedCard(
+                            colors = CardColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.Black
+                            ),
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
+                                if (canClick) {
+                                    navigator.push(UserWeekScreen(userWeekViewModel))
+                                    canClick = false
+                                }
+                            },
+                            elevation = CardDefaults.elevatedCardElevation(8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.SupervisedUserCircle,
+                                    contentDescription = " HoraSemanal",
+                                    modifier = Modifier.size(size.dp),
+                                    tint = Color(0xFF707272)
+                                )
+                                Text("Horas Semanales")
                             }
 
                         }
