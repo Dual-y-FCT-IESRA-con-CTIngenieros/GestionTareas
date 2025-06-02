@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,7 +69,7 @@ import org.jetbrains.compose.resources.painterResource
  *
  * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
-class LoginScreen(private val userViewmodel: UserViewModel): Screen {
+class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual
@@ -81,6 +82,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         val login by userViewmodel.login.collectAsState(false)
         val checkSess by userViewmodel.checkSess.collectAsState(false)
         val passForgot by userViewmodel.passForgot.collectAsState(false)
+        val passChange by userViewmodel.passChange.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
         cargarCalendarFest()
@@ -128,9 +130,9 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                     fontSize = 14.sp,
                     color = Color(0xFFF4A900),
                     modifier = Modifier.clickable {
-                            userViewmodel.onPassForgotChange(!passForgot)
+                        userViewmodel.onPassForgotChange(!passForgot)
                     })
-                DialogResetPass(passForgot){
+                DialogResetPass(passForgot) {
                     userViewmodel.onPassForgotChange(!passForgot)
                 }
             }
@@ -142,10 +144,16 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
             if (navigator != null) {
                 Boton { userViewmodel.checkLogin() }
                 if (login) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        FullScreenLoadingManager.showLoader()
-                        doLogin(email,navigator)
-                        FullScreenLoadingManager.hideLoader()
+                    if (userViewmodel.passwordText.equals("ct1234")) {
+                        DialogChangePass(passChange){
+                            userViewmodel.onPassChangeChange(it)
+                        }
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            FullScreenLoadingManager.showLoader()
+                            doLogin(email, navigator)
+                            FullScreenLoadingManager.hideLoader()
+                        }
                     }
                 }
             }
@@ -261,7 +269,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
     }
 
     @Composable
-    fun DialogResetPass(alertOpen: Boolean,onDismiss: (Boolean) -> Unit) {
+    fun DialogResetPass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
         val user = remember { mutableStateOf("") }
 
         if (alertOpen) {
@@ -284,7 +292,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                         OutlinedTextField(
                             value = user.value,
                             colors = customTextFieldColors(),
-                            onValueChange = { user.value = it},
+                            onValueChange = { user.value = it },
                             label = { Text("Usuario") },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -314,6 +322,71 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         }
     }
 
+    @Composable
+    fun DialogChangePass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
+        val pass = remember { mutableStateOf("") }
+        var visibility by remember { mutableStateOf(false) }
+
+        if (alertOpen) {
+            Dialog(onDismissRequest = { onDismiss(false) }) {
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            "Escriba la nueva contraseña",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        OutlinedTextField(
+                            value = pass.value,
+                            onValueChange = { pass.value = it },
+                            label = { Text("Contraseña") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = customTextFieldColors(),
+                            visualTransformation = if (!visibility) PasswordVisualTransformation() else VisualTransformation.None, // Ponemos los puntos o mostrarmos el texto
+                            trailingIcon = { // Dependiendo de si está visible o no cambia el icono
+                                IconButton(onClick = { visibility = !visibility }) {
+                                    Icon(
+                                        imageVector = if (visibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = "Visibility"
+                                    )
+                                }
+                            }
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextButton(onClick = { onDismiss(false) }) {
+                                Text("Cancelar")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                colors = com.es.appmovil.utils.customButtonColors(),
+                                onClick = {
+                                    onDismiss(false)
+                                    pass.value = ""
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        Database.updateUser(pass.value)
+                                    }
+                                }) {
+                                Text("Aceptar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     /**
      * Dialog de error que nos indica el error al iniciar sesión
      *

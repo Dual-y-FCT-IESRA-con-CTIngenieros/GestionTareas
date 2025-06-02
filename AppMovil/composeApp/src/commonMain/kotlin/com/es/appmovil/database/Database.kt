@@ -117,6 +117,18 @@ object Database {
         }
     }
 
+    suspend fun updateUser(newPassword: String){
+        try {
+            supabase.auth.updateUser {
+                password = newPassword
+            }
+        }catch (
+            _:Exception
+        ){
+            println("Error al cambiar la contraseña")
+        }
+    }
+
     suspend fun addEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").insert(data)
