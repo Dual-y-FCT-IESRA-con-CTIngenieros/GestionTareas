@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
+import com.es.appmovil.viewmodel.CalendarFestViewModel
 import com.es.appmovil.viewmodel.CalendarYearViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.UserWeekViewModel
@@ -52,6 +53,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
         val calendarBlockWeekViewModel = CalendarBlockWeekViewModel()
         val calendarYearViewModel = CalendarYearViewModel()
         val userWeekViewModel = UserWeekViewModel()
+        val calendarFestViewModel = CalendarFestViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
@@ -193,7 +195,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
-                                    navigator.push(CalendarYearScreen(calendarYearViewModel))
+                                    navigator.push(CalendarFestScreen(calendarFestViewModel))
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
