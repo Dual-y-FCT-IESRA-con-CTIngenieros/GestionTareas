@@ -322,7 +322,6 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
     }
 
     @Composable
-    fun DialogChangePass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
     fun DialogChangePass(
         alertOpen: Boolean,
         onDismiss: () -> Unit
