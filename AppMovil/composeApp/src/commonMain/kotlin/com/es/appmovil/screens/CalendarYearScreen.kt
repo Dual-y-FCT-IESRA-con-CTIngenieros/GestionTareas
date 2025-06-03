@@ -25,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -36,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.es.appmovil.model.Employee
+import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.CalendarYearViewModel
@@ -72,6 +75,19 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
         var orderDescendant by remember { mutableStateOf(true) }
         val showDialog by calendarYearViewModel.showDialog.collectAsState()
 
+        val manageCSV = ManageCSV()
+        var showDialogDownload by rememberSaveable { mutableStateOf(false) }
+
+        if (showDialogDownload) {
+            DownloadWeekDialog(
+                onDismiss = { showDialogDownload = false },
+                onConfirm = {
+                    showDialogDownload = false
+                    manageCSV.generateYearCsv(fechaActual.year)
+                },
+            )
+        }
+
 
         if (showDialog) {
             AlertDialog(
@@ -83,6 +99,11 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
+
+            HeaderSection { showDialogDownload = true }
+
+            Spacer(Modifier.size(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -338,5 +359,44 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 }
             )
         }
+    }
+
+
+    @Composable
+    private fun HeaderSection(onDownloadClick: () -> Unit) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Gestión anual", fontSize = 22.sp)
+            androidx.compose.material3.IconButton(onClick = onDownloadClick) {
+                Icon(imageVector = Icons.Filled.Download, contentDescription = "")
+            }
+        }
+    }
+
+    @Composable
+    private fun DownloadWeekDialog(
+        onDismiss: () -> Unit,
+        onConfirm: () -> Unit,
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Descargar Semana") },
+            text = {
+
+            },
+            confirmButton = {
+                Button(onClick = onConfirm, colors = customButtonColors()) {
+                    Text("Descargar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = onDismiss, colors = customButtonColors()) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
