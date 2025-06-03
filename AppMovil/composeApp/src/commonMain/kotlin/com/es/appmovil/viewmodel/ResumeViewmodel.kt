@@ -26,9 +26,6 @@ class ResumeViewmodel {
     private val employee = DataViewModel.employee
     private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
-    private var _dailyHours = MutableStateFlow(8)
-    val dailyHours: StateFlow<Int> = _dailyHours
-
     private var _currentDay = MutableStateFlow(getDays())
     val currentDay: StateFlow<Int> = _currentDay
 

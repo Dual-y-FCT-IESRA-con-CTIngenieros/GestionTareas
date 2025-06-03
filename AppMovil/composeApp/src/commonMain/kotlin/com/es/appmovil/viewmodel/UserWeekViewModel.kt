@@ -18,7 +18,7 @@ class UserWeekViewModel {
 
         val filteredActivities = employeeActivities.value.filter { activity ->
             val activityDate = LocalDate.parse(activity.date)
-            activityDate in startDate..endDate && workOrdersInArea.contains(activity.idWorkOrder)
+            activityDate in startDate..endDate && workOrdersInArea.contains(activity.idWorkOrder) // borrar el  && work... para todas las horas aunque no sean productivas
         }
 
         val employeeHours = mutableMapOf<String, Int>()

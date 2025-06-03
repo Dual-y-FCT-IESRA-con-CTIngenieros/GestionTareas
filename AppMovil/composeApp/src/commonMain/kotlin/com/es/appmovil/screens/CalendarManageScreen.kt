@@ -144,6 +144,8 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                         }
                     }
 
+                    Spacer(Modifier.size(16.dp))
+
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween

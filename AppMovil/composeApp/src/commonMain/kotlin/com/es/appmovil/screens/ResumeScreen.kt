@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
+import com.es.appmovil.viewmodel.DataViewModel.dailyHours
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.getHours
 import com.es.appmovil.viewmodel.DataViewModel.today
@@ -62,7 +63,7 @@ class ResumeScreen: Screen{
         val calendarViewmodel = CalendarViewModel()
         val showDialog by calendarViewmodel.showDialog.collectAsState()
         val dayMenuViewModel = DayMenuViewModel()
-        val dailyHours by resumeViewmodel.dailyHours.collectAsState()
+        val dailyHours by dailyHours.collectAsState()
         val currentDay by resumeViewmodel.currentDay.collectAsState()
 
         MaterialTheme {

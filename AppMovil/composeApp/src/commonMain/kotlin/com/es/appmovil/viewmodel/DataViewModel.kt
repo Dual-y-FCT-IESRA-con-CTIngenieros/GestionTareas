@@ -3,6 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
 import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Employee
@@ -44,6 +45,9 @@ object DataViewModel {
     private var _currentMonth = MutableStateFlow("0")
     var _currentYear = MutableStateFlow("0")
 
+    private var _dailyHours = MutableStateFlow(8)
+    val dailyHours: StateFlow<Int> = _dailyHours
+
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList
 
@@ -57,7 +61,7 @@ object DataViewModel {
     val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
 
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
-    //val projects: StateFlow<List<Project>> = _projects
+    val projects: StateFlow<List<Project>> = _projects
 
     private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
     val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
@@ -70,6 +74,9 @@ object DataViewModel {
 
     private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
     val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
+
+    private val _aircrafts = MutableStateFlow<List<Aircraft>>(emptyList())
+    val aircrafts: StateFlow<List<Aircraft>> = _aircrafts
 
     // Carga de los datos de la base de datos
     init {
@@ -85,6 +92,7 @@ object DataViewModel {
         cargarCalendar()
         cargarUserYearData()
         cargarArea()
+        cargarAircraft()
     }
 
     private fun cargarTimeCodes() {
@@ -94,6 +102,7 @@ object DataViewModel {
 
         }
     }
+
     private fun cargarEmployeeActivities() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
@@ -194,6 +203,13 @@ object DataViewModel {
             idCalendar = today.value.year,
             date = festivos
         )
+    }
+
+    fun cargarAircraft() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Aircraft>("Aircraft")
+            _aircrafts.value = datos.toMutableList()
+        }
     }
 
     // Funciones comunes a varias pantallas
