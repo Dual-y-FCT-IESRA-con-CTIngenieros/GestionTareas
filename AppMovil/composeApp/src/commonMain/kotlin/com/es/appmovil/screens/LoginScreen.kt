@@ -130,30 +130,29 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                     fontSize = 14.sp,
                     color = Color(0xFFF4A900),
                     modifier = Modifier.clickable {
-                        userViewmodel.onPassForgotChange(!passForgot)
+                        userViewmodel.onPassForgotChange()
                     })
                 DialogResetPass(passForgot) {
-                    userViewmodel.onPassForgotChange(!passForgot)
+                    userViewmodel.onPassForgotChange()
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
+            DialogChangePass(
+                passChange,
+                onDismiss = { userViewmodel.onPassChangeChange() }
+            )
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Boton { userViewmodel.checkLogin() }
-                if (login) {
-                    if (userViewmodel.passwordText.equals("ct1234")) {
-                        DialogChangePass(passChange){
-                            userViewmodel.onPassChangeChange(it)
-                        }
-                    } else {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            FullScreenLoadingManager.showLoader()
-                            doLogin(email, navigator)
-                            FullScreenLoadingManager.hideLoader()
-                        }
+                Boton {
+                    userViewmodel.checkLogin()
+                }
+                if (login && !passChange) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        FullScreenLoadingManager.showLoader()
+                        doLogin(email, navigator)
+                        FullScreenLoadingManager.hideLoader()
                     }
                 }
             }
@@ -324,11 +323,15 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
 
     @Composable
     fun DialogChangePass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
+    fun DialogChangePass(
+        alertOpen: Boolean,
+        onDismiss: () -> Unit
+    ) {
         val pass = remember { mutableStateOf("") }
         var visibility by remember { mutableStateOf(false) }
 
         if (alertOpen) {
-            Dialog(onDismissRequest = { onDismiss(false) }) {
+            Dialog(onDismissRequest = { onDismiss() }) {
                 androidx.compose.material3.Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -341,7 +344,12 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            "Escriba la nueva contraseña",
+                            "Hemos detectado que ha iniciado sesion con la contraseña por defecto",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Text(
+                            "Por favor, escriba una contraseña nueva",
                             style = MaterialTheme.typography.titleMedium
                         )
                         OutlinedTextField(
@@ -366,18 +374,21 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                             horizontalArrangement = Arrangement.End,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            TextButton(onClick = { onDismiss(false) }) {
+                            TextButton(onClick = {
+                                onDismiss()
+                                pass.value = ""
+                            }) {
                                 Text("Cancelar")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 colors = com.es.appmovil.utils.customButtonColors(),
                                 onClick = {
-                                    onDismiss(false)
-                                    pass.value = ""
                                     CoroutineScope(Dispatchers.IO).launch {
                                         Database.updateUser(pass.value)
                                     }
+                                    onDismiss()
+                                    pass.value = ""
                                 }) {
                                 Text("Aceptar")
                             }

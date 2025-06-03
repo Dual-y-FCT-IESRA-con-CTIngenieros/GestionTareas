@@ -73,12 +73,12 @@ class UserViewModel : ViewModel() {
         _password.value = pass
     }
 
-    fun onPassForgotChange(value: Boolean) {
-        _passForgot.value = value
+    fun onPassForgotChange() {
+        _passForgot.value = !_passForgot.value
     }
 
-    fun onPassChangeChange(value: Boolean){
-        _passChange.value = value
+    fun onPassChangeChange(){
+        _passChange.value = !_passChange.value
     }
 
     private fun completeEmail() {
@@ -111,6 +111,9 @@ class UserViewModel : ViewModel() {
                         settings.putString("access_token", session.accessToken)
                         settings.putString("refresh_token", session.refreshToken)
                         settings.putString("email_user", _email.value)
+                    }
+                    if (_password.value == "ct1234") {
+                        onPassChangeChange()
                     }
                 } catch (e: AuthRestException) { // Si da error no ha podido iniciar sesión
                     _loginError.value = true
