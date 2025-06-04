@@ -26,27 +26,58 @@ class EmployeesDataViewModel : ViewModel() {
     private val _exEmployees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
     val exEmployees: MutableStateFlow<MutableList<Employee>> = _exEmployees
 
-    private var _filter:MutableStateFlow<String> = MutableStateFlow("")
+    private var _filter: MutableStateFlow<String> = MutableStateFlow("")
     val filter: StateFlow<String> = _filter
 
-    private val _name = mutableStateOf("")
-    val name = _name
-    private val _lastName = mutableStateOf("")
-    val lastName = _lastName
-    private val _idRol = mutableStateOf("")
-    val idRol = _idRol
-    private var _email = mutableStateOf("")
-    val email = _email
+    private val _name = MutableStateFlow("")
+    val name: StateFlow<String> = _name
+    private val _lastName = MutableStateFlow("")
+    val lastName: StateFlow<String> = _lastName
+    private val _idRol = MutableStateFlow("")
+    val idRol: StateFlow<String> = _idRol
+    private val _user = MutableStateFlow("")
+    val user: StateFlow<String> = _user
+    private val _domain = MutableStateFlow(DataViewModel.currentEmail.value)
+    val domain: StateFlow<String> = _domain
+    private var _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
     private val _dateFrom = mutableStateOf("")
     val dateFrom = _dateFrom
-    private val _dateTo = mutableStateOf("")
-    val dateTo = _dateTo
-    private val _idEmployee = mutableStateOf("")
-    val idEmployee = _idEmployee
-    private val _idCT = mutableStateOf("")
-    val idCT = _idCT
-    private val _idAirbus = mutableStateOf("")
-    val idAirbus = _idAirbus
+    private val _dateTo = MutableStateFlow("")
+    val dateTo: StateFlow<String> = _dateTo
+    private val _idEmployee = MutableStateFlow("")
+    val idEmployee: StateFlow<String> = _idEmployee
+    private val _idCT = MutableStateFlow("")
+    val idCT: StateFlow<String> = _idCT
+    private val _idAirbus = MutableStateFlow("")
+    val idAirbus: StateFlow<String> = _idAirbus
+
+    fun onChangeName(newName: String) {
+        _name.value = newName
+    }
+
+    fun onChangeLastName(newLastName: String) {
+        _lastName.value = newLastName
+    }
+
+    fun onChangeUser(newUser: String) {
+        _user.value = newUser
+    }
+
+    fun onChangeEmail(newEmail: String) {
+        val regex = ".+@".toRegex()
+//        if (!regex.containsMatchIn(_email.value)) {
+            _email.value = newEmail + _domain.value
+//        }
+    }
+
+    fun onChangeIdCT(newIdCT: String) {
+        _idCT.value = newIdCT
+    }
+
+    fun onChangeIdAirbus(newIdAirbus: String) {
+        _idAirbus.value = newIdAirbus
+    }
 
     fun orderEmployees() {
         _actualEmployees.value.clear()
@@ -57,7 +88,7 @@ class EmployeesDataViewModel : ViewModel() {
         _employees.value.forEach { employee ->
             val dateTo = employee.dateTo
 
-            if (dateTo == null) {
+            if (dateTo.isNullOrEmpty()) {
                 _actualEmployees.value.add(employee)
             } else {
                 try {
@@ -77,13 +108,12 @@ class EmployeesDataViewModel : ViewModel() {
 
     fun addEmployee(newEmployee: Employee) {
         viewModelScope.launch {
-            FullScreenLoadingManager.showLoader()
             Database.addEmployee(
                 newEmployee.toInsertDTO()
             )
+            Database.register(newEmployee.email, "ct1234")
             DataViewModel.employees.value.add(newEmployee)
             orderEmployees()
-            FullScreenLoadingManager.hideLoader()
         }
     }
 
@@ -96,9 +126,10 @@ class EmployeesDataViewModel : ViewModel() {
 
             val updatedEmployee = removeEmployee.toEntity()
 
-            val employeeToRemove = DataViewModel.employees.value.find { it.idEmployee == updatedEmployee.idEmployee }
+            val employeeToRemove =
+                DataViewModel.employees.value.find { it.idEmployee == updatedEmployee.idEmployee }
             DataViewModel.employees.value.remove(employeeToRemove)
-            DataViewModel.employees.value.add(removeEmployee.toEntity() )
+            DataViewModel.employees.value.add(removeEmployee.toEntity())
 
             orderEmployees()
 
@@ -107,7 +138,7 @@ class EmployeesDataViewModel : ViewModel() {
 
     }
 
-    fun changeFilter(value:String) {
+    fun changeFilter(value: String) {
         _filter.value = value
     }
 }

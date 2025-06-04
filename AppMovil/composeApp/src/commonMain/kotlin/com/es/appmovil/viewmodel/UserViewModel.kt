@@ -26,9 +26,25 @@ class UserViewModel : ViewModel() {
     private var _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
+    private var _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+
+    init {
+        viewModelScope.launch {
+            FullScreenLoadingManager.showLoader()
+            _email.value = DataViewModel.cargarYObtenerEmail()
+            FullScreenLoadingManager.hideLoader()
+        }
+    }
     // Contraseña del usuario con la que iniciará sesión.
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password
+
+    private var _passForgot = MutableStateFlow(false)
+    val passForgot: StateFlow<Boolean> = _passForgot
+
+    private var _passChange = MutableStateFlow(false)
+    val passChange: StateFlow<Boolean> = _passChange
 
     // Contraseña del usuario con la que iniciará sesión.
     private var _visibility = MutableStateFlow(false)
@@ -57,6 +73,21 @@ class UserViewModel : ViewModel() {
         _password.value = pass
     }
 
+    fun onPassForgotChange() {
+        _passForgot.value = !_passForgot.value
+    }
+
+    fun onPassChangeChange(){
+        _passChange.value = !_passChange.value
+    }
+
+    private fun completeEmail() {
+        val regex = ".+@".toRegex()
+        if (!regex.containsMatchIn(_email.value)){
+            _email.value = _username.value + _email.value
+        }
+    }
+
     fun onChangeVisibility() {
         _visibility.value = !_visibility.value
     }
@@ -66,9 +97,10 @@ class UserViewModel : ViewModel() {
         if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    completeEmail()
                     // Intenta iniciar sesión en la base de datos
                     supabase.auth.signInWith(Email) {
-                        email = _username.value
+                        email = _email.value
                         password = _password.value
                     }
                     _login.value = true
@@ -78,7 +110,10 @@ class UserViewModel : ViewModel() {
                         val settings = Settings()
                         settings.putString("access_token", session.accessToken)
                         settings.putString("refresh_token", session.refreshToken)
-                        settings.putString("email_user", _username.value)
+                        settings.putString("email_user", _email.value)
+                    }
+                    if (_password.value == "ct1234") {
+                        onPassChangeChange()
                     }
                 } catch (e: AuthRestException) { // Si da error no ha podido iniciar sesión
                     _loginError.value = true
@@ -120,8 +155,6 @@ class UserViewModel : ViewModel() {
                         Database.getEmployee(user.email ?: "")
                     }
                     _login.value = true
-                } else {
-                    if (emailUser != null) _username.value = emailUser
                 }
 
             } catch (e: Exception) {

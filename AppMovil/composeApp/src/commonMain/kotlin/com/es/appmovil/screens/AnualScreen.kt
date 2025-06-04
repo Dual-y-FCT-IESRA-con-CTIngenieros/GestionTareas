@@ -67,24 +67,32 @@ class AnualScreen : Screen {
                                                 if (index != 1) {
                                                     anualViewModel.changeIndex(1)
                                                 }
-                                            }, modifier = Modifier.size(24.dp)
+                                            },
+                                            enabled = index == 2,
+                                            modifier = Modifier.size(24.dp)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
-                                                contentDescription = ""
-                                            )
+                                            if (index == 2) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                                                    contentDescription = ""
+                                                )
+                                            }
                                         }
                                         IconButton(
                                             onClick = {
                                                 if (index != 2) {
                                                     anualViewModel.changeIndex(2)
                                                 }
-                                            }, modifier = Modifier.size(24.dp)
+                                            },
+                                            enabled = index == 1,
+                                            modifier = Modifier.size(24.dp)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                                contentDescription = ""
-                                            )
+                                            if (index == 1) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                                    contentDescription = ""
+                                                )
+                                            }
                                         }
                                     }
 

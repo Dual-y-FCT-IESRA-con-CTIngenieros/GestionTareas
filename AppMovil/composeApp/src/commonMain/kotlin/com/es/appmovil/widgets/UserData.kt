@@ -79,11 +79,12 @@ fun UserData(
         )
     }
 
-    val name by mutableStateOf(employee.nombre)
-    val lastName by mutableStateOf(employee.apellidos)
-    val email by mutableStateOf(employee.email)
-    val idCT by mutableStateOf(employee.idCT)
-    val idAirbus by mutableStateOf(employee.idAirbus)
+    val name = remember { mutableStateOf(employee.nombre) }
+    val lastName = remember { mutableStateOf(employee.apellidos) }
+    val user = remember { mutableStateOf(employee.email.substring(0, employee.email.indexOf('@'))) }
+    val domain = remember { mutableStateOf(employee.email.substring(employee.email.indexOf('@'))) }
+    val idCT = remember { mutableStateOf(employee.idCT) }
+    val idAirbus = remember { mutableStateOf(employee.idAirbus)}
     val dateFrom = remember { mutableStateOf(employee.dateFrom) }
     val dateTo = remember { mutableStateOf("") }
 
@@ -122,42 +123,54 @@ fun UserData(
                 .padding(8.dp)
         ) {
             OutlinedTextField(
-                colors = customTextFieldColors(),
                 modifier = Modifier.fillMaxWidth(),
-                value = idCT,
-                onValueChange = {},
+                colors = customTextFieldColors(),
+                value = idCT.value,
+                onValueChange = { idCT.value = it },
                 label = { Text("ID CT") },
             )
             OutlinedTextField(
-                colors = customTextFieldColors(),
                 modifier = Modifier.fillMaxWidth(),
-                value = idAirbus,
-                onValueChange = {},
+                colors = customTextFieldColors(),
+                value = idAirbus.value,
+                onValueChange = { idAirbus.value = it},
                 label = { Text("ID Airbus") },
             )
             Row {
                 OutlinedTextField(
                     colors = customTextFieldColors(),
                     modifier = Modifier.weight(1f),
-                    value = name,
-                    onValueChange = {},
+                    value = name.value,
+                    onValueChange = { name.value = it},
                     label = { Text("Nombre") },
                 )
                 OutlinedTextField(
                     colors = customTextFieldColors(),
                     modifier = Modifier.weight(2f),
-                    value = lastName,
-                    onValueChange = {},
+                    value = lastName.value,
+                    onValueChange = { lastName.value = it},
                     label = { Text("Apellidos") },
                 )
             }
-            OutlinedTextField(
-                colors = customTextFieldColors(),
-                modifier = Modifier.fillMaxWidth(),
-                value = email,
-                onValueChange = {},
-                label = { Text("Correo electrónico") },
-            )
+            Row(Modifier.fillMaxWidth()){
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    colors = customTextFieldColors(),
+                    value = user.value,
+                    onValueChange = {
+                        user.value = it
+                    },
+                    label = { Text("Usuario") },
+                )
+                OutlinedTextField(
+                    modifier = Modifier.weight(2.5f),
+                    readOnly = true,
+                    colors = customTextFieldColors(),
+                    value = domain.value,
+                    onValueChange = {},
+                    label = { Text("Correo electrónico") },
+                )
+            }
             DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
             ExposedDropdownMenuBox(
                 expanded = expandido,
@@ -200,15 +213,15 @@ fun UserData(
                             Database.updateEmployee(
                                 EmployeeUpdateDTO(
                                     employee.idEmployee,
-                                    name,
-                                    lastName,
-                                    email,
+                                    name.value,
+                                    lastName.value,
+                                    user.value + domain.value,
                                     dateFrom.value,
                                     dateTo.value,
                                     roles.find { it.rol == seleccion }?.idRol ?: -1,
                                     null,
-                                    idCT,
-                                    idAirbus
+                                    idCT.value,
+                                    idAirbus.value
                                 )
                             )
                             FullScreenLoadingManager.hideLoader()
@@ -230,15 +243,15 @@ fun UserData(
                 confirmRemove(
                     employeesDataViewModel, alertOpen, dateTo, EmployeeUpdateDTO(
                         employee.idEmployee,
-                        name,
-                        lastName,
-                        email,
+                        name.value,
+                        lastName.value,
+                        user.value + domain.value,
                         dateFrom.value,
                         dateTo.value,
                         roles.find { it.rol == seleccion }?.idRol ?: -1,
                         null,
-                        idCT,
-                        idAirbus
+                        idCT.value,
+                        idAirbus.value
                     )
                 ) { alertOpen = it }
             }
