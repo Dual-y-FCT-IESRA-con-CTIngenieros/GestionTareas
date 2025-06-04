@@ -21,10 +21,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.EventBusy
-import androidx.compose.material.icons.filled.EventNote
 import androidx.compose.material.icons.filled.FreeCancellation
-import androidx.compose.material.icons.filled.SupervisedUserCircle
-import androidx.compose.material.icons.filled.TableView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

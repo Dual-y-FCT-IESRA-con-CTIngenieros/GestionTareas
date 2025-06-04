@@ -75,9 +75,6 @@ object DataViewModel {
     private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
     val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
 
-    private val _aircrafts = MutableStateFlow<List<Aircraft>>(emptyList())
-    val aircrafts: StateFlow<List<Aircraft>> = _aircrafts
-
     // Carga de los datos de la base de datos
     init {
         cargarTimeCodes()
@@ -92,7 +89,6 @@ object DataViewModel {
         cargarCalendar()
         cargarUserYearData()
         cargarArea()
-        cargarAircraft()
     }
 
     private fun cargarTimeCodes() {
@@ -203,13 +199,6 @@ object DataViewModel {
             idCalendar = today.value.year,
             date = festivos
         )
-    }
-
-    fun cargarAircraft() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Aircraft>("Aircraft")
-            _aircrafts.value = datos.toMutableList()
-        }
     }
 
     // Funciones comunes a varias pantallas
