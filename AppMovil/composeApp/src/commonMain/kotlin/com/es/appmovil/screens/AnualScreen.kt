@@ -144,6 +144,8 @@ class AnualScreen : Screen {
                                 "V. Restantes" to (yearData?.currentHolidays?.toString() ?: "-")
                             )
 
+                            Text("Vacaciones")
+
                             cards.chunked(2).forEach { rowItems ->
                                 Row(
                                     modifier = Modifier
