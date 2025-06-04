@@ -7,6 +7,7 @@ import com.es.appmovil.screens.LoginScreen
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.getMonth
 import com.es.appmovil.viewmodel.UserViewModel
+import com.es.appmovil.widgets.FullScreenLoader
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -17,6 +18,7 @@ fun App() {
         val userViewmodel = UserViewModel()
         DataViewModel
         getMonth()
+        FullScreenLoader()
 
         Navigator(screen = LoginScreen(userViewmodel))
 //        { navigator: Navigator ->
@@ -24,3 +26,5 @@ fun App() {
 //        }
     }
 }
+
+expect suspend fun saveToDownloads(data: String, filename: String): Boolean

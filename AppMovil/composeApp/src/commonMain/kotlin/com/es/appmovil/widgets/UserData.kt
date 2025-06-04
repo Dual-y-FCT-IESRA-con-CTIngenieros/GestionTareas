@@ -48,10 +48,11 @@ import com.es.appmovil.model.Rol
 import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
+import com.es.appmovil.viewmodel.EmployeesDataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -63,7 +64,8 @@ import kotlinx.datetime.toLocalDateTime
 fun UserData(
     index: Int,
     employee: Employee,
-    roles: List<Rol>
+    roles: List<Rol>,
+    employeesDataViewModel: EmployeesDataViewModel = EmployeesDataViewModel()
 ) {
 
     var expandido by remember { mutableStateOf(false) }
@@ -77,158 +79,195 @@ fun UserData(
         )
     }
 
-    val name by mutableStateOf(employee.nombre)
-    val lastName by mutableStateOf(employee.apellidos)
-    val email by mutableStateOf(employee.email)
+    val name = remember { mutableStateOf(employee.nombre) }
+    val lastName = remember { mutableStateOf(employee.apellidos) }
+    val user = remember { mutableStateOf(employee.email.substring(0, employee.email.indexOf('@'))) }
+    val domain = remember { mutableStateOf(employee.email.substring(employee.email.indexOf('@'))) }
+    val idCT = remember { mutableStateOf(employee.idCT) }
+    val idAirbus = remember { mutableStateOf(employee.idAirbus)}
     val dateFrom = remember { mutableStateOf(employee.dateFrom) }
     val dateTo = remember { mutableStateOf("") }
 
-
-    if(employee.dateTo != null){
-      if (isDateBeforeToday(employee.dateTo)){
-          return
-      }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.AccountCircle,
+            contentDescription = "User"
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "${employee.nombre} ${employee.apellidos}",
+            modifier = Modifier.weight(1f) // Empuja el botón hacia la derecha
+        )
+        IconButton(onClick = {
+            expandedIndex = if (expandedIndex == index) null else index
+        }) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Down Arrow"
+            )
+        }
     }
-
-        Row(
-            modifier = Modifier
+    if (expandedIndex == index) {
+        Column(
+            Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(8.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "User"
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                colors = customTextFieldColors(),
+                value = idCT.value,
+                onValueChange = { idCT.value = it },
+                label = { Text("ID CT") },
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "${employee.nombre} ${employee.apellidos}",
-                modifier = Modifier.weight(1f) // Empuja el botón hacia la derecha
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                colors = customTextFieldColors(),
+                value = idAirbus.value,
+                onValueChange = { idAirbus.value = it},
+                label = { Text("ID Airbus") },
             )
-            IconButton(onClick = {
-                expandedIndex = if (expandedIndex == index) null else index
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Down Arrow"
-                )
-            }
-        }
-        if (expandedIndex == index) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .border(1.dp, Color.LightGray, shape = RoundedCornerShape(4.dp))
-                    .padding(8.dp)
-            ) {
-                Row {
-                    OutlinedTextField(
-                        colors = customTextFieldColors(),
-                        modifier = Modifier.weight(1f),
-                        value = name,
-                        onValueChange = {},
-                        label = { Text("Nombre") },
-                    )
-                    OutlinedTextField(
-                        colors = customTextFieldColors(),
-                        modifier = Modifier.weight(2f),
-                        value = lastName,
-                        onValueChange = {},
-                        label = { Text("Primer apellido") },
-                    )
-                }
+            Row {
                 OutlinedTextField(
                     colors = customTextFieldColors(),
-                    modifier = Modifier.fillMaxWidth(),
-                    value = email,
+                    modifier = Modifier.weight(1f),
+                    value = name.value,
+                    onValueChange = { name.value = it},
+                    label = { Text("Nombre") },
+                )
+                OutlinedTextField(
+                    colors = customTextFieldColors(),
+                    modifier = Modifier.weight(2f),
+                    value = lastName.value,
+                    onValueChange = { lastName.value = it},
+                    label = { Text("Apellidos") },
+                )
+            }
+            Row(Modifier.fillMaxWidth()){
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    colors = customTextFieldColors(),
+                    value = user.value,
+                    onValueChange = {
+                        user.value = it
+                    },
+                    label = { Text("Usuario") },
+                )
+                OutlinedTextField(
+                    modifier = Modifier.weight(2.5f),
+                    readOnly = true,
+                    colors = customTextFieldColors(),
+                    value = domain.value,
                     onValueChange = {},
                     label = { Text("Correo electrónico") },
                 )
-                DatePickerDialogSample("Date From",dateFrom)
-                ExposedDropdownMenuBox(
+            }
+            DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
+            ExposedDropdownMenuBox(
+                expanded = expandido,
+                onExpandedChange = { expandido = !expandido },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    colors = customTextFieldColors(),
+                    value = seleccion,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Rol") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
                     expanded = expandido,
-                    onExpandedChange = { expandido = !expandido },
-                    modifier = Modifier.fillMaxWidth()
+                    onDismissRequest = { expandido = false }
                 ) {
-                    OutlinedTextField(
-                        colors = customTextFieldColors(),
-                        value = seleccion,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Rol") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandido,
-                        onDismissRequest = { expandido = false }
-                    ) {
-                        opciones.forEach { opcion ->
-                            DropdownMenuItem(
-                                text = { androidx.compose.material.Text(opcion) },
-                                onClick = {
-                                    seleccion = opcion
-                                    expandido = false
-                                }
-                            )
-                        }
+                    opciones.forEach { opcion ->
+                        DropdownMenuItem(
+                            text = { androidx.compose.material.Text(opcion) },
+                            onClick = {
+                                seleccion = opcion
+                                expandido = false
+                            }
+                        )
                     }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Button(
-                        colors = customButtonColors(),
-                        onClick = {
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    colors = customButtonColors(),
+                    onClick = {
                         CoroutineScope(Dispatchers.Main).launch {
+                            FullScreenLoadingManager.showLoader()
                             Database.updateEmployee(
                                 EmployeeUpdateDTO(
                                     employee.idEmployee,
-                                    name,
-                                    lastName,
-                                    email,
+                                    name.value,
+                                    lastName.value,
+                                    user.value + domain.value,
                                     dateFrom.value,
                                     dateTo.value,
-                                    roles.find { it.rol == seleccion }?.idRol ?: -1
+                                    roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                    null,
+                                    idCT.value,
+                                    idAirbus.value
                                 )
                             )
+                            FullScreenLoadingManager.hideLoader()
                         }
                     }) {
-                        Text("Guardar")
-                    }
-                    Button(
-                        colors = customButtonColors(),
-                        onClick = {
+                    Text("Guardar")
+                }
+                Button(
+                    colors = customButtonColors(),
+                    onClick = {
                         alertOpen = true
                     }) {
-                        Icon(
-                            Icons.Filled.PersonRemove,
-                            contentDescription = "User Delete",
-                            tint = Color.Red
-                        )
-                    }
-                    confirmRemove(alertOpen, dateTo, EmployeeUpdateDTO(
+                    Icon(
+                        Icons.Filled.PersonRemove,
+                        contentDescription = "User Delete",
+                        tint = Color.Red
+                    )
+                }
+                confirmRemove(
+                    employeesDataViewModel, alertOpen, dateTo, EmployeeUpdateDTO(
                         employee.idEmployee,
-                        name,
-                        lastName,
-                        email,
+                        name.value,
+                        lastName.value,
+                        user.value + domain.value,
                         dateFrom.value,
                         dateTo.value,
-                        roles.find { it.rol == seleccion }?.idRol ?: -1
+                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                        null,
+                        idCT.value,
+                        idAirbus.value
                     )
-                    ){ alertOpen = it }
-                }
+                ) { alertOpen = it }
             }
         }
+    }
 }
 
 @Composable
-fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: EmployeeUpdateDTO, onDismissRequest: (Boolean) -> Unit = {}) {
-    if(alertOpen){
+fun confirmRemove(
+    employeesDataViewModel: EmployeesDataViewModel,
+    alertOpen: Boolean,
+    dateTo: MutableState<String>,
+    employee: EmployeeUpdateDTO,
+    onDismissRequest: (Boolean) -> Unit = {}
+) {
+    if (alertOpen) {
         Dialog(onDismissRequest = { onDismissRequest(false) }) {
             Card(
                 modifier = Modifier
@@ -247,8 +286,8 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
                     )
 
                     DatePickerDialogSample(
-                        "Date to",
                         dateTo
+                        ,"Fecha de fin de contrato"
                     )
 
                     Row(
@@ -262,14 +301,10 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
                         Button(
                             colors = customButtonColors(),
                             onClick = {
-                            employee.dateTo = dateTo.value
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Database.updateEmployee(
-                                    employee
-                                )
-                            }
-                            onDismissRequest(false)
-                        }) {
+                                employee.dateTo = dateTo.value
+                                employeesDataViewModel.removeEmployee(employee)
+                                onDismissRequest(false)
+                            }) {
                             Text("Aceptar")
                         }
                     }
@@ -282,7 +317,7 @@ fun confirmRemove(alertOpen: Boolean, dateTo: MutableState<String>, employee: Em
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogSample(label: String, dateFrom: MutableState<String>) {
+fun DatePickerDialogSample(dateFrom: MutableState<String>, titulo: String = "Fecha") {
     var showDatePicker by remember { mutableStateOf(false) }
 
     val initialMillis = remember(dateFrom.value) {
@@ -300,7 +335,7 @@ fun DatePickerDialogSample(label: String, dateFrom: MutableState<String>) {
         value = dateFrom.value,
         colors = customTextFieldColors(),
         onValueChange = {},
-        label = { Text(label) },
+        label = { Text(titulo) },
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { showDatePicker = true }) {
@@ -342,16 +377,6 @@ fun DatePickerDialogSample(label: String, dateFrom: MutableState<String>) {
                 showModeToggle = false
             )
         }
-    }
-}
-
-fun isDateBeforeToday(dateStr: String): Boolean {
-    return try {
-        val inputDate = LocalDate.parse(dateStr)
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        inputDate < today
-    } catch (e: Exception) {
-        false
     }
 }
 

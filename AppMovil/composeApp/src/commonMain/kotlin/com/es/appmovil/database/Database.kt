@@ -1,18 +1,17 @@
 package com.es.appmovil.database
 
+import com.es.appmovil.model.Config
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
 import com.es.appmovil.model.dto.EmployeeInsertDTO
 import com.es.appmovil.model.dto.EmployeeUpdateDTO
 import com.es.appmovil.viewmodel.DataViewModel
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
 
 /**
  * Singelton con la conexión ha la base de datos supabase que gestiona los datos
@@ -29,6 +28,13 @@ object Database {
         //install other modules
     }
 
+    suspend fun register(correo: String, contrasenia: String){
+        supabase.auth.signUpWith(Email) {
+            email = correo
+            password = contrasenia
+        }
+    }
+
     suspend inline fun <reified T : Any> getData(table: String): List<T> {
         try {
             return supabase
@@ -43,30 +49,26 @@ object Database {
         }
     }
 
-
-    suspend fun getTablesNames(): List<String> {
-        return try {
-            val response = supabase
-                .from("tablas_disponibles")
-                .select()
-
-            Json.parseToJsonElement(response.data)
-                .jsonArray
-                .mapNotNull { it.jsonObject["table_name"]?.toString()?.trim('"') }
-                .filter { it != "Config" }
-
-        } catch (e: Exception) {
+    suspend fun getConfigData(clave: String): Config? {
+        try {
+            return supabase
+                .from("Config")
+                .select{
+                    filter { eq("clave", clave) }
+                }
+                .decodeSingle()
+        }catch (
+            e:Exception
+        ){
             println(e)
-            emptyList()
+            return null
         }
     }
 
     suspend fun getEmployee(email:String){
         try {
             val employees = supabase.from("Employee").select().decodeList<Employee>()
-
             DataViewModel.employee = employees.first { it.email == email }
-
         }catch (
             e:Exception
         ){
@@ -102,6 +104,28 @@ object Database {
             e:Exception
             ){
             println(e)
+        }
+    }
+
+    suspend fun sendResetPass(email: String){
+        try {
+            supabase.auth.resetPasswordForEmail(email)
+        }catch (
+            _:Exception
+        ) {
+            println("Error al enviar el correo")
+        }
+    }
+
+    suspend fun updateUser(newPassword: String){
+        try {
+            supabase.auth.updateUser {
+                password = newPassword
+            }
+        }catch (
+            _:Exception
+        ){
+            println("Error al cambiar la contraseña")
         }
     }
 

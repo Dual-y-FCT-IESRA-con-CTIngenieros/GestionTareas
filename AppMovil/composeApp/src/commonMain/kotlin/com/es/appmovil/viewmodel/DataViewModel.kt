@@ -3,6 +3,7 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
 import com.es.appmovil.model.Calendar
@@ -17,6 +18,7 @@ import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.WorkOrder
+import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
 import ir.ehsannarmani.compose_charts.models.Pie
@@ -37,15 +39,17 @@ object DataViewModel {
     var currentToday =
         MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
-    var employee = Employee(-1, "", "", "", "", null, -1)
+    var employee = Employee(-1, "", "", "", "", null, -1,null, "", "", null)
 
+    private var _currentEmail = MutableStateFlow("")
+    val currentEmail: StateFlow<String> = _currentEmail
 
     // Variables comunes a varias pantallas
     private var _currentHours = MutableStateFlow(0)
     val currentHours: StateFlow<Int> = _currentHours
 
     private var _currentMonth = MutableStateFlow("0")
-    private var _currentYear = MutableStateFlow("0")
+    var _currentYear = MutableStateFlow("0")
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList
@@ -136,6 +140,29 @@ object DataViewModel {
     private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
     val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
 
+    // Carga de los datos de la base de datos
+    init {
+        cargarTimeCodes()
+        cargarEmployeeActivities()
+        cargarProjects()
+        cargarProjectsTimeCode()
+        cargarWorkOrders()
+        cargarActivities()
+        cargarEmployeeWO()
+        cargarEmployees()
+        cargarRoles()
+        cargarCalendar()
+    }
+    suspend fun cargarYObtenerEmail(): String {
+        val datos = Database.getConfigData("email")
+        if (datos != null) {
+            _currentEmail.value = datos.valor
+            return datos.valor
+        }
+        return ""
+    }
+
+    private fun cargarTimeCodes() {
     private fun cargarEmployeeWO() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeWO>("EmployeeWO")
@@ -170,6 +197,36 @@ object DataViewModel {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<ProjectTimeCode>("ProjectTimeCode")
             _projectTimeCodes.value = datos
+        }
+    }
+    private fun cargarWorkOrders() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<WorkOrder>("WorkOrder")
+            _workOrders.value = datos
+        }
+    }
+
+    private fun cargarActivities() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Activity>("Activity")
+            _activities.value = datos
+
+        }
+    }
+
+    private fun cargarEmployeeWO() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<EmployeeWO>("EmployeeWO")
+            _employeeWO.value = datos
+        }
+    }
+
+     val employees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
+
+    private fun cargarEmployees(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Employee>("Employee")
+            employees.value = datos.toMutableList()
         }
     }
 
@@ -225,6 +282,27 @@ object DataViewModel {
         cargarWorkOrders()
         cargarActivities()
         cargarEmployeeWO()
+
+    private var _calendarFest = MutableStateFlow(CalendarYearDTO(0, mutableListOf()))
+    val calendarFest = _calendarFest
+
+    private var _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    val calendar = _calendar
+
+    private fun cargarCalendar() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Calendar>("Calendar")
+            _calendar.value = datos
+        }
+    }
+
+    fun cargarCalendarFest() {
+        val festivos = calendar.value.map { it.date }
+
+        _calendarFest.value = CalendarYearDTO(
+            idCalendar = today.value.year,
+            date = festivos
+        )
     }
 
     fun load_tables(){

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -101,6 +102,7 @@ class AdminScreen : Screen {
 
                         }
 
+                        Spacer(Modifier.size(16.dp))
 
                         ElevatedCard(
                             colors = CardColors(
@@ -124,7 +126,7 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.TableView,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Tabla",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
@@ -134,7 +136,7 @@ class AdminScreen : Screen {
                         }
                     }
 
-                    Spacer(Modifier.size(30.dp))
+                    Spacer(Modifier.size(16.dp))
 
                     Row(
                         Modifier.fillMaxWidth(),
@@ -147,9 +149,10 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
+                                    navigator.push(GenerateCSVScreen())
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
@@ -161,7 +164,7 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Summarize,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Informe",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
@@ -170,6 +173,8 @@ class AdminScreen : Screen {
 
                         }
 
+                        Spacer(Modifier.size(16.dp))
+
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
@@ -177,9 +182,10 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
+                                    navigator.push(CalendarManageScreen(calendarManageViewModel))
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
@@ -191,17 +197,15 @@ class AdminScreen : Screen {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.EditCalendar,
-                                    contentDescription = "Usuario",
+                                    contentDescription = "Calendario",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
                                 Text("Gestión de calendario")
                             }
-
                         }
                     }
                 }
-
             }
         }
     }

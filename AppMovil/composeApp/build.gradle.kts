@@ -33,6 +33,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.ktor:ktor-client-okhttp:2.3.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,6 +61,10 @@ kotlin {
 
             // Multiplatform settings para guardar la sesión
             implementation("com.russhwolf:multiplatform-settings:1.3.0")
+        }
+
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:2.3.0")
         }
     }
 }
@@ -93,8 +98,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.media3.common.ktx)
-    implementation(libs.foundation.android)
     debugImplementation(compose.uiTooling)
 }
 

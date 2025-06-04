@@ -1,5 +1,7 @@
 package com.es.appmovil.viewmodel
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.es.appmovil.database.Database
 import com.es.appmovil.database.Database.supabase
 import com.russhwolf.settings.Settings
@@ -18,15 +20,31 @@ import kotlinx.coroutines.withContext
 /**
  * Clase viewmodel para el usuario, donde guardaremos los datos del usuario y sus posibles funciones
  */
-class UserViewModel {
+class UserViewModel : ViewModel() {
 
     // Nombre de usuario del trabajador con el que iniciará sesión.
     private var _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
+    private var _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+
+    init {
+        viewModelScope.launch {
+            FullScreenLoadingManager.showLoader()
+            _email.value = DataViewModel.cargarYObtenerEmail()
+            FullScreenLoadingManager.hideLoader()
+        }
+    }
     // Contraseña del usuario con la que iniciará sesión.
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password
+
+    private var _passForgot = MutableStateFlow(false)
+    val passForgot: StateFlow<Boolean> = _passForgot
+
+    private var _passChange = MutableStateFlow(false)
+    val passChange: StateFlow<Boolean> = _passChange
 
     // Contraseña del usuario con la que iniciará sesión.
     private var _visibility = MutableStateFlow(false)
@@ -50,9 +68,24 @@ class UserViewModel {
     val loginError: StateFlow<Boolean> = _loginError
 
     // Actualiza las variables para que se reflejen en la pantalla.
-    fun onChangeValue(name:String, pass:String) {
+    fun onChangeValue(name: String, pass: String) {
         _username.value = name
         _password.value = pass
+    }
+
+    fun onPassForgotChange() {
+        _passForgot.value = !_passForgot.value
+    }
+
+    fun onPassChangeChange(){
+        _passChange.value = !_passChange.value
+    }
+
+    private fun completeEmail() {
+        val regex = ".+@".toRegex()
+        if (!regex.containsMatchIn(_email.value)){
+            _email.value = _username.value + _email.value
+        }
     }
 
     fun onChangeVisibility() {
@@ -64,9 +97,10 @@ class UserViewModel {
         if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    completeEmail()
                     // Intenta iniciar sesión en la base de datos
-                    supabase.auth.signInWith(Email){
-                        email = _username.value
+                    supabase.auth.signInWith(Email) {
+                        email = _email.value
                         password = _password.value
                     }
                     _login.value = true
@@ -76,13 +110,16 @@ class UserViewModel {
                         val settings = Settings()
                         settings.putString("access_token", session.accessToken)
                         settings.putString("refresh_token", session.refreshToken)
-                        settings.putString("email_user", _username.value)
+                        settings.putString("email_user", _email.value)
                     }
-                } catch (e:AuthRestException) { // Si da error no ha podido iniciar sesión
+                    if (_password.value == "ct1234") {
+                        onPassChangeChange()
+                    }
+                } catch (e: AuthRestException) { // Si da error no ha podido iniciar sesión
                     _loginError.value = true
                     _loginErrorMessage.value = "Credenciales incorrectas"
                     _password.value = ""
-                } catch (e:Exception) { // Si da error no ha podido iniciar sesión
+                } catch (e: Exception) { // Si da error no ha podido iniciar sesión
                     _loginError.value = true
                     _loginErrorMessage.value = "No se ha podido conectar con la base de datos"
                     _password.value = ""
@@ -92,46 +129,47 @@ class UserViewModel {
         }
     }
 
-    suspend fun checkSession() {
+    fun checkSession() {
         _checkSess.value = true
         val settings = Settings()
         val emailUser = settings.getStringOrNull("email_user")
         val accessToken = settings.getStringOrNull("access_token")
         val refreshToken = settings.getStringOrNull("refresh_token")
-        try {
-            if (accessToken != null &&refreshToken != null) {
 
-                val user = supabase.auth.retrieveUser(accessToken)
+        viewModelScope.launch {
+            try {
+                if (accessToken != null && refreshToken != null) {
+                    FullScreenLoadingManager.showLoader()
 
-                val session = UserSession(
-                    accessToken = accessToken,
-                    refreshToken = refreshToken,
-                    expiresIn = 2678400, // o cualquier valor razonable si no lo tienes exacto
-                    tokenType = "Bearer",
-                    user = user // opcional, Supabase puede refrescarlo luego
-                )
-                supabase.auth.importSession(session)
-                withContext(Dispatchers.IO) {
-                    Database.getEmployee(user.email ?: "")
+                    val user = supabase.auth.retrieveUser(accessToken)
+
+                    val session = UserSession(
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                        expiresIn = 3600, // o cualquier valor razonable si no lo tienes exacto
+                        tokenType = "Bearer",
+                        user = user // opcional, Supabase puede refrescarlo luego
+                    )
+                    supabase.auth.importSession(session)
+                    withContext(Dispatchers.IO) {
+                        Database.getEmployee(user.email ?: "")
+                    }
+                    _login.value = true
                 }
-                _login.value = true
-            } else {
-                if (emailUser != null) _username.value = emailUser
+
+            } catch (e: Exception) {
+                _password.value = ""
             }
-        } catch (e:Exception) {
-            println(e)
+            finally {
+                FullScreenLoadingManager.hideLoader()
+            }
         }
+
     }
 
-//    fun signOut() {
-//        supabase.auth.signOut()
-//        settings.remove("access_token")
-//        settings.remove("refresh_token")
-//    }
     fun resetVar() {
         _visibility.value = false
         _login.value = false
-        //_username.value = ""
         _password.value = ""
     }
 

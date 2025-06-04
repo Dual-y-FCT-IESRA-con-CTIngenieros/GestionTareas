@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -46,73 +47,89 @@ class AnualScreen : Screen {
         MaterialTheme {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
-            }) {
-                Column {
-                    Column(Modifier.padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+            }) { innerPadding ->
+                Column(Modifier.padding(innerPadding).fillMaxWidth()) {
+                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp, modifier = Modifier.padding(horizontal = 16.dp).padding(top =16.dp))
 
-                        Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp)
-
-                        Spacer(Modifier.size(30.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Horas Totales: $currentHours")
-                            Row {
-                                IconButton(
-                                    onClick = {
-                                        if (index != 1) {
-                                            anualViewModel.changeIndex(1)
-                                        }
-                                    }, modifier = Modifier.size(24.dp)
+                    Spacer(Modifier.size(30.dp))
+                    LazyColumn {
+                        item {
+                            Column(Modifier.padding(horizontal = 16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
-                                        contentDescription = ""
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        if (index != 2) {
-                                            anualViewModel.changeIndex(2)
+                                    Text("Horas Totales: $currentHours")
+                                    Row {
+                                        IconButton(
+                                            onClick = {
+                                                if (index != 1) {
+                                                    anualViewModel.changeIndex(1)
+                                                }
+                                            },
+                                            enabled = index == 2,
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            if (index == 2) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                                                    contentDescription = ""
+                                                )
+                                            }
                                         }
-                                    }, modifier = Modifier.size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                        contentDescription = ""
-                                    )
+                                        IconButton(
+                                            onClick = {
+                                                if (index != 2) {
+                                                    anualViewModel.changeIndex(2)
+                                                }
+                                            },
+                                            enabled = index == 1,
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            if (index == 1) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                                    contentDescription = ""
+                                                )
+                                            }
+                                        }
+                                    }
+
                                 }
+
+                                Spacer(Modifier.size(10.dp))
+
+                                ResumenAnual(anualViewModel)
+
+                                Spacer(Modifier.size(30.dp))
+
+                                TeoricoAnual(anualViewModel)
                             }
 
                         }
 
-                        Spacer(Modifier.size(10.dp))
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 62.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val meses = listOf("E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
+                                meses.forEach { mes ->
+                                    Text(
+                                        text = mes,
+                                        fontSize = 12.sp,
+                                        modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(end = 12.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
 
-                        ResumenAnual(anualViewModel)
-
-                        Spacer(Modifier.size(30.dp))
-
-                        TeoricoAnual(anualViewModel)
-
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 62.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        val meses = listOf("E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
-                        meses.forEach { mes ->
-                            Text(
-                                text = mes,
-                                fontSize = 12.sp,
-                                modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(end = 12.dp),
-                                textAlign = TextAlign.Center
-                            )
+                            Spacer(Modifier.size(30.dp))
                         }
+
                     }
                 }
             }
