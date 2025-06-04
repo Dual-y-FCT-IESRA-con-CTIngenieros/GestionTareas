@@ -18,17 +18,28 @@ class UserWeekViewModel {
 
         val filteredActivities = employeeActivities.value.filter { activity ->
             val activityDate = LocalDate.parse(activity.date)
-            activityDate in startDate..endDate && workOrdersInArea.contains(activity.idWorkOrder) // borrar el  && work... para todas las horas aunque no sean productivas
+            activityDate in startDate..endDate && workOrdersInArea.contains(activity.idWorkOrder)  // borrar el  && work... para todas las horas aunque no sean productivas
         }
+        val activities = employeeActivities.value.filter {
+            val activityDate = LocalDate.parse(it.date)
+            activityDate in startDate..endDate
+        }
+
+        val grouped = activities.groupBy { it.idEmployee }
 
         val employeeHours = mutableMapOf<String, Int>()
 
         for (activity in filteredActivities) {
             val employee = employees.value.find { it.idEmployee == activity.idEmployee } ?: continue
             val employeeName = "${employee.nombre} ${employee.apellidos}"
+            var totalTime = employeeHours[employeeName] ?: 0
 
-            val totalTime = employeeHours[employeeName] ?: 0
-            employeeHours[employeeName] = totalTime + activity.time.toInt()
+            grouped.forEach { (key, activities) ->
+                if (employee.idEmployee == key)
+                    totalTime = activities.sumOf { it.time.toInt() }
+            }
+
+            employeeHours[employeeName] = totalTime
         }
 
         return employeeHours.toList().sortedByDescending { it.second }.toMap()

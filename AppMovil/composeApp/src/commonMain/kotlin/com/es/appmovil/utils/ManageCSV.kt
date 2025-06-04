@@ -76,7 +76,7 @@ class ManageCSV {
                 val grouped = activities.groupBy { Triple(it.idEmployee, it.idTimeCode, it.idActivity) }
 
                 val csvRows = mutableListOf(
-                    listOf("Usuario", "Nombre", "Tipo", "Avión", "Proyecto", "Tarea", "Item", "Horas", "DesgloseHoras")
+                    listOf("Usuario", "Nombre", "Tipo", "Proyecto", "Item", "Horas", "DesgloseHoras")
                 )
 
                 grouped.forEach { (key, activities) ->
@@ -88,7 +88,6 @@ class ManageCSV {
 
                     val workOrder = workOrders.value.find { it.idWorkOrder == activities.first().idWorkOrder }
                     val project = projects.value.find { it.idProject == workOrder?.idProject }
-                    val aircraft = aircrafts.value.find { it.idAircraft == project?.idCliente }
 
                     val tipo = when (timeCode.idTimeCode) {
                         100 -> "Trabajo"
@@ -111,9 +110,7 @@ class ManageCSV {
                             employee.idCT,
                             "\"${employee.apellidos.uppercase()}, ${employee.nombre.uppercase()}\"",
                             tipo,
-                            aircraft?.desc ?: "",
                             project?.desc ?: "",
-                            "",
                             activities.first().comment ?: "",
                             timeTotal.toString(),
                             desglose

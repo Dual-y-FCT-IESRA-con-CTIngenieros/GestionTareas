@@ -167,13 +167,13 @@ object DataViewModel {
     private var _calendarFest = MutableStateFlow(CalendarYearDTO(0, mutableListOf()))
     val calendarFest = _calendarFest
 
-    private var _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    private var _calendar = MutableStateFlow<MutableList<Calendar>>(mutableListOf())
     val calendar = _calendar
 
     private fun cargarCalendar() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Calendar>("Calendar")
-            _calendar.value = datos
+            _calendar.value = datos.toMutableList()
         }
     }
 

@@ -83,7 +83,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 onDismiss = { showDialogDownload = false },
                 onConfirm = {
                     showDialogDownload = false
-                    manageCSV.generateYearCsv(fechaActual.year)
+                    manageCSV.generateYearCsv(today.value.year)
                 },
             )
         }
@@ -346,7 +346,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                     Button(onClick = {
                         val dias = vacationDaysInput.toIntOrNull() ?: 0
                         calendarYearViewModel.setNextHolidaysDays(dias)
-                        calendarYearViewModel.closeYear(generateNewYear)
+                        calendarYearViewModel.closeYear(generateNewYear, today.value.year)
                         showCloseYearDialog = false
                     }, enabled = if(!generateNewYear || generateNewYear && (vacationDaysInput.toIntOrNull() ?: 0) > 0) true else false) {
                         Text("Cerrar año")
@@ -383,10 +383,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
     ) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("Descargar Semana") },
-            text = {
-
-            },
+            title = { Text("Descargar Datos de este año.") },
             confirmButton = {
                 Button(onClick = onConfirm, colors = customButtonColors()) {
                     Text("Descargar")

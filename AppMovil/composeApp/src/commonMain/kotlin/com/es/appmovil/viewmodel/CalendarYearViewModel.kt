@@ -64,11 +64,10 @@ class CalendarYearViewModel {
         }
     }
 
-    fun closeYear(generateNewYear:Boolean){
+    fun closeYear(generateNewYear:Boolean, currentYear:Int){
 
         val blockDate = employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
         if (blockDate.isNotEmpty()) {
-            val currentYear = _currentYear.value.toIntOrNull() ?: 0
             val nextYear = currentYear + 1
             val days = _nextDaysHolidays.value
             val hours = days * 8

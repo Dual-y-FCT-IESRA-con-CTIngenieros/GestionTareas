@@ -18,6 +18,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.filled.FreeCancellation
 import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material.icons.filled.TableView
 import androidx.compose.runtime.Composable
@@ -102,7 +107,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.SupervisedUserCircle,
+                                    imageVector = Icons.Filled.FreeCancellation,
                                     contentDescription = "Semanal",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
@@ -135,7 +140,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.TableView,
+                                    imageVector = Icons.Filled.EventBusy,
                                     contentDescription = "Anual",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
@@ -173,7 +178,7 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.SupervisedUserCircle,
+                                    imageVector = Icons.AutoMirrored.Filled.EventNote,
                                     contentDescription = " HoraSemanal",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
@@ -206,12 +211,12 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.TableView,
+                                    imageVector = Icons.Filled.EditCalendar,
                                     contentDescription = "Anual",
                                     modifier = Modifier.size(size.dp),
                                     tint = Color(0xFF707272)
                                 )
-                                Text("Gestión Anual")
+                                Text("Calendario Festivos")
                             }
 
                         }
