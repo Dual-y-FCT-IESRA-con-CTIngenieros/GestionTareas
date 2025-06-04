@@ -37,6 +37,8 @@ object DataViewModel {
     var employee = Employee(-1, "", "", "", "", null, -1,null, "", "", null)
 
     var employeesYearData = MutableStateFlow<MutableList<UserYearData>>(mutableListOf())
+    private var _currentEmail = MutableStateFlow("")
+    val currentEmail: StateFlow<String> = _currentEmail
 
     // Variables comunes a varias pantallas
     private var _currentHours = MutableStateFlow(0)
@@ -89,6 +91,14 @@ object DataViewModel {
         cargarCalendar()
         cargarUserYearData()
         cargarArea()
+    }
+    suspend fun cargarYObtenerEmail(): String {
+        val datos = Database.getConfigData("email")
+        if (datos != null) {
+            _currentEmail.value = datos.valor
+            return datos.valor
+        }
+        return ""
     }
 
     private fun cargarTimeCodes() {

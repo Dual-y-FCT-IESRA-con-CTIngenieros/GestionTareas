@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
@@ -27,10 +28,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +51,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
+import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
 import ctingenierosappmovil.composeapp.generated.resources.LogoCT
 import ctingenierosappmovil.composeapp.generated.resources.Res
@@ -61,17 +69,20 @@ import org.jetbrains.compose.resources.painterResource
  *
  * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
-class LoginScreen(private val userViewmodel: UserViewModel): Screen {
+class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual
         val navigator = LocalNavigator.current
         // Creamos las variables necesarias desde el viewmodel
         val username by userViewmodel.username.collectAsState("")
+        val email by userViewmodel.email.collectAsState("")
         val password by userViewmodel.passwordText.collectAsState("")
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
         val checkSess by userViewmodel.checkSess.collectAsState(false)
+        val passForgot by userViewmodel.passForgot.collectAsState(false)
+        val passChange by userViewmodel.passChange.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
         cargarCalendarFest()
@@ -118,27 +129,39 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = Color(0xFFF4A900),
-                    modifier = Modifier.clickable {})
+                    modifier = Modifier.clickable {
+                        userViewmodel.onPassForgotChange()
+                    })
+                DialogResetPass(passForgot) {
+                    userViewmodel.onPassForgotChange()
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
+            DialogChangePass(
+                passChange,
+                onDismiss = { userViewmodel.onPassChangeChange() }
+            )
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
             if (navigator != null) {
-                Boton { userViewmodel.checkLogin() }
-                if (login) {
+                Boton {
+                    userViewmodel.checkLogin()
+                }
+                if (login && !passChange) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        doLogin(username, navigator)
+                        FullScreenLoadingManager.showLoader()
+                        doLogin(email, navigator)
+                        FullScreenLoadingManager.hideLoader()
                     }
                 }
             }
         }
     }
 
-    private suspend fun doLogin(username: String, navigator: Navigator) {
+    private suspend fun doLogin(email: String, navigator: Navigator) {
         withContext(Dispatchers.IO) {
-            Database.getEmployee(username)
+            Database.getEmployee(email)
         }
         userViewmodel.resetVar()
         userViewmodel.resetError()
@@ -166,7 +189,7 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         OutlinedTextField(
             value = username,
             onValueChange = { onChangeValue(it, password) },
-            label = { Text("Correo") },
+            label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
@@ -244,6 +267,136 @@ class LoginScreen(private val userViewmodel: UserViewModel): Screen {
         )
     }
 
+    @Composable
+    fun DialogResetPass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
+        val user = remember { mutableStateOf("") }
+
+        if (alertOpen) {
+            Dialog(onDismissRequest = { onDismiss(false) }) {
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            "Escriba su usuario",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        OutlinedTextField(
+                            value = user.value,
+                            colors = customTextFieldColors(),
+                            onValueChange = { user.value = it },
+                            label = { Text("Usuario") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextButton(onClick = { onDismiss(false) }) {
+                                Text("Cancelar")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                colors = com.es.appmovil.utils.customButtonColors(),
+                                onClick = {
+                                    onDismiss(false)
+                                    user.value = ""
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        Database.sendResetPass(user.value + DataViewModel.currentEmail.value)
+                                    }
+                                }) {
+                                Text("Aceptar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun DialogChangePass(
+        alertOpen: Boolean,
+        onDismiss: () -> Unit
+    ) {
+        val pass = remember { mutableStateOf("") }
+        var visibility by remember { mutableStateOf(false) }
+
+        if (alertOpen) {
+            Dialog(onDismissRequest = { onDismiss() }) {
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            "Hemos detectado que ha iniciado sesion con la contraseña por defecto",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Text(
+                            "Por favor, escriba una contraseña nueva",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        OutlinedTextField(
+                            value = pass.value,
+                            onValueChange = { pass.value = it },
+                            label = { Text("Contraseña") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = customTextFieldColors(),
+                            visualTransformation = if (!visibility) PasswordVisualTransformation() else VisualTransformation.None, // Ponemos los puntos o mostrarmos el texto
+                            trailingIcon = { // Dependiendo de si está visible o no cambia el icono
+                                IconButton(onClick = { visibility = !visibility }) {
+                                    Icon(
+                                        imageVector = if (visibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = "Visibility"
+                                    )
+                                }
+                            }
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextButton(onClick = {
+                                onDismiss()
+                                pass.value = ""
+                            }) {
+                                Text("Cancelar")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                colors = com.es.appmovil.utils.customButtonColors(),
+                                onClick = {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        Database.updateUser(pass.value)
+                                    }
+                                    onDismiss()
+                                    pass.value = ""
+                                }) {
+                                Text("Aceptar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     /**
      * Dialog de error que nos indica el error al iniciar sesión
      *
