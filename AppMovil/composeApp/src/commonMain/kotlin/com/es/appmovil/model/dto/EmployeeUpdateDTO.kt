@@ -10,5 +10,9 @@ data class EmployeeUpdateDTO(
     val email: String,
     val dateFrom: String,
     var dateTo: String?,
-    val idRol: Int
+    val idRol: Int,
+    val blockDate:String?,
+    val idCT:String,
+    val idAirbus:String,
+    val unblockDate:String?
 )

@@ -25,10 +25,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,44 +45,42 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.database.Database
-import com.es.appmovil.model.dto.EmployeeInsertDTO
+import com.es.appmovil.model.Employee
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.EmployeesDataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.widgets.DatePickerDialogSample
 import com.es.appmovil.widgets.UserData
+import com.es.appmovil.widgets.genericFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class UserManageScreen : Screen {
+class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewModel) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-
-        LaunchedEffect(Unit) {
-            DataViewModel.cargarEmployees()
-            DataViewModel.cargarRoles()
-        }
+        employeesDataViewModel.orderEmployees()
 
         val navigator: Navigator = LocalNavigator.currentOrThrow
-        val employees = DataViewModel.employees.value
-        val roles = DataViewModel.roles.value
+        val actualEmployees by employeesDataViewModel.actualEmployees.collectAsState()
+        val exEmployees by employeesDataViewModel.exEmployees.collectAsState()
+        val roles by DataViewModel.roles.collectAsState()
+        val filter by employeesDataViewModel.filter.collectAsState()
 
         val opciones = roles.map { it.rol }
-        val seleccionInicial = if (opciones.isNotEmpty()) opciones[1] else ""
+        val seleccionInicial = if (opciones.isNotEmpty()) opciones[0] else ""
         var seleccion by remember { mutableStateOf(seleccionInicial) }
 
-        var name by mutableStateOf("")
-        var lastName by mutableStateOf("")
-        var email by mutableStateOf("")
-        val dateFrom = mutableStateOf("")
-
+        var changeEmployees by remember { mutableStateOf(true) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
         var expandido by remember { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
+
+        val employeeText = if (changeEmployees) "Empleados actuales" else "Antiguos empleados"
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
             Row(
@@ -89,7 +88,7 @@ class UserManageScreen : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {navigator.pop()}){
+                IconButton(onClick = { navigator.pop() }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
                 }
                 Text(
@@ -103,11 +102,55 @@ class UserManageScreen : Screen {
                     Icon(Icons.Filled.Add, contentDescription = "Add")
                 }
             }
-            LazyColumn {
-                employees.forEachIndexed { index, employee ->
-                    item { UserData(index, employee, roles) }
+            Row(
+                modifier = Modifier.fillMaxWidth(), // Esto es crucial para que funcione
+                horizontalArrangement = Arrangement.SpaceBetween, // Distribuye el espacio entre los elementos
+                verticalAlignment = Alignment.CenterVertically // Alinea verticalmente los elementos
+            ) {
+                Text(
+                    text = employeeText,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
+                IconButton(onClick = { changeEmployees = !changeEmployees }) {
+                    Icon(
+                        Icons.Filled.TransferWithinAStation,
+                        contentDescription = "change employees"
+                    )
                 }
             }
+
+            genericFilter(true, filter) { employeesDataViewModel.changeFilter(it) }
+
+            LazyColumn {
+                if (changeEmployees) {
+                    val actualEmployeesFilter = if (filter.isNotBlank()) {
+                        actualEmployees.filter {
+                            val name = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in name
+                        }
+                    } else {
+                        actualEmployees
+                    }
+                    items(actualEmployeesFilter.size) { index ->
+                        UserData(index, actualEmployeesFilter[index], roles)
+                    }
+                } else {
+                    val exEmployeesFilter = if (filter.isNotBlank()) {
+                        exEmployees.filter {
+                            val name = (it.nombre + " " + it.apellidos).lowercase()
+                            filter.lowercase() in name
+                        }
+                    } else {
+                        exEmployees
+                    }
+                    items(exEmployeesFilter.size) { index ->
+                        UserData(index, exEmployeesFilter[index], roles)
+                    }
+                }
+            }
+
         }
         if (showDialog) {
             ModalBottomSheet(
@@ -123,11 +166,25 @@ class UserManageScreen : Screen {
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .padding(8.dp)
                 ) {
-                    Row{
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = customTextFieldColors(),
+                        value = employeesDataViewModel.idCT.value,
+                        onValueChange = { employeesDataViewModel.email.value = it },
+                        label = { Text("ID CT") },
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = customTextFieldColors(),
+                        value = employeesDataViewModel.idAirbus.value,
+                        onValueChange = { employeesDataViewModel.email.value = it },
+                        label = { Text("ID Airbus") },
+                    )
+                    Row {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = name,
-                            onValueChange = { name = it },
+                            value = employeesDataViewModel.name.value,
+                            onValueChange = { employeesDataViewModel.name.value = it },
                             label = { Text("Nombre") },
                             colors = customTextFieldColors(),
                         )
@@ -135,19 +192,19 @@ class UserManageScreen : Screen {
                         OutlinedTextField(
                             modifier = Modifier.weight(2f),
                             colors = customTextFieldColors(),
-                            value = lastName,
-                            onValueChange = { lastName = it },
-                            label = { Text("Primer apellido") },
+                            value = employeesDataViewModel.lastName.value,
+                            onValueChange = { employeesDataViewModel.lastName.value = it },
+                            label = { Text("Apellidos") },
                         )
                     }
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         colors = customTextFieldColors(),
-                        value = email,
-                        onValueChange = { email = it },
+                        value = employeesDataViewModel.email.value,
+                        onValueChange = { employeesDataViewModel.email.value = it },
                         label = { Text("Correo electrónico") },
                     )
-                    DatePickerDialogSample(dateFrom)
+                    DatePickerDialogSample(employeesDataViewModel.dateFrom, "Fecha de antigüedad")
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido }
@@ -180,26 +237,35 @@ class UserManageScreen : Screen {
                     Button(
                         colors = customButtonColors(),
                         border = BorderStroke(0.5.dp, Color.Black),
-                        modifier = Modifier.fillMaxWidth().height(50.dp).align(Alignment.CenterHorizontally),
+                        modifier = Modifier.fillMaxWidth().height(50.dp)
+                            .align(Alignment.CenterHorizontally),
                         shape = RoundedCornerShape(10.dp),
                         onClick = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Database.addEmployee(
-                                EmployeeInsertDTO(
-                                    name,
-                                    lastName,
-                                    email,
-                                    dateFrom.value,
-                                    roles.find { it.rol == seleccion }?.idRol ?: -1
+                            CoroutineScope(Dispatchers.Main).launch {
+                                FullScreenLoadingManager.showLoader()
+                                employeesDataViewModel.addEmployee(
+                                    Employee(
+                                        employeesDataViewModel.employees.value.maxByOrNull { it.idEmployee }!!.idEmployee,
+                                        employeesDataViewModel.name.value,
+                                        employeesDataViewModel.lastName.value,
+                                        employeesDataViewModel.email.value,
+                                        employeesDataViewModel.dateFrom.value,
+                                        null,
+                                        roles.find { it.rol == seleccion }?.idRol ?: -1,
+                                        null,
+                                        employeesDataViewModel.idCT.value,
+                                        employeesDataViewModel.idAirbus.value
+                                    )
                                 )
-                            )
+                                FullScreenLoadingManager.hideLoader()
+                            }
+                            showDialog = false
                         }
-                        showDialog = false
-                    }
                     ) {
                         Text("Guardar")
                     }
                 }
+
 
             }
         }

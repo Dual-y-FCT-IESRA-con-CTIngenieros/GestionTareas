@@ -20,6 +20,10 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,8 +37,8 @@ import com.es.appmovil.viewmodel.ResumeViewmodel
 fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
     // Creamos la variable de modificador base de los box
     val boxModifier = Modifier.height(20.dp).clip(shape = RoundedCornerShape(5.dp))
-
-    val timeActivity = resumeViewmodel.getTimeActivity()
+    val timeActivity by resumeViewmodel.timeActivity.collectAsState()
+    resumeViewmodel.getTimeActivity()
 
     Row {
         Text("Resumen anual", fontWeight = FontWeight.SemiBold)
@@ -60,9 +64,9 @@ fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val totalHours = timeActivity.value.values.sum()
+            val totalHours = timeActivity.values.sum()
 
-            timeActivity.value.forEach { (color, hour) ->
+            timeActivity.forEach { (color, hour) ->
                 if (hour != 0f) {
                     Box(
                         boxModifier.background(color = Color(color)).weight(hour / totalHours)
@@ -74,7 +78,7 @@ fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
         }
         Spacer(Modifier.size(5.dp))
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-            timeActivity.value.forEach { (timeCode, hour) ->
+            timeActivity.forEach { (timeCode, hour) ->
                 if (hour != 0f) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(

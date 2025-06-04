@@ -10,5 +10,9 @@ data class Employee(
     val email: String,
     val dateFrom: String,
     val dateTo: String?,
-    val idRol: Int
+    val idRol: Int,
+    var blockDate:String?,
+    val idCT:String,
+    val idAirbus:String,
+    var unblockDate:String?
 )
