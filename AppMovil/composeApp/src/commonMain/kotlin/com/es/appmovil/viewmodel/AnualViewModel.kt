@@ -2,9 +2,12 @@ package com.es.appmovil.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import com.es.appmovil.model.UserYearData
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.employee
+import com.es.appmovil.viewmodel.DataViewModel.employeesYearData
+import com.es.appmovil.viewmodel.DataViewModel.today
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +36,13 @@ class AnualViewModel {
         val i = if (month <= 6) 1 else 2
         generarBarrasPorMes(i)
         return i
+    }
+
+    fun getEmployeeYearData(employeeId: Int): UserYearData? {
+        val currentYear = today.value.year
+        return employeesYearData.value.firstOrNull {
+            it.idEmployee == employeeId && it.year == currentYear
+        }
     }
 
     fun changeIndex(i: Int) {

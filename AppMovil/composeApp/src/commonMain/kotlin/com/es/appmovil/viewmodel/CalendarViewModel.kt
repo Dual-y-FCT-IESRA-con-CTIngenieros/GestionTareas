@@ -8,6 +8,7 @@ import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.viewmodel.DataViewModel.changeMonth
 import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.employeeActivities
+import com.es.appmovil.viewmodel.DataViewModel.employeesYearData
 import com.es.appmovil.viewmodel.DataViewModel.getPie
 import com.es.appmovil.viewmodel.DataViewModel.today
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -117,6 +118,26 @@ class CalendarViewModel {
                 }
             }
         }
+
+        if (employeeActivity.idTimeCode == 900){
+            val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
+            if(userYearData != null){
+                userYearData.enjoyedHolidays += employeeActivity.time.toInt()
+                userYearData.currentHolidays -= employeeActivity.time.toInt()
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.updateData("UserYearData", userYearData)
+                }
+            }
+        } else if (employeeActivity.idEmployee == 100) {
+            val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
+            if(userYearData != null){
+                userYearData.workedHours += employeeActivity.time.toInt()
+                CoroutineScope(Dispatchers.IO).launch {
+                    Database.updateData("UserYearData", userYearData)
+                }
+            }
+        }
+
         getPie()
     }
 
