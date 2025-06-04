@@ -1,5 +1,6 @@
 package com.es.appmovil.database
 
+import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Config
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
@@ -77,7 +78,7 @@ object Database {
 
     }
 
-    suspend fun addData(table: String, data: Any) {
+    suspend inline fun <reified T : Any>  addData(table: String, data: T) {
         try {
             supabase.from(table).insert(data)
         }catch (
@@ -139,10 +140,23 @@ object Database {
         }
     }
 
-    suspend fun updateData(table:String, data:Any, idName:String, id:Any){
+    suspend inline fun <reified T : Any> updateData(table:String, data:T){
         try {
-            supabase.from(table).update(data) {
-                filter { eq(idName, id) }
+            supabase.from(table).upsert(data)
+        }catch (
+            e:Exception
+        ){
+            println(e)
+        }
+    }
+
+    suspend fun deleteCalendar(table:String, data: Calendar){
+        try {
+            supabase.from(table).delete {
+                filter {
+                    eq("idCalendar", data.idCalendar)
+                    eq("date", data.date)
+                }
             }
         }catch (
             e:Exception

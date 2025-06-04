@@ -37,6 +37,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarManageViewModel
+import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
@@ -55,6 +56,8 @@ class AdminScreen : Screen {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
             }) {
+                resetToday()
+                calendarManageViewModel.resetWeeks()
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Row(

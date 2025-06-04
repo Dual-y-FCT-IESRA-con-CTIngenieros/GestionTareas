@@ -24,7 +24,7 @@ import kotlinx.datetime.Month
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
-class CalendarManageViewModel {
+class CalendarBlockWeekViewModel {
 
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog

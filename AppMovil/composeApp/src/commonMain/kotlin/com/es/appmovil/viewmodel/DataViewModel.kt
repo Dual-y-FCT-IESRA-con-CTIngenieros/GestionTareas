@@ -3,6 +3,8 @@ package com.es.appmovil.viewmodel
 import androidx.compose.ui.graphics.Color
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Aircraft
+import com.es.appmovil.model.Area
 import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Employee
 import com.es.appmovil.model.EmployeeActivity
@@ -11,6 +13,7 @@ import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
+import com.es.appmovil.model.UserYearData
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
@@ -33,6 +36,7 @@ object DataViewModel {
 
     var employee = Employee(-1, "", "", "", "", null, -1,null, "", "", null)
 
+    var employeesYearData = MutableStateFlow<MutableList<UserYearData>>(mutableListOf())
     private var _currentEmail = MutableStateFlow("")
     val currentEmail: StateFlow<String> = _currentEmail
 
@@ -42,6 +46,9 @@ object DataViewModel {
 
     private var _currentMonth = MutableStateFlow("0")
     var _currentYear = MutableStateFlow("0")
+
+    private var _dailyHours = MutableStateFlow(8)
+    val dailyHours: StateFlow<Int> = _dailyHours
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList
@@ -56,7 +63,7 @@ object DataViewModel {
     val employeeActivities: StateFlow<MutableList<EmployeeActivity>> = _employeeActivities
 
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
-    //val projects: StateFlow<List<Project>> = _projects
+    val projects: StateFlow<List<Project>> = _projects
 
     private val _projectTimeCodes = MutableStateFlow<List<ProjectTimeCode>>(emptyList())
     val projectTimeCodes: StateFlow<List<ProjectTimeCode>> = _projectTimeCodes
@@ -82,6 +89,8 @@ object DataViewModel {
         cargarEmployees()
         cargarRoles()
         cargarCalendar()
+        cargarUserYearData()
+        cargarArea()
     }
     suspend fun cargarYObtenerEmail(): String {
         val datos = Database.getConfigData("email")
@@ -99,6 +108,7 @@ object DataViewModel {
 
         }
     }
+
     private fun cargarEmployeeActivities() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<EmployeeActivity>("EmployeeActivity")
@@ -141,7 +151,7 @@ object DataViewModel {
         }
     }
 
-     val employees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
+    val employees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
 
     private fun cargarEmployees(){
         CoroutineScope(Dispatchers.IO).launch {
@@ -163,15 +173,34 @@ object DataViewModel {
     private var _calendarFest = MutableStateFlow(CalendarYearDTO(0, mutableListOf()))
     val calendarFest = _calendarFest
 
-    private var _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    private var _calendar = MutableStateFlow<MutableList<Calendar>>(mutableListOf())
     val calendar = _calendar
 
     private fun cargarCalendar() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Calendar>("Calendar")
-            _calendar.value = datos
+            _calendar.value = datos.toMutableList()
         }
     }
+
+    private var _areas = MutableStateFlow<List<Area>>(emptyList())
+    val areas = _areas
+
+
+    private fun cargarArea() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Area>("Area")
+            _areas.value = datos
+        }
+    }
+
+    fun cargarUserYearData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<UserYearData>("UserYearData")
+            employeesYearData.value = datos.toMutableList()
+        }
+    }
+
 
     fun cargarCalendarFest() {
         val festivos = calendar.value.map { it.date }
