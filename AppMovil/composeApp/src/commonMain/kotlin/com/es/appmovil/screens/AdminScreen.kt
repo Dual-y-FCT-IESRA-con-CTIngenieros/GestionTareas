@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.viewmodel.CalendarManageViewModel
+import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
 
@@ -46,6 +48,8 @@ class AdminScreen : Screen {
         var canClick by remember { mutableStateOf(true) }
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
+        val employeesDataViewModel = EmployeesDataViewModel()
+        val calendarManageViewModel = CalendarManageViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
@@ -78,9 +82,9 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    navigator.push(UserManageScreen())
+                                    navigator.push(UserManageScreen(employeesDataViewModel = employeesDataViewModel))
                                     canClick = false
                                 }
                             },
@@ -111,7 +115,7 @@ class AdminScreen : Screen {
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.size(180.dp).clickable {
+                            modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
                                     navigator.push(TableManageScreen())

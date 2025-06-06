@@ -20,6 +20,7 @@ import com.es.appmovil.utils.customTextFieldColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenu(
+    label: String,
     expandido: Boolean,
     opciones: List<String>,
     seleccion: String,
@@ -42,7 +43,7 @@ fun DropdownMenu(
             value = seleccion,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Rol") },
+            label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
             modifier = Modifier.menuAnchor()
         )
@@ -51,12 +52,12 @@ fun DropdownMenu(
             expanded = expandido,
             onDismissRequest = { onExapandedChange(false) }
         ) {
-            OutlinedTextField(
-                value = filtro,
-                onValueChange = { filtro = it },
-                label = { Text("Filtrar") },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            )
+//            OutlinedTextField(
+//                value = filtro,
+//                onValueChange = { filtro = it },
+//                label = { Text("Filtrar") },
+//                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+//            )
 
             opcionesFiltradas.forEach { opcion ->
                 DropdownMenuItem(

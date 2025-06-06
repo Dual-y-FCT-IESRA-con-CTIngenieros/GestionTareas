@@ -12,6 +12,9 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 /**
  * Singelton con la conexión ha la base de datos supabase que gestiona los datos
@@ -28,7 +31,8 @@ object Database {
         //install other modules
     }
 
-    suspend fun register(correo: String, contrasenia: String){
+
+    suspend fun register(correo: String, contrasenia: String) {
         supabase.auth.signUpWith(Email) {
             email = correo
             password = contrasenia
@@ -41,11 +45,29 @@ object Database {
                 .from(table)
                 .select()
                 .decodeList<T>()
-        }catch (
-            e:Exception
+        } catch (
+            e: Exception
         ) {
             println(e)
             return emptyList()
+        }
+    }
+
+
+    suspend fun getTablesNames(): List<String> {
+        return try {
+            val response = supabase
+                .from("tablas_disponibles")
+                .select()
+
+            Json.parseToJsonElement(response.data)
+                .jsonArray
+                .mapNotNull { it.jsonObject["table_name"]?.toString()?.trim('"') }
+                .filter { it != "Config" }
+
+        } catch (e: Exception) {
+            println(e)
+            emptyList()
         }
     }
 
@@ -53,25 +75,27 @@ object Database {
         try {
             return supabase
                 .from("Config")
-                .select{
+                .select {
                     filter { eq("clave", clave) }
                 }
                 .decodeSingle()
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
             return null
         }
     }
 
-    suspend fun getEmployee(email:String){
+    suspend fun getEmployee(email: String) {
         try {
             val employees = supabase.from("Employee").select().decodeList<Employee>()
+
             DataViewModel.employee = employees.first { it.email == email }
-        }catch (
-            e:Exception
-        ){
+
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
 
@@ -80,9 +104,9 @@ object Database {
     suspend fun addData(table: String, data: Any) {
         try {
             supabase.from(table).insert(data)
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
@@ -90,76 +114,77 @@ object Database {
     suspend fun addEmployee(data: EmployeeInsertDTO) {
         try {
             supabase.from("Employee").insert(data)
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
 
-    suspend fun updateEmployee(data:EmployeeUpdateDTO){
+    suspend fun updateEmployee(data: EmployeeUpdateDTO) {
         try {
             supabase.from("Employee").upsert(data)
-        }catch (
-            e:Exception
-            ){
-            println(e)
-        }
-    }
-
-    suspend fun sendResetPass(email: String){
-        try {
-            supabase.auth.resetPasswordForEmail(email)
-        }catch (
-            _:Exception
+        } catch (
+            e: Exception
         ) {
-            println("Error al enviar el correo")
-        }
-    }
-
-    suspend fun updateUser(newPassword: String){
-        try {
-            supabase.auth.updateUser {
-                password = newPassword
-            }
-        }catch (
-            _:Exception
-        ){
-            println("Error al cambiar la contraseña")
+            println(e)
         }
     }
 
     suspend fun addEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").insert(data)
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
 
-    suspend fun updateData(table:String, data:Any){
+    suspend fun updateData(table: String, data: Any) {
         try {
             supabase.from(table).upsert(data)
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
 
-    suspend fun updateEmployeeActivity(data:EmployeeActivity){
+    suspend fun updateEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").upsert(data)
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
 
-    suspend fun deleteEmployeeActivity(data:EmployeeActivity) {
+    suspend fun sendResetPass(email: String) {
+        try {
+            supabase.auth.resetPasswordForEmail(email)
+        } catch (
+            _: Exception
+        ) {
+            println("Error al enviar el correo")
+        }
+    }
+
+    suspend fun updateUser(newPassword: String) {
+        try {
+            supabase.auth.updateUser {
+                password = newPassword
+            }
+        } catch (
+            _: Exception
+        ) {
+            println("Error al cambiar la contraseña")
+        }
+    }
+
+
+    suspend fun deleteEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").delete() {
                 filter {
@@ -170,25 +195,25 @@ object Database {
                     eq("date", data.date)
                 }
             }
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }
 
-    suspend fun deregister(table:String, fecha:String, idName:String, id:Any){
+    suspend fun deregister(table: String, fecha: String, idName: String, id: Any) {
         try {
             supabase.from(table).update(
                 {
                     set("dateTo", fecha)
                 }
-            ){
+            ) {
                 filter { eq(idName, id) }
             }
-        }catch (
-            e:Exception
-        ){
+        } catch (
+            e: Exception
+        ) {
             println(e)
         }
     }

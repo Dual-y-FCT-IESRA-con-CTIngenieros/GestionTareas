@@ -221,7 +221,8 @@ fun UserData(
                                     roles.find { it.rol == seleccion }?.idRol ?: -1,
                                     null,
                                     idCT.value,
-                                    idAirbus.value
+                                    idAirbus.value,
+                                    null
                                 )
                             )
                             FullScreenLoadingManager.hideLoader()
@@ -251,7 +252,8 @@ fun UserData(
                         roles.find { it.rol == seleccion }?.idRol ?: -1,
                         null,
                         idCT.value,
-                        idAirbus.value
+                        idAirbus.value,
+                        null
                     )
                 ) { alertOpen = it }
             }

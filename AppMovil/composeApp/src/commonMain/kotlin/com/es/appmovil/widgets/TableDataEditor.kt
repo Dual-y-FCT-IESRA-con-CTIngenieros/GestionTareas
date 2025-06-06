@@ -3,13 +3,9 @@ package com.es.appmovil.widgets
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
+import com.es.appmovil.viewmodel.TableManageViewModel
 
 
 @Composable
@@ -44,6 +41,8 @@ fun claseTabla(tableName: String): Unit? {
 fun ActivityDataEditor() {
     var idActivity by remember { mutableStateOf("") }
     var idTimeCode by remember { mutableStateOf("") }
+    var timeCodeSelection by remember { mutableStateOf(false) }
+    var timeCodeData by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     val dateFrom = remember { mutableStateOf("") }
     val dateTo = remember { mutableStateOf("") }
@@ -58,14 +57,13 @@ fun ActivityDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idTimeCode,
-            onValueChange = { idTimeCode = it },
-            label = { Text("idTimeCode") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DropdownMenu(
+            label = "TimeCodes",
+            expandido = timeCodeSelection,
+            opciones = emptyList(),
+            seleccion = idTimeCode,
+            onExapandedChange = { timeCodeSelection = !timeCodeSelection},
+            onValueChange = { idTimeCode = it }
         )
         OutlinedTextField(
             colors = customTextFieldColors(),
@@ -76,8 +74,8 @@ fun ActivityDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        DatePickerDialogSample("Date From",dateFrom)
-        DatePickerDialogSample("Date To",dateTo)
+        DatePickerDialogSample(dateFrom,"Date From")
+        DatePickerDialogSample(dateTo,"Date To")
         Button(
             colors = customButtonColors(),
             onClick = { /* Use the variables here */ }
@@ -157,7 +155,6 @@ fun AreaDataEditor() {
 fun CalendarDataEditor() {
     var idCalendar by remember { mutableStateOf("") }
     val fecha = remember { mutableStateOf("") }
-    var idActivity by remember { mutableStateOf("") }
 
     Column {
         OutlinedTextField(
@@ -169,16 +166,7 @@ fun CalendarDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        DatePickerDialogSample("Fecha", fecha)
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idActivity,
-            onValueChange = { idActivity = it },
-            label = { Text("idActivity") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+        DatePickerDialogSample(fecha,"Fecha")
         Button(
             colors = customButtonColors(),
             onClick = { /* Use the variables here */ }
@@ -219,6 +207,7 @@ fun EmployeeDataEditor() {
     val dateFrom = remember { mutableStateOf("") }
     val dateTo = remember { mutableStateOf("") }
     var rol by remember { mutableStateOf("") }
+    var rolSelection by remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
@@ -248,16 +237,15 @@ fun EmployeeDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        DatePickerDialogSample("Date From", dateFrom)
-        DatePickerDialogSample("Date To", dateTo)
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = rol,
-            onValueChange = { rol = it },
-            label = { Text("Rol") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DatePickerDialogSample( dateFrom,"Fecha antigüedad")
+        DatePickerDialogSample(dateTo,"Fecha fin de contrato")
+        DropdownMenu(
+            label = "Rols",
+            expandido = rolSelection,
+            opciones = emptyList(),
+            seleccion = rol,
+            onExapandedChange = { rolSelection = !rolSelection },
+            onValueChange = { rol = it }
         )
         Button(
             colors = customButtonColors(),
@@ -306,7 +294,9 @@ fun ProjectDataEditor() {
     var idProject by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var idCliente by remember { mutableStateOf("") }
+    var clienteSelection by remember { mutableStateOf(false) }
     var idArea by remember { mutableStateOf("") }
+    var areaSelection by remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
@@ -327,23 +317,21 @@ fun ProjectDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idCliente,
-            onValueChange = { idCliente = it },
-            label = { Text("IdCliente") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DropdownMenu(
+            label = "Clients",
+            expandido = clienteSelection,
+            opciones = emptyList(),
+            seleccion = idCliente,
+            onExapandedChange = { clienteSelection = !clienteSelection },
+            onValueChange = { idCliente = it }
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idArea,
-            onValueChange = { idArea = it },
-            label = { Text("IdArea") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DropdownMenu(
+            label = "Areas",
+            expandido = areaSelection,
+            opciones = emptyList(),
+            seleccion = idArea,
+            onExapandedChange = { areaSelection = !areaSelection },
+            onValueChange = { idArea = it }
         )
         Button(
             colors = customButtonColors(),
@@ -425,10 +413,13 @@ fun WorkOrderDataEditor() {
     var idWorkOrder by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var projectManager by remember { mutableStateOf("") }
+    var projectManagerSelection by remember { mutableStateOf(false) }
     var idProject by remember { mutableStateOf("") }
-    var proyectSelection by remember { mutableStateOf(false) }
+    var projectSelection by remember { mutableStateOf(false) }
     var idAircraft by remember { mutableStateOf("") }
     var aircraftSelection by remember { mutableStateOf(false) }
+    var idArea by remember{ mutableStateOf("") }
+    var areaSelection by remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
@@ -449,39 +440,37 @@ fun WorkOrderDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = projectManager,
-            onValueChange = { projectManager = it },
-            label = { Text("Project Manager") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idProject,
-            onValueChange = { idProject = it },
-            label = { Text("idProject") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DropdownMenu(
+            label = "Proyect Managers",
+            expandido = projectManagerSelection,
+            opciones = emptyList(),
+            seleccion = projectManager,
+            onExapandedChange = { projectManagerSelection = !projectManagerSelection },
+            onValueChange = { projectManager = it }
         )
         DropdownMenu(
+            label = "Projects",
+            expandido = projectSelection,
+            opciones = emptyList(),
+            seleccion = idProject,
+            onExapandedChange = { projectSelection = !projectSelection },
+            onValueChange = { idProject = it }
+        )
+        DropdownMenu(
+            label = "Aircrafts",
             expandido = aircraftSelection,
             opciones = emptyList(),
             seleccion = idAircraft,
             onExapandedChange = { aircraftSelection = !aircraftSelection },
             onValueChange = { idAircraft = it }
         )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idAircraft,
-            onValueChange = { idAircraft = it },
-            label = { Text("idAircraft") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+        DropdownMenu(
+            label = "Areas",
+            expandido = areaSelection,
+            opciones = emptyList(),
+            seleccion = idArea,
+            onExapandedChange = { areaSelection = !areaSelection },
+            onValueChange = { idArea = it }
         )
         Button(
             colors = customButtonColors(),
