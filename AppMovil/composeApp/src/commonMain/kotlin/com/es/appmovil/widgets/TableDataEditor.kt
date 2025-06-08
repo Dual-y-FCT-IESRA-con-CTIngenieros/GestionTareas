@@ -13,36 +13,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import com.es.appmovil.database.Database
+import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Aircraft
+import com.es.appmovil.model.Area
+import com.es.appmovil.model.Calendar
+import com.es.appmovil.model.Client
+import com.es.appmovil.model.Manager
+import com.es.appmovil.model.Project
+import com.es.appmovil.model.Rol
+import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.WorkOrder
+import com.es.appmovil.model.dto.TimeCodeDTO
+import com.es.appmovil.utils.DTOConverter.toDTO
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.TableManageViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun claseTabla(tableName: String): Unit? {
+    val viewModel = TableManageViewModel()
+
     return when (tableName) {
-        "Activity" -> ActivityDataEditor()
-        "Aircraft" -> AircraftDataEditor()
-        "Area" -> AreaDataEditor()
-        "Calendar" -> CalendarDataEditor()
-        "Client" -> ClientDataEditor()
-        "Employee" -> EmployeeDataEditor()
-        "Manager" -> ManagerDataEditor()
-        "Project" -> ProjectDataEditor()
-        "Rol" -> RolDataEditor()
-        "TimeCode" -> TimeCodeDataEditor()
-        "WorkOrder" -> WorkOrderDataEditor()
+        "Activity" -> ActivityDataEditor(viewModel)
+        "Aircraft" -> AircraftDataEditor(viewModel)
+        "Area" -> AreaDataEditor(viewModel)
+        "Client" -> ClientDataEditor(viewModel)
+        "Manager" -> ManagerDataEditor(viewModel)
+        "Project" -> ProjectDataEditor(viewModel)
+        "Rol" -> RolDataEditor(viewModel)
+        "TimeCode" -> TimeCodeDataEditor(viewModel)
+        "WorkOrder" -> WorkOrderDataEditor(viewModel)
         else -> null
     }
 
 }
 
 @Composable
-fun ActivityDataEditor() {
+fun ActivityDataEditor(viewModel: TableManageViewModel) {
     var idActivity by remember { mutableStateOf("") }
-    var idTimeCode by remember { mutableStateOf("") }
+    var idTimeCode by remember { mutableStateOf(mapOf("" to "")) }
     var timeCodeSelection by remember { mutableStateOf(false) }
-    var timeCodeData by remember { mutableStateOf("") }
+    val timeCodeData = viewModel.timeCode.value.associate { it.idTimeCode.toString() to it.desc }
     var descripcion by remember { mutableStateOf("") }
     val dateFrom = remember { mutableStateOf("") }
     val dateTo = remember { mutableStateOf("") }
@@ -60,9 +77,9 @@ fun ActivityDataEditor() {
         DropdownMenu(
             label = "TimeCodes",
             expandido = timeCodeSelection,
-            opciones = emptyList(),
-            seleccion = idTimeCode,
-            onExapandedChange = { timeCodeSelection = !timeCodeSelection},
+            opciones = timeCodeData,
+            seleccion = idTimeCode.values.first().toString(),
+            onExapandedChange = { timeCodeSelection = !timeCodeSelection },
             onValueChange = { idTimeCode = it }
         )
         OutlinedTextField(
@@ -74,19 +91,38 @@ fun ActivityDataEditor() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        DatePickerDialogSample(dateFrom,"Date From")
-        DatePickerDialogSample(dateTo,"Date To")
+        DatePickerDialogSample(dateFrom, "Date From")
+        DatePickerDialogSample(dateTo, "Date To")
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newActivity = Activity(
+                        idActivity.toInt(),
+                        idTimeCode.keys.first().toInt(),
+                        descripcion,
+                        dateFrom.value,
+                        dateTo.value
+                    )
+                    Database.addData<Activity>("Activity", newActivity)
+                    viewModel.activities.value.add(newActivity)
+                    FullScreenLoadingManager.hideLoader()
+                    idActivity = ""
+                    idTimeCode = mapOf("" to "")
+                    descripcion = ""
+                    dateFrom.value = ""
+                    dateTo.value = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun AircraftDataEditor() {
+fun AircraftDataEditor(viewModel: TableManageViewModel) {
     var idAircraft by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
 
@@ -111,28 +147,31 @@ fun AircraftDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newAircraft = Aircraft(
+                        idAircraft,
+                        descripcion
+                    )
+                    Database.addData<Aircraft>("Aircraft", newAircraft)
+                    viewModel.aircraft.value.add(newAircraft)
+                    FullScreenLoadingManager.hideLoader()
+                    idAircraft = ""
+                    descripcion = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun AreaDataEditor() {
-    var idArea by remember { mutableStateOf("") }
+fun AreaDataEditor(viewModel: TableManageViewModel) {
     var descripcion by remember { mutableStateOf("") }
 
     Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idArea,
-            onValueChange = { idArea = it },
-            label = { Text("idArea") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
         OutlinedTextField(
             colors = customTextFieldColors(),
             value = descripcion,
@@ -144,40 +183,27 @@ fun AreaDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newArea = Area(
+                        (viewModel.area.value.maxByOrNull { it.idArea!! }?.idArea ?: 0) + 1,
+                        descripcion
+                    )
+                    Database.addData<Area>("Area", newArea)
+                    viewModel.area.value.add(newArea)
+                    FullScreenLoadingManager.hideLoader()
+                    descripcion = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun CalendarDataEditor() {
-    var idCalendar by remember { mutableStateOf("") }
-    val fecha = remember { mutableStateOf("") }
-
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = idCalendar,
-            onValueChange = { idCalendar = it },
-            label = { Text("idCalendar") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        DatePickerDialogSample(fecha,"Fecha")
-        Button(
-            colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
-            Text("Crear")
-        }
-    }
-}
-
-@Composable
-fun ClientDataEditor() {
+fun ClientDataEditor(viewModel: TableManageViewModel) {
     var nombreCliente by remember { mutableStateOf("") }
 
     Column {
@@ -192,72 +218,27 @@ fun ClientDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newClient = Client(
+                        (viewModel.client.value.maxByOrNull { it.idCliente }?.idCliente ?: 0) + 1,
+                        nombre = nombreCliente
+                    )
+                    Database.addData<Client>("Client", newClient)
+                    viewModel.client.value.add(newClient)
+                    FullScreenLoadingManager.hideLoader()
+                    nombreCliente = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun EmployeeDataEditor() {
-    var nombre by remember { mutableStateOf("") }
-    var apellidos by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    val dateFrom = remember { mutableStateOf("") }
-    val dateTo = remember { mutableStateOf("") }
-    var rol by remember { mutableStateOf("") }
-    var rolSelection by remember { mutableStateOf(false) }
-
-    Column {
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = apellidos,
-            onValueChange = { apellidos = it },
-            label = { Text("Apellidos") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        OutlinedTextField(
-            colors = customTextFieldColors(),
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        DatePickerDialogSample( dateFrom,"Fecha antigüedad")
-        DatePickerDialogSample(dateTo,"Fecha fin de contrato")
-        DropdownMenu(
-            label = "Rols",
-            expandido = rolSelection,
-            opciones = emptyList(),
-            seleccion = rol,
-            onExapandedChange = { rolSelection = !rolSelection },
-            onValueChange = { rol = it }
-        )
-        Button(
-            colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
-            Text("Crear")
-        }
-    }
-}
-
-@Composable
-fun ManagerDataEditor() {
+fun ManagerDataEditor(viewModel: TableManageViewModel) {
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
 
@@ -282,21 +263,34 @@ fun ManagerDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newManager = Manager(
+                        (viewModel.manager.value.maxByOrNull { it.idManager }?.idManager ?: 0) + 1,
+                        nombre = nombre,
+                        apellidos = apellidos
+                    )
+                    Database.addData<Manager>("Manager", newManager)
+                    viewModel.manager.value.add(newManager)
+                    FullScreenLoadingManager.hideLoader()
+                    nombre = ""
+                    apellidos = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun ProjectDataEditor() {
+fun ProjectDataEditor(viewModel: TableManageViewModel) {
     var idProject by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var idCliente by remember { mutableStateOf("") }
+    var idCliente by remember { mutableStateOf(mapOf("" to "")) }
     var clienteSelection by remember { mutableStateOf(false) }
-    var idArea by remember { mutableStateOf("") }
-    var areaSelection by remember { mutableStateOf(false) }
+    val clienteData = remember { viewModel.client.value.associate { it.idCliente.toString() to it.nombre } }
 
     Column {
         OutlinedTextField(
@@ -320,30 +314,37 @@ fun ProjectDataEditor() {
         DropdownMenu(
             label = "Clients",
             expandido = clienteSelection,
-            opciones = emptyList(),
-            seleccion = idCliente,
+            opciones = clienteData,
+            seleccion = idCliente.values.first().toString(),
             onExapandedChange = { clienteSelection = !clienteSelection },
             onValueChange = { idCliente = it }
         )
-        DropdownMenu(
-            label = "Areas",
-            expandido = areaSelection,
-            opciones = emptyList(),
-            seleccion = idArea,
-            onExapandedChange = { areaSelection = !areaSelection },
-            onValueChange = { idArea = it }
-        )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newProject = Project(
+                        idProject,
+                        descripcion,
+                        idCliente.keys.first().toInt()
+                    )
+                    Database.addData<Project>("Project", newProject)
+                    viewModel.project.value.add(newProject)
+                    FullScreenLoadingManager.hideLoader()
+                    idProject = ""
+                    descripcion = ""
+                    idCliente = mapOf("" to "")
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun RolDataEditor() {
+fun RolDataEditor(viewModel: TableManageViewModel) {
     var rol by remember { mutableStateOf("") }
 
     Column {
@@ -358,15 +359,27 @@ fun RolDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newRol = Rol(
+                        (viewModel.rol.value.maxByOrNull { it.idRol }?.idRol ?: 0) + 1,
+                        rol = rol
+                    )
+                    Database.addData<Rol>("Rol", newRol)
+                    viewModel.rol.value.add(newRol)
+                    FullScreenLoadingManager.hideLoader()
+                    rol = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun TimeCodeDataEditor() {
+fun TimeCodeDataEditor(viewModel: TableManageViewModel) {
     var idTimeCode by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var color by remember { mutableStateOf("") }
@@ -401,25 +414,46 @@ fun TimeCodeDataEditor() {
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newTimeCode = TimeCode(
+                        idTimeCode.toInt(),
+                        descripcion,
+                        color,
+                        false
+                    )
+                    Database.addData<TimeCode>("TimeCode", newTimeCode)
+                    viewModel.timeCode.value.add(newTimeCode.toDTO())
+                    FullScreenLoadingManager.hideLoader()
+                    idTimeCode = ""
+                    descripcion = ""
+                    color = ""
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
 }
 
 @Composable
-fun WorkOrderDataEditor() {
+fun WorkOrderDataEditor(viewModel: TableManageViewModel) {
     var idWorkOrder by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var projectManager by remember { mutableStateOf("") }
+    var projectManager by remember { mutableStateOf(mapOf("" to "")) }
     var projectManagerSelection by remember { mutableStateOf(false) }
-    var idProject by remember { mutableStateOf("") }
+    val projectManagerData =
+        viewModel.manager.value.associate { it.idManager.toString() to "${it.nombre} ${it.apellidos}" }
+    var idProject by remember { mutableStateOf(mapOf("" to "")) }
     var projectSelection by remember { mutableStateOf(false) }
-    var idAircraft by remember { mutableStateOf("") }
+    val projectData = viewModel.project.value.associate { it.idProject to it.desc }
+    var idAircraft by remember { mutableStateOf(mapOf("" to "")) }
     var aircraftSelection by remember { mutableStateOf(false) }
-    var idArea by remember{ mutableStateOf("") }
+    val aircraftData = viewModel.aircraft.value.associate { it.idAircraft.toString() to it.desc }
+    var idArea by remember { mutableStateOf(mapOf("" to "")) }
     var areaSelection by remember { mutableStateOf(false) }
+    val areaData = viewModel.area.value.associate { it.idArea.toString() to it.desc }
 
     Column {
         OutlinedTextField(
@@ -443,39 +477,60 @@ fun WorkOrderDataEditor() {
         DropdownMenu(
             label = "Proyect Managers",
             expandido = projectManagerSelection,
-            opciones = emptyList(),
-            seleccion = projectManager,
+            opciones = projectManagerData,
+            seleccion = projectManager.values.first().toString(),
             onExapandedChange = { projectManagerSelection = !projectManagerSelection },
             onValueChange = { projectManager = it }
         )
         DropdownMenu(
             label = "Projects",
             expandido = projectSelection,
-            opciones = emptyList(),
-            seleccion = idProject,
+            opciones = projectData,
+            seleccion = idProject.values.first().toString(),
             onExapandedChange = { projectSelection = !projectSelection },
             onValueChange = { idProject = it }
         )
         DropdownMenu(
             label = "Aircrafts",
             expandido = aircraftSelection,
-            opciones = emptyList(),
-            seleccion = idAircraft,
+            opciones = aircraftData,
+            seleccion = idAircraft.values.first().toString(),
             onExapandedChange = { aircraftSelection = !aircraftSelection },
             onValueChange = { idAircraft = it }
         )
         DropdownMenu(
             label = "Areas",
             expandido = areaSelection,
-            opciones = emptyList(),
-            seleccion = idArea,
+            opciones = areaData,
+            seleccion = idArea.values.first().toString(),
             onExapandedChange = { areaSelection = !areaSelection },
             onValueChange = { idArea = it }
         )
         Button(
             colors = customButtonColors(),
-            onClick = { /* Use the variables here */ }
-        ){
+            onClick = {
+                CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
+                    FullScreenLoadingManager.showLoader()
+                    val newWorkOrder = WorkOrder(
+                        idWorkOrder,
+                        descripcion,
+                        projectManager.keys.first().toInt(),
+                        idProject.keys.first(),
+                        idAircraft.keys.first().toInt(),
+                        idArea.keys.first().toInt()
+                    )
+                    Database.addData<WorkOrder>("WorkOrder", newWorkOrder)
+                    viewModel.workOrder.value.add(newWorkOrder)
+                    FullScreenLoadingManager.hideLoader()
+                    idWorkOrder = ""
+                    descripcion = ""
+                    projectManager = mapOf("" to "")
+                    idProject = mapOf("" to "")
+                    idAircraft = mapOf("" to "")
+                    idArea = mapOf("" to "")
+                }
+            }
+        ) {
             Text("Crear")
         }
     }
