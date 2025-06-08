@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Aircraft(
-    val idAircraft: Int,
+    val idAircraft: String,
     val desc: String
 )
