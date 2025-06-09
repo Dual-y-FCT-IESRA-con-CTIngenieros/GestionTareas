@@ -395,7 +395,7 @@ class TableManageScreen : Screen {
                 dateTo = data["dateTo"] as String?
             )
             "Aircraft" -> Aircraft(
-                idAircraft = data["idAircraft"] as Int,
+                idAircraft = data["idAircraft"] as String,
                 desc = data["desc"] as String
             )
             "Area" -> Area(
