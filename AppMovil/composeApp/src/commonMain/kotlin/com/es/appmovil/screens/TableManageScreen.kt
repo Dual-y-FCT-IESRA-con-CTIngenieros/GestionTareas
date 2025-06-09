@@ -47,6 +47,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Aircraft
+import com.es.appmovil.model.Area
+import com.es.appmovil.model.Client
+import com.es.appmovil.model.Manager
+import com.es.appmovil.model.Project
+import com.es.appmovil.model.Rol
+import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
@@ -71,9 +80,7 @@ class TableManageScreen : Screen {
             DataViewModel.activities.collectAsState(),
             DataViewModel.aircraft.collectAsState(),
             DataViewModel.area.collectAsState(),
-            DataViewModel.calendar.collectAsState(),
             DataViewModel.cliente.collectAsState(),
-            DataViewModel.employees.collectAsState(),
             DataViewModel.manager.collectAsState(),
             DataViewModel.projects.collectAsState(),
             DataViewModel.roles.collectAsState(),
@@ -108,16 +115,17 @@ class TableManageScreen : Screen {
                 tables.forEach { (tableName, tableData) ->
                     item {
                         TableItem(
-                            tableName,
-                            onEditClick = {
-                                navigator.push(
-                                    TableManageDataScreen(
-                                        tableName,
-                                        tableData
-                                    )
-                                )
-                            }
-                        )
+                            tableName
+                        ) {
+                            val tableEntries: List<TableEntry> =
+                                tableData.filterIsInstance<TableEntry>()
+                            navigator.push(
+                                TableManageDataScreen(
+                                    tableName,
+                                    tableEntries
+                                ) { _, data -> reconstructEntry(tableName, data) }
+                            )
+                        }
                     }
 
                 }
@@ -376,5 +384,58 @@ class TableManageScreen : Screen {
 //        }
 //    }
 
+
+    private fun reconstructEntry(tableName: String, data: Map<String, Any?>): TableEntry {
+        return when (tableName) {
+            "Activity" -> Activity(
+                idActivity = data["idActivity"] as Int,
+                idTimeCode = data["idTimeCode"] as Int,
+                desc = data["desc"] as String,
+                dateFrom = data["dateFrom"] as String?,
+                dateTo = data["dateTo"] as String?
+            )
+            "Aircraft" -> Aircraft(
+                idAircraft = data["idAircraft"] as Int,
+                desc = data["desc"] as String
+            )
+            "Area" -> Area(
+                idArea = data["idArea"] as Int,
+                desc = data["desc"] as String
+            )
+            "Client" -> Client(
+                idCliente = data["idCliente"] as Int,
+                nombre = data["nombre"] as String
+            )
+            "Manager" -> Manager(
+                idManager = data["idManager"] as Int,
+                nombre = data["nombre"] as String,
+                apellidos = data["apellidos"] as String
+            )
+            "Project" -> Project(
+                idProject = data["idProject"] as String,
+                desc = data["desc"] as String,
+                idCliente = data["idCliente"] as Int?
+            )
+            "Rol" -> Rol(
+                idRol = data["idRol"] as Int,
+                rol = data["rol"] as String
+            )
+            "TimeCode" -> TimeCode(
+                idTimeCode = data["idTimeCode"] as Int,
+                desc = data["desc"] as String,
+                color = data["color"] as String,
+                chkProd = data["chkProd"] as Boolean
+            )
+            "WorkOrder" -> WorkOrder(
+                idWorkOrder = data["idWorkOrder"] as String,
+                desc = data["desc"] as String,
+                projectManager = data["projectManager"] as Int?,
+                idProject = data["idProject"] as String,
+                idAircraft = data["idAircraft"] as Int?,
+                idArea = data["idArea"] as Int?
+            )
+            else -> error("Tipo de tabla desconocido: $tableName")
+        }
+    }
 
 }
