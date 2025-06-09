@@ -22,16 +22,16 @@ import com.es.appmovil.utils.customTextFieldColors
 fun DropdownMenu(
     label: String,
     expandido: Boolean,
-    opciones: List<String>,
+    opciones: Map<String,String>,
     seleccion: String,
     onExapandedChange: (Boolean) -> Unit,
-    onValueChange: (String) -> Unit
+    onValueChange: (Map<String,String>) -> Unit
 ) {
     var filtro by remember { mutableStateOf("") }
 
-    val opcionesFiltradas = opciones.filter {
-        it.contains(filtro, ignoreCase = true)
-    }
+//    val opcionesFiltradas = opciones.filter {
+//        it.contains(filtro, ignoreCase = true)
+//    }
 
     ExposedDropdownMenuBox(
         expanded = expandido,
@@ -59,11 +59,11 @@ fun DropdownMenu(
 //                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
 //            )
 
-            opcionesFiltradas.forEach { opcion ->
+            opciones.forEach { opcion ->
                 DropdownMenuItem(
-                    text = { Text(opcion) },
+                    text = { Text(opcion.value) },
                     onClick = {
-                        onValueChange(opcion)
+                        onValueChange(mapOf(opcion.key to opcion.value))
                         filtro = ""
                         onExapandedChange(false)
                     }

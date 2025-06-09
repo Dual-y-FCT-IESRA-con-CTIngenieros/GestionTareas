@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Aircraft(
-    val idAircraft: Int,
+    val idAircraft: String,
     val desc: String
 ) : TableEntry {
     override fun getFieldMap(): Map<String, Any?> = mapOf(

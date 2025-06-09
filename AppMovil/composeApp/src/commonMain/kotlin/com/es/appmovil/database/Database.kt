@@ -101,7 +101,7 @@ object Database {
 
     }
 
-    suspend fun addData(table: String, data: Any) {
+    suspend inline fun <reified T: Any> addData(table: String, data: T) {
         try {
             supabase.from(table).insert(data)
         } catch (
