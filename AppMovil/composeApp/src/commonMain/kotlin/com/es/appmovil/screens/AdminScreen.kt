@@ -121,6 +121,7 @@ class AdminScreen : Screen {
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
+                                    navigator.push(TableManageScreen())
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)

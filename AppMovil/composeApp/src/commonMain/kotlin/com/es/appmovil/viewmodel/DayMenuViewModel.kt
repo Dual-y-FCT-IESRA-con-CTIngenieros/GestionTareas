@@ -106,8 +106,12 @@ class DayMenuViewModel {
 
         val indexedValue = getIndexCode(code)
 
-        onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
-        onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+        try{
+            onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+            onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+        }catch (e:Exception){
+
+        }
 
         val a = activityTimeCode.value[indexedValue].projects.first()
 
