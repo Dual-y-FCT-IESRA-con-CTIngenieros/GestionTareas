@@ -56,6 +56,7 @@ import com.es.appmovil.model.Project
 import com.es.appmovil.model.Rol
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.WorkOrder
+import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
@@ -230,8 +231,8 @@ class TableManageScreen : Screen {
                             }
                             Button(
                                 onClick = {
-                                    onDismiss
-                                    /*generarCSV(tableSelected)*/
+                                    ManageCSV().generateCSV(tableSelected)
+                                    onDismiss.invoke()
                                 },
                                 colors = customButtonColors(),
                             ) {
