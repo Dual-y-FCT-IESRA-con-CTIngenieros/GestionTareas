@@ -25,10 +25,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Minimize
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +46,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
+import com.es.appmovil.interfaces.TableEntry
 import com.es.appmovil.model.Activity
 import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
@@ -61,7 +60,6 @@ import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
-import com.es.appmovil.viewmodel.TableManageViewModel
 import com.es.appmovil.widgets.claseTabla
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
