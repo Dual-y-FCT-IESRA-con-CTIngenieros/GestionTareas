@@ -203,7 +203,7 @@ class TableManageDataScreen(
                 val projectManagerData =
                     TableManageViewModel().manager.value.associate { it.idManager.toString() to "${it.nombre} ${it.apellidos}" }
 
-                com.es.appmovil.widgets.DropdownMenu(
+                DropdownMenu(
                     label = "Proyect Managers",
                     expandido = projectManagerSelection,
                     opciones = projectManagerData,
@@ -234,7 +234,7 @@ class TableManageDataScreen(
                 if(entries.all { it is WorkOrder }) {
                     var idAircraft by remember { mutableStateOf(mapOf("" to "")) }
                     var aircraftSelection by remember { mutableStateOf(false) }
-                    val aircraftData = TableManageViewModel().aircraft.value.associate { it.idAircraft.toString() to it.desc }
+                    val aircraftData = TableManageViewModel().aircraft.value.associate { it.idAircraft to it.desc }
 
                     DropdownMenu(
                         label = "Aircrafts",
