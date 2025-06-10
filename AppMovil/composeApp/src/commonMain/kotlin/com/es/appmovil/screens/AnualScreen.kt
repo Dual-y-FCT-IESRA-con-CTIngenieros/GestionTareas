@@ -144,36 +144,44 @@ class AnualScreen : Screen {
                                 "V. Restantes" to (yearData?.currentHolidays?.toString() ?: "-")
                             )
 
-                            Text("Vacaciones")
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                                Text("Vacaciones")
+                            }
 
-                            cards.chunked(2).forEach { rowItems ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    rowItems.forEach { (label, value) ->
-                                        Card(
-                                            modifier = Modifier.weight(1f),
-                                            elevation = CardDefaults.cardElevation(4.dp),
-                                            shape = RoundedCornerShape(8.dp),
-                                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                                        ) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .padding(12.dp)
-                                                    .fillMaxWidth(),
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                            Column(Modifier.padding(horizontal = 16.dp)){
+                                cards.chunked(2).forEach { rowItems ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        rowItems.forEach { (label, value) ->
+                                            Card(
+                                                modifier = Modifier.weight(1f),
+                                                elevation = CardDefaults.cardElevation(4.dp),
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = CardDefaults.cardColors(containerColor = Color.White)
                                             ) {
-                                                Text(text = label, fontSize = 14.sp, color = Color.Gray)
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                Text(
-                                                    text = value,
-                                                    fontSize = 20.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = Color.Black
-                                                )
+                                                Column(
+                                                    modifier = Modifier
+                                                        .padding(12.dp)
+                                                        .fillMaxWidth(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        text = label,
+                                                        fontSize = 14.sp,
+                                                        color = Color.Gray
+                                                    )
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    Text(
+                                                        text = value,
+                                                        fontSize = 20.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = Color.Black
+                                                    )
+                                                }
                                             }
                                         }
                                     }

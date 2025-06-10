@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -39,6 +40,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Calendar
 import com.es.appmovil.utils.customButtonColors
@@ -46,6 +50,7 @@ import com.es.appmovil.viewmodel.CalendarFestViewModel
 import com.es.appmovil.viewmodel.DataViewModel.calendar
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.widgets.HeaderSection
 import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +66,7 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
     @Composable
     override fun Content() {
         var monthChangeFlag = true
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val fechaActual by today.collectAsState()
         var showDialog by remember { mutableStateOf(false) }
         var showDialogDelete by remember { mutableStateOf(false) }
@@ -108,7 +114,8 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection { showDialogAdd = true }
+            HeaderSection(navigator, "Calendario Festivos", Icons.Filled.Add, true) { showDialog = true }
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -236,19 +243,5 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                 }
             }
         )
-    }
-
-    @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Calendario Festivos", fontSize = 22.sp)
-            IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "")
-            }
-        }
     }
 }

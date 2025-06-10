@@ -164,16 +164,6 @@ object Database {
         }
     }
 
-    suspend inline fun <reified T : Any> updateData(table:String, data:T){
-        try {
-            supabase.from(table).upsert(data)
-        }catch (
-            e:Exception
-        ){
-            println(e)
-        }
-    }
-
     suspend fun deleteCalendar(table:String, data: Calendar){
         try {
             supabase.from(table).delete {

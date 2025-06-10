@@ -47,6 +47,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.model.Employee
 import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
@@ -56,6 +59,7 @@ import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.employeesYearData
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.widgets.HeaderSection
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -64,6 +68,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
     @Composable
     override fun Content() {
         val availableYears = employeesYearData.value.map { it.year }.distinct()
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         var yearChangeFlag = true
         val fechaActual by today.collectAsState()
         val employees by employees.collectAsState()
@@ -100,7 +105,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
 
-            HeaderSection { showDialogDownload = true }
+            HeaderSection(navigator, "Gestión anual", Icons.Filled.Download, true) { showDialogDownload = true }
 
             Spacer(Modifier.size(16.dp))
 
@@ -358,21 +363,6 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                     }
                 }
             )
-        }
-    }
-
-
-    @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Gestión anual", fontSize = 22.sp)
-            androidx.compose.material3.IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Download, contentDescription = "")
-            }
         }
     }
 

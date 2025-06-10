@@ -18,6 +18,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -36,6 +37,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.model.Area
 import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
@@ -43,6 +47,7 @@ import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.dailyHours
 import com.es.appmovil.viewmodel.DataViewModel.today
 import com.es.appmovil.viewmodel.UserWeekViewModel
+import com.es.appmovil.widgets.HeaderSection
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -53,6 +58,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
     @Composable
     override fun Content() {
         val manageCSV = ManageCSV()
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val area by DataViewModel.areas.collectAsState()
         var areaIndex by remember { mutableStateOf(0) }
         var selectedWeek by remember { mutableStateOf(1) }
@@ -85,7 +91,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection { showDialog = true }
+            HeaderSection(navigator, "Control de Semanas", Icons.Filled.Download, true) { showDialog = true }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -109,20 +115,6 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
             )
 
             EmployeeList(employeeByArea = employeeByArea)
-        }
-    }
-
-    @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Control de Semanas", fontSize = 22.sp)
-            IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Download, contentDescription = "")
-            }
         }
     }
 

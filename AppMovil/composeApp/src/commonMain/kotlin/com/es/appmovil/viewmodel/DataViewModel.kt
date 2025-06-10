@@ -187,16 +187,6 @@ object DataViewModel {
         }
     }
 
-    private val _area = MutableStateFlow<List<Area>>(emptyList())
-    val area: StateFlow<List<Area>> = _area
-
-    private fun cargarArea() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Area>("Area")
-            _area.value = datos
-        }
-    }
-
     fun load_tables() {
         cargarActivities()
         cargarAircraft()

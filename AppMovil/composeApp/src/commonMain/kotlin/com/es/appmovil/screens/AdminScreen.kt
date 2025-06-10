@@ -147,41 +147,8 @@ class AdminScreen : Screen {
 
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
-                            modifier = Modifier.weight(1f).height(180.dp).clickable {
-                                if (canClick) {
-                                    canClick = false
-                                    navigator.push(GenerateCSVScreen())
-                                }
-                            },
-                            elevation = CardDefaults.elevatedCardElevation(8.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Summarize,
-                                    contentDescription = "Informe",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
-                                Text("Generar Informes")
-                            }
-
-                        }
-
-                        Spacer(Modifier.size(16.dp))
-
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,

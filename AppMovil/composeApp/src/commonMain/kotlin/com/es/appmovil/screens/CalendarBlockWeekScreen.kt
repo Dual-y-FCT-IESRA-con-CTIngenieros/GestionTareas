@@ -25,6 +25,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Search
@@ -43,11 +44,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
 import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.widgets.HeaderSection
 import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -56,6 +61,7 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
     @Composable
     override fun Content() {
         var monthChangeFlag = true
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val fechaActual by today.collectAsState()
         val showDialog by calendarBlockWeekViewModel.showDialog.collectAsState()
         val weekIndex by calendarBlockWeekViewModel.weekIndex.collectAsState()
@@ -104,6 +110,9 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
+
+            HeaderSection(navigator, "Bloqueo Semanal", Icons.Filled.Add, false) { }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

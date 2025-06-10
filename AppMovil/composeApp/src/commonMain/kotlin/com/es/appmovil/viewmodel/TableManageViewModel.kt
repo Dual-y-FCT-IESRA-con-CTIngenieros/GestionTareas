@@ -25,7 +25,7 @@ class TableManageViewModel : ViewModel(){
     val activities: StateFlow<MutableList<Activity>> = _activities.asStateFlow()
     private val _aircraft: MutableStateFlow<MutableList<Aircraft>> = MutableStateFlow(DataViewModel.aircraft.value.toMutableList())
     val aircraft: StateFlow<MutableList<Aircraft>> = _aircraft.asStateFlow()
-    private val _area: MutableStateFlow<MutableList<Area>> = MutableStateFlow(DataViewModel.area.value.toMutableList())
+    private val _area: MutableStateFlow<MutableList<Area>> = MutableStateFlow(DataViewModel.areas.value.toMutableList())
     val area: StateFlow<MutableList<Area>> = _area.asStateFlow()
     private val _calendar: MutableStateFlow<MutableList<Calendar>> = MutableStateFlow(DataViewModel.calendar.value.toMutableList())
     val calendar: StateFlow<MutableList<Calendar>> = _calendar.asStateFlow()

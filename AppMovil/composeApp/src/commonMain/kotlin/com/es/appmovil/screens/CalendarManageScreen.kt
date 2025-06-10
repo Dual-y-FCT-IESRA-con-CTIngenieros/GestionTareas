@@ -19,6 +19,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.FreeCancellation
@@ -43,6 +44,7 @@ import com.es.appmovil.viewmodel.CalendarYearViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.UserWeekViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
+import com.es.appmovil.widgets.HeaderSection
 
 class CalendarManageScreen(private val calendarManageViewModel: CalendarManageViewModel) : Screen {
     @Composable
@@ -65,17 +67,8 @@ class CalendarManageScreen(private val calendarManageViewModel: CalendarManageVi
                 calendarBlockWeekViewModel.resetWeeks()
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Gestión De Calendario",
-                            fontWeight = FontWeight.Black,
-                            fontSize = 25.sp
-                        )
-                    }
+
+                    HeaderSection(navigator, "Gestión De Calendario", Icons.Filled.Download, false) {}
 
                     Spacer(Modifier.size(30.dp))
 

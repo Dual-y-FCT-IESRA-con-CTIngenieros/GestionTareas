@@ -123,19 +123,19 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Text(
-                    "¿Olvidaste tu contraseña?",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = Color(0xFFF4A900),
-                    modifier = Modifier.clickable {
-                        userViewmodel.onPassForgotChange()
-                    })
-                DialogResetPass(passForgot) {
-                    userViewmodel.onPassForgotChange()
-                }
-            }
+//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+//                Text(
+//                    "¿Olvidaste tu contraseña?",
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 14.sp,
+//                    color = Color(0xFFF4A900),
+//                    modifier = Modifier.clickable {
+//                        userViewmodel.onPassForgotChange()
+//                    })
+//                DialogResetPass(passForgot) {
+//                    userViewmodel.onPassForgotChange()
+//                }
+//            }
 
             Spacer(modifier = Modifier.height(20.dp))
             DialogChangePass(
@@ -308,9 +308,6 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                                 onClick = {
                                     onDismiss(false)
                                     user.value = ""
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        Database.sendResetPass(user.value + DataViewModel.currentEmail.value)
-                                    }
                                 }) {
                                 Text("Aceptar")
                             }
