@@ -7,7 +7,7 @@ data class UserYearData(
     val idEmployee:Int,
     val year:Int,
     val daysHolidays:Int,
-    val currentHolidays:Int,
+    var currentHolidays:Int,
     var enjoyedHolidays:Int,
     var workedHours:Int,
     var recoveryHours:Int,

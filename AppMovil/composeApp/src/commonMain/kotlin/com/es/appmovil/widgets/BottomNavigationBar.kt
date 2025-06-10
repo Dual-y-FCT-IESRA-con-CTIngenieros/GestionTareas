@@ -69,22 +69,25 @@ fun BottomNavigationBar(navigator: Navigator) {
             .background(Color.White)
             .graphicsLayer { shadowElevation = 10f }
     ) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val width = size.width
-            val height = size.height
-            val curveSize = 100f
-            val curveHeight = 140f
+        val currentScreen = navigator.lastItem
+        if(currentScreen is ResumeScreen || currentScreen is CalendarScreen) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val width = size.width
+                val height = size.height
+                val curveSize = 100f
+                val curveHeight = 140f
 
-            val path = Path().apply {
-                moveTo(0f, 0f)
-                lineTo((width / 2) - curveSize, 0f)
-                quadraticBezierTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
-                lineTo(width, 0f)
-                lineTo(width, height)
-                lineTo(0f, height)
-                close()
+                val path = Path().apply {
+                    moveTo(0f, 0f)
+                    lineTo((width / 2) - curveSize, 0f)
+                    quadraticBezierTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
+                    lineTo(width, 0f)
+                    lineTo(width, height)
+                    lineTo(0f, height)
+                    close()
+                }
+                drawPath(path, color = Color.White)
             }
-            drawPath(path, color = Color.White)
         }
 
         Row(
