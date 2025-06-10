@@ -47,6 +47,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
 import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
@@ -59,8 +60,13 @@ import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
+import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.TableManageViewModel
 import com.es.appmovil.widgets.claseTabla
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 
 class TableManageScreen : Screen {
     @Composable
@@ -123,7 +129,10 @@ class TableManageScreen : Screen {
                                 TableManageDataScreen(
                                     tableName,
                                     tableEntries
-                                ) { _, data -> reconstructEntry(tableName, data) }
+                                ) { _, data ->
+                                    val tableEdit = reconstructEntry(tableName, data)
+                                    updateTable(tableName, tableEdit.getFieldMap())
+                                }
                             )
                         }
                     }
@@ -384,56 +393,160 @@ class TableManageScreen : Screen {
 //        }
 //    }
 
+    private fun updateTable(tableName: String, data: Map<String, Any?>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            FullScreenLoadingManager.showLoader()
+            when (tableName) {
+                "Activity" -> {
+                    val activity = Activity(
+                        idActivity = data["idActivity"] as Int,
+                        idTimeCode = data["idTimeCode"] as Int,
+                        desc = data["desc"] as String,
+                        dateFrom = data["dateFrom"] as String?,
+                        dateTo = data["dateTo"] as String?
+                    )
+                    Database.updateData<Activity>(tableName, activity)
+                }
+
+                "Aircraft" -> {
+                    val aircraft = Aircraft(
+                        idAircraft = data["idAircraft"] as String,
+                        desc = data["desc"] as String
+                    )
+                    Database.updateData<Aircraft>(tableName, aircraft)
+                }
+
+                "Area" -> {
+                    val area = Area(
+                        idArea = data["idArea"] as Int,
+                        desc = data["desc"] as String
+                    )
+                    Database.updateData<Area>(tableName, area)
+                }
+
+                "Client" -> {
+                    val client = Client(
+                        idCliente = data["idCliente"] as Int,
+                        nombre = data["nombre"] as String
+                    )
+                    Database.updateData<Client>(tableName, client)
+                }
+
+                "Manager" -> {
+                    val manager = Manager(
+                        idManager = data["idManager"] as Int,
+                        nombre = data["nombre"] as String,
+                        apellidos = data["apellidos"] as String
+                    )
+                    Database.updateData<Manager>(tableName, manager)
+                }
+
+                "Project" -> {
+                    val project = Project(
+                        idProject = data["idProject"] as String,
+                        desc = data["desc"] as String,
+                        idCliente = data["idCliente"] as Int?
+                    )
+                    Database.updateData<Project>(tableName, project)
+                }
+
+                "Rol" -> {
+                    val rol = Rol(
+                        idRol = data["idRol"] as Int,
+                        rol = data["rol"] as String
+                    )
+                    Database.updateData<Rol>(tableName, rol)
+                }
+
+                "TimeCode" -> {
+                    val timeCode = TimeCode(
+                        idTimeCode = data["idTimeCode"] as Int,
+                        desc = data["desc"] as String,
+                        color = data["color"] as String,
+                        chkProd = data["chkProd"] as Boolean
+                    )
+                    Database.updateData<TimeCode>(tableName, timeCode)
+                }
+
+                "WorkOrder" -> {
+                    val workOrder = WorkOrder(
+                        idWorkOrder = data["idWorkOrder"] as String,
+                        desc = data["desc"] as String,
+                        projectManager = data["projectManager"] as Int?,
+                        idProject = data["idProject"] as String,
+                        idAircraft = data["idAircraft"] as Int?,
+                        idArea = data["idArea"] as Int?
+                    )
+                    Database.updateData<WorkOrder>(tableName, workOrder)
+                }
+
+                else -> error("Tipo de tabla desconocido: $tableName")
+            }
+            FullScreenLoadingManager.hideLoader()
+        }
+    }
 
     private fun reconstructEntry(tableName: String, data: Map<String, Any?>): TableEntry {
         return when (tableName) {
-            "Activity" -> Activity(
-                idActivity = data["idActivity"] as Int,
-                idTimeCode = data["idTimeCode"] as Int,
-                desc = data["desc"] as String,
-                dateFrom = data["dateFrom"] as String?,
-                dateTo = data["dateTo"] as String?
-            )
+            "Activity" -> {
+                Activity(
+                    idActivity = data["idActivity"] as Int,
+                    idTimeCode = data["idTimeCode"] as Int,
+                    desc = data["desc"] as String,
+                    dateFrom = data["dateFrom"] as String?,
+                    dateTo = data["dateTo"] as String?
+                )
+
+            }
+
             "Aircraft" -> Aircraft(
                 idAircraft = data["idAircraft"] as String,
                 desc = data["desc"] as String
             )
+
             "Area" -> Area(
                 idArea = data["idArea"] as Int,
                 desc = data["desc"] as String
             )
+
             "Client" -> Client(
                 idCliente = data["idCliente"] as Int,
                 nombre = data["nombre"] as String
             )
+
             "Manager" -> Manager(
                 idManager = data["idManager"] as Int,
                 nombre = data["nombre"] as String,
                 apellidos = data["apellidos"] as String
             )
+
             "Project" -> Project(
                 idProject = data["idProject"] as String,
                 desc = data["desc"] as String,
-                idCliente = data["idCliente"] as Int?
+                idCliente = data["idCliente"].toString().toIntOrNull()
             )
+
             "Rol" -> Rol(
                 idRol = data["idRol"] as Int,
                 rol = data["rol"] as String
             )
+
             "TimeCode" -> TimeCode(
                 idTimeCode = data["idTimeCode"] as Int,
                 desc = data["desc"] as String,
                 color = data["color"] as String,
                 chkProd = data["chkProd"] as Boolean
             )
+
             "WorkOrder" -> WorkOrder(
                 idWorkOrder = data["idWorkOrder"] as String,
                 desc = data["desc"] as String,
-                projectManager = data["projectManager"] as Int?,
+                projectManager = data["projectManager"].toString().toIntOrNull(),
                 idProject = data["idProject"] as String,
-                idAircraft = data["idAircraft"] as Int?,
-                idArea = data["idArea"] as Int?
+                idAircraft = data["idAircraft"].toString().toIntOrNull(),
+                idArea = data["idArea"].toString().toIntOrNull()
             )
+
             else -> error("Tipo de tabla desconocido: $tableName")
         }
     }

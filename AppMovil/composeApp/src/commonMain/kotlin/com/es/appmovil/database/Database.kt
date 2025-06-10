@@ -141,8 +141,9 @@ object Database {
         }
     }
 
-    suspend fun updateData(table: String, data: Any) {
+    suspend inline fun <reified T:Any> updateData(table: String, data: T) {
         try {
+            println("Datos nuevos: $data")
             supabase.from(table).upsert(data)
         } catch (
             e: Exception

@@ -80,8 +80,8 @@ fun DayDialog(
     val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
     val activitySeleccionado by dayMenuViewModel.activitySelected.collectAsState()
 
-    val startUnblockDate = employee.unblockDate?.split("/")?.get(0) ?: ""
-    val endUnblockDate = employee.unblockDate?.split("/")?.get(1) ?: ""
+    val startUnblockDate = employee.unblockDate?.split("-")?.get(0) ?: ""
+    val endUnblockDate = employee.unblockDate?.split("-")?.get(1) ?: ""
 
     dayMenuViewModel.loadTimes(100)
 
