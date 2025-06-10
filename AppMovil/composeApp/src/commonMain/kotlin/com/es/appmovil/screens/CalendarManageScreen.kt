@@ -31,13 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.CalendarBlockWeekViewModel
 import com.es.appmovil.viewmodel.CalendarFestViewModel
 import com.es.appmovil.viewmodel.CalendarYearViewModel
@@ -46,7 +43,7 @@ import com.es.appmovil.viewmodel.UserWeekViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.HeaderSection
 
-class CalendarManageScreen(private val calendarManageViewModel: CalendarManageViewModel) : Screen {
+class CalendarManageScreen : Screen {
     @Composable
     override fun Content() {
         val size = 90

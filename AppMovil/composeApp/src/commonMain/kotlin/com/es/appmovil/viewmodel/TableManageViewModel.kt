@@ -1,8 +1,6 @@
 package com.es.appmovil.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
 import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
@@ -17,7 +15,6 @@ import com.es.appmovil.model.dto.TimeCodeDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class TableManageViewModel : ViewModel(){
 

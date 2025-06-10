@@ -18,7 +18,6 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +51,6 @@ import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.widgets.DatePickerDialogSample
-import com.es.appmovil.widgets.HeaderSection
 import com.es.appmovil.widgets.UserData
 import com.es.appmovil.widgets.genericFilter
 import kotlinx.coroutines.CoroutineScope

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -114,7 +113,7 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection(navigator, "Calendario Festivos", Icons.Filled.Add, true) { showDialog = true }
+            HeaderSection(navigator, "Calendario Festivos", Icons.Filled.Add, true) { showDialogAdd = true }
 
 
             Row(
