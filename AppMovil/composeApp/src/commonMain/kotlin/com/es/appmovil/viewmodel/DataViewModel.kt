@@ -16,6 +16,7 @@ import com.es.appmovil.model.Project
 import com.es.appmovil.model.ProjectTimeCode
 import com.es.appmovil.model.Rol
 import com.es.appmovil.model.TimeCode
+import com.es.appmovil.model.UserYearData
 import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.CalendarYearDTO
 import com.es.appmovil.model.dto.TimeCodeDTO
@@ -40,6 +41,7 @@ object DataViewModel {
 
     var employee = Employee(-1, "", "", "", "", null, -1, null, "", "", null)
 
+    var employeesYearData = MutableStateFlow<MutableList<UserYearData>>(mutableListOf())
     private var _currentEmail = MutableStateFlow("")
     val currentEmail: StateFlow<String> = _currentEmail
 
@@ -49,6 +51,9 @@ object DataViewModel {
 
     private var _currentMonth = MutableStateFlow("0")
     var _currentYear = MutableStateFlow("0")
+
+    private var _dailyHours = MutableStateFlow(8)
+    val dailyHours: StateFlow<Int> = _dailyHours
 
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList
@@ -89,6 +94,8 @@ object DataViewModel {
         cargarEmployees()
         cargarRoles()
         cargarCalendar()
+        cargarUserYearData()
+        cargarArea()
     }
 
     suspend fun cargarYObtenerEmail(): String {
@@ -208,13 +215,13 @@ object DataViewModel {
     private var _calendarFest = MutableStateFlow(CalendarYearDTO(0, mutableListOf()))
     val calendarFest = _calendarFest
 
-    private var _calendar = MutableStateFlow<List<Calendar>>(emptyList())
+    private var _calendar = MutableStateFlow<MutableList<Calendar>>(mutableListOf())
     val calendar = _calendar
 
     private fun cargarCalendar() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Calendar>("Calendar")
-            _calendar.value = datos
+            _calendar.value = datos.toMutableList()
         }
     }
 
@@ -255,6 +262,24 @@ object DataViewModel {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getTablesNames()
             _tablesNames.value = datos
+        }
+    }
+    
+    private var _areas = MutableStateFlow<List<Area>>(emptyList())
+    val areas = _areas
+
+
+    private fun cargarArea() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<Area>("Area")
+            _areas.value = datos
+        }
+    }
+
+    fun cargarUserYearData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val datos = Database.getData<UserYearData>("UserYearData")
+            employeesYearData.value = datos.toMutableList()
         }
     }
 

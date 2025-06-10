@@ -8,6 +8,7 @@ data class Project(
     val idProject: String,
     val desc: String,
     val idCliente: Int?
+
 ) : TableEntry {
     override fun getFieldMap(): Map<String, Any?> = mapOf(
         "idProject" to idProject,
