@@ -1,6 +1,6 @@
 package com.es.appmovil.model
 
-import com.es.appmovil.screens.TableEntry
+import com.es.appmovil.interfaces.TableEntry
 import kotlinx.serialization.Serializable
 
 @Serializable

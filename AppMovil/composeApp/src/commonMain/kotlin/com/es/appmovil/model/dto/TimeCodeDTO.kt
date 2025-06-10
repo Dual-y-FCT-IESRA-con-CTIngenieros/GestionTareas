@@ -1,6 +1,6 @@
 package com.es.appmovil.model.dto
 
-import com.es.appmovil.screens.TableEntry
+import com.es.appmovil.interfaces.TableEntry
 
 data class TimeCodeDTO(
     val idTimeCode: Int,

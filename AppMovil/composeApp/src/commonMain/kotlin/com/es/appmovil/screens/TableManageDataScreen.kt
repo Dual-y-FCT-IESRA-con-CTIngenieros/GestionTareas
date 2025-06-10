@@ -1,34 +1,44 @@
 package com.es.appmovil.screens
 
-
 import androidx.compose.foundation.background
 import cafe.adriel.voyager.core.screen.Screen
 import androidx.compose.runtime.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.es.appmovil.interfaces.TableEntry
+import com.es.appmovil.model.Activity
+import com.es.appmovil.model.Project
+import com.es.appmovil.model.WorkOrder
 import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toEntity
+import com.es.appmovil.utils.customButtonColors
+import com.es.appmovil.viewmodel.TableManageViewModel
 import com.es.appmovil.widgets.DatePickerDialogSample
-
-// Interfaz común
-interface TableEntry {
-    fun getFieldMap(): Map<String, Any?>
-    fun getId(): String // para identificar cada entrada única
-}
+import com.es.appmovil.widgets.DropdownMenu
 
 // Pantalla dinámica
 class TableManageDataScreen(
@@ -44,36 +54,19 @@ class TableManageDataScreen(
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             // Título
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Tabla: $tableName",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            TitleSection(tableName)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lista de registros
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(entries, key = { it.getId() }) { entry ->
-                    val en = if (entry is TimeCodeDTO) entry.toEntity() else entry
-                    val summary = en.getFieldMap()
-                        .entries.joinToString(" | ") { "${it.key}: ${it.value}" }
-                    Text(
-                        text = summary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                selectedEntry = entry
-                                editableFields = entry.getFieldMap()
-                            }
-                            .padding(8.dp)
-                    )
-                }
+            Column(modifier = Modifier.weight(1f)) {
+
+                TableSection(
+                    entries = entries,
+                    onEntryClick = { entry ->
+                        selectedEntry = entry
+                        editableFields = if (entry is TimeCodeDTO) entry.toEntity().getFieldMap() else entry.getFieldMap()
+                    }
+                )
             }
 
             // Editor dinámico
@@ -94,66 +87,249 @@ class TableManageDataScreen(
 
                 editableFields.forEach { (key, value) ->
 
-                    when (key) {
-                        "dateFrom" -> {
-                            DatePickerDialogSample(mutableStateOf(value.toString()), "Date From")
+                    EditableFields(key,editableFields, value, { newValue ->
+                        editableFields = editableFields.toMutableMap().apply {
+                            this[key] = parseValue(value, newValue)
                         }
-                        "dateTo" -> {
-                            DatePickerDialogSample(mutableStateOf(value.toString()), "Date To")
+                    }, {
+                        editableFields = editableFields.toMutableMap().apply {
+                            this[key] = it.value.toLong()
                         }
-                        "color" -> {
-                            val color = editableFields[key]
-                            var selectedColor = if (color is Long) Color(color) else Color.Red
-
-                            ColorSelectorRow(
-                                selectedColor = selectedColor,
-                                onColorSelected = {
-                                    selectedColor = it
-                                    editableFields = editableFields.toMutableMap().apply {
-                                        this[key] = it.value.toLong()
-                                    }
-                                }
-                            )
+                    }, { checked ->
+                        editableFields = editableFields.toMutableMap().apply {
+                            this[key] = checked
                         }
-                        "chkProd" -> {
-                            val currentValue = editableFields[key]?.toString()?.toBooleanStrictOrNull() ?: false
-                            Row(Modifier.fillMaxWidth().padding(start = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text("Check Producción")
-                                Checkbox(
-                                    checked = currentValue,
-                                    onCheckedChange = { checked ->
-                                        editableFields = editableFields.toMutableMap().apply {
-                                            this[key] = checked
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                        else -> {
-                            val currentValue = editableFields[key]?.toString() ?: ""
-                            OutlinedTextField(
-                                value = currentValue,
-                                onValueChange = { newValue ->
-                                    editableFields = editableFields.toMutableMap().apply {
-                                        this[key] = parseValue(value, newValue)
-                                    }
-                                },
-                                label = { Text(key) },
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                            )
-                        }
-                    }
+                    })
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(onClick = {
                     onUpdate(entry, editableFields)
-                }) {
+                }, colors = customButtonColors()) {
                     Text("Guardar cambios")
                 }
             }
         }
+    }
+
+    // 🔹 Título de la pantalla
+    @Composable
+    private fun TitleSection(tableName: String) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Tabla: $tableName",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+
+
+    // 🔹 Encabezados y filas de la tabla
+    @Composable
+    private fun TableSection(entries: List<TableEntry>, onEntryClick: (TableEntry) -> Unit) {
+        val columnHeaders = entries.firstOrNull()?.getFieldMap()?.keys?.toList().orEmpty()
+        val scrollState = rememberScrollState()
+
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            // Encabezado fijo
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(scrollState)
+                    .background(Color.LightGray)
+                    .padding(vertical = 8.dp)
+            ) {
+                columnHeaders.forEach { header ->
+                    Text(
+                        text = header,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .padding(horizontal = 8.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            HorizontalDivider(thickness = 1.dp, color = Color.DarkGray)
+
+            // Grid personalizado con scroll sincronizado
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1), // Una sola columna para mantener estructura de fila
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(entries, key = { it.getId() }) { entry ->
+                    val en = if (entry is TimeCodeDTO) entry.toEntity() else entry
+                    val fieldMap = en.getFieldMap()
+
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(scrollState)
+                                .clickable { onEntryClick(entry) }
+                                .padding(vertical = 8.dp)
+                        ) {
+                            columnHeaders.forEach { key ->
+                                Text(
+                                    text = fieldMap[key].toString(),
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .padding(horizontal = 8.dp)
+                                )
+                            }
+                        }
+                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun EditableFields(key:String ,editableFields: Map<String, Any?>,value:Any?, onChangeValue: (String) -> Unit, onColorSelected: (Color) -> Unit, onCheckedSelected: (Boolean) -> Unit) {
+        when (key) {
+            "dateFrom" -> {
+                DatePickerDialogSample(mutableStateOf(value.toString()), "Date From")
+            }
+            "projectManager" -> {
+                var projectManager by remember { mutableStateOf(mapOf("" to "")) }
+                var projectManagerSelection by remember { mutableStateOf(false) }
+                val projectManagerData =
+                    TableManageViewModel().manager.value.associate { it.idManager.toString() to "${it.nombre} ${it.apellidos}" }
+
+                com.es.appmovil.widgets.DropdownMenu(
+                    label = "Proyect Managers",
+                    expandido = projectManagerSelection,
+                    opciones = projectManagerData,
+                    seleccion = projectManager.values.first().toString(),
+                    onExapandedChange = {
+                        projectManagerSelection = !projectManagerSelection
+                    },
+                    onValueChange = { projectManager = it }
+                )
+            }
+            "idPoject" -> {
+                if(entries.all { it is WorkOrder }) {
+                    var idProject by remember { mutableStateOf(mapOf("" to "")) }
+                    var projectSelection by remember { mutableStateOf(false) }
+                    val projectData = TableManageViewModel().project.value.associate { it.idProject to it.desc }
+
+                    DropdownMenu(
+                        label = "Projects",
+                        expandido = projectSelection,
+                        opciones = projectData,
+                        seleccion = idProject.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        onExapandedChange = { projectSelection = !projectSelection },
+                        onValueChange = { idProject = it }
+                    )
+                } else EditText(key,editableFields,onChangeValue)
+            }
+            "idAircraft" -> {
+                if(entries.all { it is WorkOrder }) {
+                    var idAircraft by remember { mutableStateOf(mapOf("" to "")) }
+                    var aircraftSelection by remember { mutableStateOf(false) }
+                    val aircraftData = TableManageViewModel().aircraft.value.associate { it.idAircraft.toString() to it.desc }
+
+                    DropdownMenu(
+                        label = "Aircrafts",
+                        expandido = aircraftSelection,
+                        opciones = aircraftData,
+                        seleccion = idAircraft.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        onExapandedChange = { aircraftSelection = !aircraftSelection },
+                        onValueChange = { idAircraft = it }
+                    )
+                } else EditText(key,editableFields,onChangeValue)
+            }
+            "idArea" -> {
+                if(entries.all { it is WorkOrder }) {
+                    var idArea by remember { mutableStateOf(mapOf("" to "")) }
+                    var areaSelection by remember { mutableStateOf(false) }
+                    val areaData = TableManageViewModel().area.value.associate { it.idArea.toString() to it.desc }
+
+                    DropdownMenu(
+                        label = "Areas",
+                        expandido = areaSelection,
+                        opciones = areaData,
+                        seleccion = idArea.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        onExapandedChange = { areaSelection = !areaSelection },
+                        onValueChange = { idArea = it }
+                    )
+                } else EditText(key,editableFields,onChangeValue)
+            }
+            "idCliente" -> {
+                if(entries.all { it is Project }) {
+                    var idCliente by remember { mutableStateOf(mapOf("" to "")) }
+                    var clienteSelection by remember { mutableStateOf(false) }
+                    val clienteData = remember { TableManageViewModel().client.value.associate { it.idCliente.toString() to it.nombre } }
+                    DropdownMenu(
+                        label = "Clients",
+                        expandido = clienteSelection,
+                        opciones = clienteData,
+                        seleccion = idCliente.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        onExapandedChange = { clienteSelection = !clienteSelection },
+                        onValueChange = { idCliente = it }
+                    )
+                } else EditText(key,editableFields,onChangeValue)
+            }
+            "idTimeCode" -> {
+                if(entries.all { it is Activity }) {
+                    var idTimeCode by remember { mutableStateOf(mapOf("" to "")) }
+                    var timeCodeSelection by remember { mutableStateOf(false) }
+                    val timeCodeData = TableManageViewModel().timeCode.value.associate { it.idTimeCode.toString() to it.desc }
+                    DropdownMenu(
+                        label = "TimeCodes",
+                        expandido = timeCodeSelection,
+                        opciones = timeCodeData,
+                        seleccion = idTimeCode.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        onExapandedChange = { timeCodeSelection = !timeCodeSelection },
+                        onValueChange = { idTimeCode = it }
+                    )
+                } else EditText(key,editableFields,onChangeValue)
+            }
+            "dateTo" -> {
+                DatePickerDialogSample(mutableStateOf(value.toString()), "Date To")
+            }
+            "color" -> {
+                val color = editableFields[key]
+                var selectedColor = if (color is Long) Color(color) else Color.Red
+
+                ColorSelectorRow(
+                    selectedColor = selectedColor,
+                    onColorSelected = {
+                        selectedColor = it
+                        onColorSelected.invoke(it)
+                    }
+                )
+            }
+            "chkProd" -> {
+                val currentValue = editableFields[key]?.toString()?.toBooleanStrictOrNull() ?: false
+                Row(Modifier.fillMaxWidth().padding(start = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Check Producción")
+                    Checkbox(
+                        checked = currentValue,
+                        onCheckedChange = onCheckedSelected
+                    )
+                }
+            }
+            else -> EditText(key,editableFields,onChangeValue)
+        }
+    }
+
+    @Composable
+    private fun EditText(key:String, editableFields: Map<String, Any?>, onChangeValue:(String)-> Unit) {
+        val currentValue = editableFields[key]?.toString() ?: ""
+        OutlinedTextField(
+            value = currentValue,
+            onValueChange = onChangeValue,
+            label = { Text(key) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        )
     }
 
     // Ayudante para convertir String a tipo original
