@@ -23,6 +23,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -243,7 +244,7 @@ fun ProyectoYTimeCodeSelector(
             readOnly = true,
             label = { Text("TimeCode") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTimeCode) },
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
         )
 
         ExposedDropdownMenu(
@@ -314,7 +315,7 @@ fun ProjectsSelected(
             readOnly = true,
             label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
             enabled = timeCodeSeleccionado != 0
         )
 

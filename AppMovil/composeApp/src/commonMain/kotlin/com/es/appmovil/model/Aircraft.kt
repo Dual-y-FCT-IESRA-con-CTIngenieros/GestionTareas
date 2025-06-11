@@ -18,5 +18,5 @@ data class Aircraft(
         "idAircraft" to idAircraft,
         "desc" to desc
     )
-    override fun getId(): String = idAircraft.toString()
+    override fun getId(): String = idAircraft
 }

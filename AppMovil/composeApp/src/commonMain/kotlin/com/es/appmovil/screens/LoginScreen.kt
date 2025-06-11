@@ -14,15 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
@@ -307,7 +303,7 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
-                                colors = com.es.appmovil.utils.customButtonColors(),
+                                colors = customButtonColors(),
                                 onClick = {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         Database.updateUser(pass.value)

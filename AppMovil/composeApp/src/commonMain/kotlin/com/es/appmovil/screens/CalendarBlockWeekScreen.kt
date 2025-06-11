@@ -173,11 +173,6 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
 
             // Lista de semanas con opción a bloquear/desbloquear y modificar empleados
             weeksInMonth.forEachIndexed { index, pair ->
-                val generateBlock by calendarBlockWeekViewModel.blockDate.collectAsState()
-                val date = generateBlock?.let {
-                    runCatching { LocalDate.parse(it) }.getOrDefault(LocalDate(1900, 1, 1))
-                } ?: LocalDate(1900, 1, 1)
-
                 ElevatedCard(
                     colors = CardColors(
                         containerColor = Color.White,

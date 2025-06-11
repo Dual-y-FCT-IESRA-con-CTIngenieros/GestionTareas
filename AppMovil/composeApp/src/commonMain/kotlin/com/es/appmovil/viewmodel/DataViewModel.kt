@@ -37,10 +37,10 @@ import kotlinx.datetime.toLocalDateTime
  * Objeto singleton que maneja la carga, almacenamiento y exposición reactiva
  * de los datos principales de la app, provenientes de la base de datos.
  *
- * Utiliza [MutableStateFlow] para el estado mutable interno y
- * expone solo [StateFlow] para lectura externa.
+ * Utiliza 'MutableStateFlow' para el estado mutable interno y
+ * expone solo 'StateFlow' para lectura externa.
  *
- * Realiza carga inicial en [init] mediante corrutinas en [Dispatchers.IO].
+ * Realiza carga inicial en 'init' mediante corrutinas en [Dispatchers.IO].
  */
 object DataViewModel {
 

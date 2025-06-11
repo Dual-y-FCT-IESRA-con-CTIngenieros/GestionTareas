@@ -68,7 +68,7 @@ class ResumeScreen : Screen {
      * un diálogo de calendario.
      *
      * Utiliza [Scaffold] para estructurar la pantalla y maneja la navegación interna
-     * mediante [Navigator].
+     * mediante 'Navigator'.
      */
     @Composable
     override fun Content() {

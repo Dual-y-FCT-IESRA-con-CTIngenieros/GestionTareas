@@ -7,7 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +42,7 @@ fun HeaderSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { navigator.pop() }) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Return")
         }
         Text(tittle, fontWeight = FontWeight.Black, fontSize = 25.sp)
         if (isIcon)

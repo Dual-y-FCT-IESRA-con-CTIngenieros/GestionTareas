@@ -25,6 +25,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -293,7 +294,7 @@ class TableManageScreen : Screen {
                 readOnly = true,
                 label = { Text("Seleccione Tabla") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTablas) },
-                modifier = Modifier.menuAnchor()
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
             )
 
             ExposedDropdownMenu(
