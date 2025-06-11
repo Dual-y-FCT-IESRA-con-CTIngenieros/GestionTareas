@@ -110,7 +110,7 @@ class DayMenuViewModel {
             onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
             onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
         } catch (e: Exception) {
-
+            print(e.message)
         }
 
         val a = activityTimeCode.value[indexedValue].projects.first()

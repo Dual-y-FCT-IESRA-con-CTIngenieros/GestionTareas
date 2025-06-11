@@ -28,6 +28,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -184,7 +185,7 @@ fun UserData(
                     readOnly = true,
                     label = { Text("Rol") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                 )
                 ExposedDropdownMenu(
                     expanded = expandido,
@@ -192,7 +193,7 @@ fun UserData(
                 ) {
                     opciones.forEach { opcion ->
                         DropdownMenuItem(
-                            text = { androidx.compose.material.Text(opcion) },
+                            text = { Text(opcion) },
                             onClick = {
                                 seleccion = opcion
                                 expandido = false

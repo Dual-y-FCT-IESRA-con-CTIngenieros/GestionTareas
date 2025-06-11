@@ -80,7 +80,7 @@ fun BottomNavigationBar(navigator: Navigator) {
                 val path = Path().apply {
                     moveTo(0f, 0f)
                     lineTo((width / 2) - curveSize, 0f)
-                    quadraticBezierTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
+                    quadraticTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
                     lineTo(width, 0f)
                     lineTo(width, height)
                     lineTo(0f, height)

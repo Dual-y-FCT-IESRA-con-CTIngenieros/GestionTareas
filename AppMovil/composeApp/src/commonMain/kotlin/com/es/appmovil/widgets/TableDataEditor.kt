@@ -184,7 +184,7 @@ fun AreaDataEditor(viewModel: TableManageViewModel) {
                 CoroutineScope(viewModel.viewModelScope.coroutineContext).launch {
                     FullScreenLoadingManager.showLoader()
                     val newArea = Area(
-                        (viewModel.area.value.maxByOrNull { it.idArea!! }?.idArea ?: 0) + 1,
+                        (viewModel.area.value.maxByOrNull { it.idArea }?.idArea ?: 0) + 1,
                         descripcion
                     )
                     Database.addData<Area>("Area", newArea)
@@ -448,7 +448,7 @@ fun WorkOrderDataEditor(viewModel: TableManageViewModel) {
     val projectData = viewModel.project.value.associate { it.idProject to it.desc }
     var idAircraft by remember { mutableStateOf(mapOf("" to "")) }
     var aircraftSelection by remember { mutableStateOf(false) }
-    val aircraftData = viewModel.aircraft.value.associate { it.idAircraft.toString() to it.desc }
+    val aircraftData = viewModel.aircraft.value.associate { it.idAircraft to it.desc }
     var idArea by remember { mutableStateOf(mapOf("" to "")) }
     var areaSelection by remember { mutableStateOf(false) }
     val areaData = viewModel.area.value.associate { it.idArea.toString() to it.desc }

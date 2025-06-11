@@ -41,9 +41,6 @@ class UserViewModel : ViewModel() {
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password
 
-    private var _passForgot = MutableStateFlow(false)
-    val passForgot: StateFlow<Boolean> = _passForgot
-
     private var _passChange = MutableStateFlow(false)
     val passChange: StateFlow<Boolean> = _passChange
 
@@ -72,10 +69,6 @@ class UserViewModel : ViewModel() {
     fun onChangeValue(name: String, pass: String) {
         _username.value = name
         _password.value = pass
-    }
-
-    fun onPassForgotChange() {
-        _passForgot.value = !_passForgot.value
     }
 
     fun onPassChangeChange() {
@@ -133,7 +126,6 @@ class UserViewModel : ViewModel() {
     fun checkSession() {
         _checkSess.value = true
         val settings = Settings()
-        val emailUser = settings.getStringOrNull("email_user")
         val accessToken = settings.getStringOrNull("access_token")
         val refreshToken = settings.getStringOrNull("refresh_token")
 

@@ -96,6 +96,7 @@ object DataViewModel {
         cargarCalendar()
         cargarUserYearData()
         cargarArea()
+        cargarEmployeeWH()
     }
 
     suspend fun cargarYObtenerEmail(): String {
@@ -225,8 +226,9 @@ object DataViewModel {
         }
     }
 
+
     private val _employeeWH = MutableStateFlow<List<EmployeeWorkHours>>(emptyList())
-    val employeeWH: StateFlow<List<EmployeeWorkHours>> = _employeeWH
+    //val employeeWH: StateFlow<List<EmployeeWorkHours>> = _employeeWH
 
     private fun cargarEmployeeWH() {
         CoroutineScope(Dispatchers.IO).launch {
