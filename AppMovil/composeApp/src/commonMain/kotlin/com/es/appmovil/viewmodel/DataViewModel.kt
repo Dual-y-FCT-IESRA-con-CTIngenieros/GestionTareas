@@ -170,7 +170,7 @@ object DataViewModel {
     private val _roles = MutableStateFlow<List<Rol>>(emptyList())
     val roles: StateFlow<List<Rol>> = _roles
 
-    fun cargarRoles() {
+    private fun cargarRoles() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
@@ -254,7 +254,7 @@ object DataViewModel {
             _tablesNames.value = datos
         }
     }
-    
+
     private var _areas = MutableStateFlow<List<Area>>(emptyList())
     val areas = _areas
 

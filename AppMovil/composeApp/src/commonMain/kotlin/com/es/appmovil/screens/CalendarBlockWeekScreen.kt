@@ -57,7 +57,8 @@ import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 
-class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBlockWeekViewModel) : Screen {
+class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBlockWeekViewModel) :
+    Screen {
     @Composable
     override fun Content() {
         var monthChangeFlag = true
@@ -97,7 +98,8 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                     else {
                         if (weekIndex > 0) calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
                         else {
-                            val previousWeek = calendarBlockWeekViewModel.getPreviousWeek(weeksInMonth[0])
+                            val previousWeek =
+                                calendarBlockWeekViewModel.getPreviousWeek(weeksInMonth[0])
                             calendarBlockWeekViewModel.lockWeek(previousWeek)
                         }
                     }
@@ -269,7 +271,8 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                         }
 
                         items(employeesFilter.size) { employee ->
-                            val employeesOrder = if (!orderDescendant) employeesFilter.sortedByDescending { it.unblockDate } else employeesFilter.sortedBy { it.unblockDate }
+                            val employeesOrder =
+                                if (!orderDescendant) employeesFilter.sortedByDescending { it.unblockDate } else employeesFilter.sortedBy { it.unblockDate }
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -292,7 +295,8 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                                     )
                                 } ?: LocalDate(2025, 1, 1)
 
-                                val unblockDate = employeesOrder[employee].unblockDate?.split("/")?.get(1)
+                                val unblockDate =
+                                    employeesOrder[employee].unblockDate?.split("/")?.get(1)
                                 val dateUnblock = unblockDate?.let { LocalDate.parse(it) }
 
                                 Checkbox(
@@ -301,7 +305,8 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                                         val currentWeek = weeksInMonth[weekIndex]
                                         val employeeId = employeesOrder[employee]
 
-                                        val shouldUnlock = date >= currentWeek.second && currentWeek.second != dateUnblock
+                                        val shouldUnlock =
+                                            date >= currentWeek.second && currentWeek.second != dateUnblock
 
                                         val targetWeek = if (shouldUnlock && weekIndex == 0) {
                                             calendarBlockWeekViewModel.getPreviousWeek(currentWeek)
@@ -339,7 +344,7 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
     fun DialogLock(
         week: List<Pair<LocalDate, LocalDate>>,
         index: Int,
-        date:LocalDate,
+        date: LocalDate,
         locked: List<Pair<LocalDate, LocalDate>>,
         onAdd: () -> Unit,
         onRemove: () -> Unit,

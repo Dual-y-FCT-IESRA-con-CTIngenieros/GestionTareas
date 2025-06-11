@@ -19,7 +19,7 @@ import com.es.appmovil.utils.customTextFieldColors
  */
 
 @Composable
-fun genericFilter(showFilter: Boolean, filter:String, onFilterChange: (String) -> Unit){
+fun genericFilter(showFilter: Boolean, filter: String, onFilterChange: (String) -> Unit) {
     if (showFilter) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
             OutlinedTextField(

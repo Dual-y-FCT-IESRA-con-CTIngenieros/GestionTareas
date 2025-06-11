@@ -21,9 +21,6 @@ fun App() {
         FullScreenLoader()
 
         Navigator(screen = LoginScreen(userViewmodel))
-//        { navigator: Navigator ->
-//            SlideTransition(navigator)
-//        }
     }
 }
 

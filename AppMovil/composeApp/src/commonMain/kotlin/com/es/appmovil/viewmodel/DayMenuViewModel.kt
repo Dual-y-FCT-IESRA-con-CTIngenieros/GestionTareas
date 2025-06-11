@@ -19,63 +19,63 @@ class DayMenuViewModel {
     val comment: StateFlow<String> = _comment
 
     private var _hours = MutableStateFlow(8)
-    val hours:StateFlow<Int> = _hours
+    val hours: StateFlow<Int> = _hours
 
     // Variables para la selección de TimeCodes
     private var _timeCode = MutableStateFlow(0)
-    val timeCode:StateFlow<Int> = _timeCode
+    val timeCode: StateFlow<Int> = _timeCode
 
-    private var _timeCodeSelected:MutableStateFlow<String?> = MutableStateFlow(null)
-    val timeCodeSeleccionado:StateFlow<String?> = _timeCodeSelected
+    private var _timeCodeSelected: MutableStateFlow<String?> = MutableStateFlow(null)
+    val timeCodeSeleccionado: StateFlow<String?> = _timeCodeSelected
 
     // Variables para la selección de WorkOrders
     private var _workOrder = MutableStateFlow("")
-    val workOrder:StateFlow<String> = _workOrder
+    val workOrder: StateFlow<String> = _workOrder
 
-    private var _workSelected:MutableStateFlow<String?> = MutableStateFlow(null)
-    val workSelected:StateFlow<String?> = _workSelected
+    private var _workSelected: MutableStateFlow<String?> = MutableStateFlow(null)
+    val workSelected: StateFlow<String?> = _workSelected
 
     val workOrderTimeCodeDTO = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
 
     // Variables para la selección de los Activities
     private var _activity = MutableStateFlow(0)
-    val activity:StateFlow<Int> = _activity
+    val activity: StateFlow<Int> = _activity
 
-    private var _activitySelected:MutableStateFlow<String?> = MutableStateFlow(null)
-    val activitySelected:StateFlow<String?> = _activitySelected
+    private var _activitySelected: MutableStateFlow<String?> = MutableStateFlow(null)
+    val activitySelected: StateFlow<String?> = _activitySelected
 
     val activityTimeCode = MutableStateFlow(mutableListOf<ProjectTimeCodeDTO>())
 
 
-    fun onComment(newComment:String) {
+    fun onComment(newComment: String) {
         _comment.value = newComment
     }
 
-    fun onHours(newHour:Int) {
+    fun onHours(newHour: Int) {
         _hours.value = newHour
     }
 
-    fun onTimeCode(newTimeCode:Int) {
+    fun onTimeCode(newTimeCode: Int) {
         _timeCode.value = newTimeCode
     }
 
-    fun onTimeSelected(newTimeCode:String?) {
+    fun onTimeSelected(newTimeCode: String?) {
         _timeCodeSelected.value = newTimeCode
     }
 
-    fun onWorkOrder(newWorkOrder:String) {
+    fun onWorkOrder(newWorkOrder: String) {
         _workOrder.value = newWorkOrder
     }
 
-    fun onWorkSelected(newProject:String?) {
+    fun onWorkSelected(newProject: String?) {
         _workSelected.value = newProject
     }
 
-    fun onActivity(newActivity:Int) {
+    fun onActivity(newActivity: Int) {
         _activity.value = newActivity
     }
 
-    fun onActivitySelected(newActivity:String?) {
+    fun onActivitySelected(newActivity: String?) {
         _activitySelected.value = newActivity
     }
 
@@ -88,7 +88,7 @@ class DayMenuViewModel {
         _activitySelected.value = null
     }
 
-    private fun getIndexCode(code:Int):Int {
+    private fun getIndexCode(code: Int): Int {
         return when (code) {
             100 -> 0
             200 -> 1
@@ -99,23 +99,24 @@ class DayMenuViewModel {
         }
     }
 
-    fun loadTimes(code:Int) {
+    fun loadTimes(code: Int) {
         val tc = timeCodes.value.find { it.idTimeCode == code }
         onTimeCode(code)
         onTimeSelected("${tc?.idTimeCode} - ${tc?.desc}")
 
         val indexedValue = getIndexCode(code)
 
-        try{
+        try {
             onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
             onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
-        }catch (e:Exception){
+        } catch (e: Exception) {
 
         }
 
         val a = activityTimeCode.value[indexedValue].projects.first()
 
-        val idActivity = DataViewModel.activities.value.find { act -> act.idActivity.toString() == a.split("-")[0].trim()  }
+        val idActivity =
+            DataViewModel.activities.value.find { act -> act.idActivity.toString() == a.split("-")[0].trim() }
         val activityInt = idActivity?.idActivity ?: 0
 
         onActivity(activityInt)
@@ -150,7 +151,8 @@ class DayMenuViewModel {
             }
         }
 
-        workOrderTimeCodeDTO.value = workOrdersPorTimeCode.sortedBy { it.idTimeCode }.toMutableList()
+        workOrderTimeCodeDTO.value =
+            workOrdersPorTimeCode.sortedBy { it.idTimeCode }.toMutableList()
     }
 
     fun generateActivities() {
@@ -165,7 +167,8 @@ class DayMenuViewModel {
                     .filter { it.idTimeCode == activity.idTimeCode }
                     .map { "${it.idActivity} - ${it.desc}" }
 
-                val dto = ProjectTimeCodeDTO(activity.idTimeCode, activitiesTimeCode.toMutableList())
+                val dto =
+                    ProjectTimeCodeDTO(activity.idTimeCode, activitiesTimeCode.toMutableList())
                 activitiesPorTimeCode.add(dto)
 
                 if (activity.idTimeCode == 100) {

@@ -205,14 +205,14 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             label = { Text("Apellidos") },
                         )
                     }
-                    Row(Modifier.fillMaxWidth()){
+                    Row(Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
                             colors = customTextFieldColors(),
                             value = user,
                             onValueChange = {
                                 employeesDataViewModel.onChangeUser(it)
-                                            },
+                            },
                             label = { Text("Usuario") },
                         )
                         OutlinedTextField(

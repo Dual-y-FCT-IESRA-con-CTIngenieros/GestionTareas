@@ -12,7 +12,6 @@ import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 
-
 @Composable
 fun ResumenAnual(anualViewModel: AnualViewModel) {
     val data2 by anualViewModel.bars.collectAsState()

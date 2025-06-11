@@ -35,31 +35,32 @@ class CalendarBlockWeekViewModel {
     private var _weekIndex = MutableStateFlow(0)
     val weekIndex: StateFlow<Int> = _weekIndex
 
-    private var _blockDate:MutableStateFlow<String?> = MutableStateFlow("")
+    private var _blockDate: MutableStateFlow<String?> = MutableStateFlow("")
     val blockDate: StateFlow<String?> = _blockDate
 
-    private var _filter:MutableStateFlow<String> = MutableStateFlow("")
+    private var _filter: MutableStateFlow<String> = MutableStateFlow("")
     val filter: StateFlow<String> = _filter
 
-    private val _weeksInMonth = MutableStateFlow(generateWeeksForMonth(today.value.year, today.value.month))
-    val weeksInMonth:StateFlow<List<Pair<LocalDate, LocalDate>>> = _weeksInMonth
+    private val _weeksInMonth =
+        MutableStateFlow(generateWeeksForMonth(today.value.year, today.value.month))
+    val weeksInMonth: StateFlow<List<Pair<LocalDate, LocalDate>>> = _weeksInMonth
 
     private val _locked = MutableStateFlow<List<Pair<LocalDate, LocalDate>>>(emptyList())
     val locked: StateFlow<List<Pair<LocalDate, LocalDate>>> = _locked
 
-    fun changeDialog(bool:Boolean) {
+    fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
 
-    fun changeWeekIndex(index:Int) {
+    fun changeWeekIndex(index: Int) {
         _weekIndex.value = index
     }
 
-    fun changeEmployeesModifie(bool:Boolean) {
+    fun changeEmployeesModifie(bool: Boolean) {
         _employeeModifie.value = bool
     }
 
-    fun changeFilter(value:String) {
+    fun changeFilter(value: String) {
         _filter.value = value
     }
 
@@ -87,7 +88,10 @@ class CalendarBlockWeekViewModel {
         changeEmployeesModifie(false)
     }
 
-    fun getWeekColor(week: Pair<LocalDate, LocalDate>, employees: List<Employee>): Pair<ImageVector, Color> {
+    fun getWeekColor(
+        week: Pair<LocalDate, LocalDate>,
+        employees: List<Employee>
+    ): Pair<ImageVector, Color> {
         val weekEnd = week.second
 
         val states = employees.mapNotNull {
@@ -123,8 +127,9 @@ class CalendarBlockWeekViewModel {
         return icon to color
     }
 
-    fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee, unlock:Boolean) {
-        val updated = if(unlock) employee.copy(unblockDate = null) else employee.copy(unblockDate = "${week.first}/${week.second}")
+    fun lockWeekEmployee(week: Pair<LocalDate, LocalDate>, employee: Employee, unlock: Boolean) {
+        val updated =
+            if (unlock) employee.copy(unblockDate = null) else employee.copy(unblockDate = "${week.first}/${week.second}")
         employees.update { list ->
             list.map { if (it.idEmployee == updated.idEmployee) updated else it }.toMutableList()
         }
@@ -134,7 +139,21 @@ class CalendarBlockWeekViewModel {
         employees.value.forEach {
             it.blockDate = week.second.toString()
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.unblockDate))
+                Database.updateEmployee(
+                    EmployeeUpdateDTO(
+                        it.idEmployee,
+                        it.nombre,
+                        it.apellidos,
+                        it.email,
+                        it.dateFrom,
+                        it.dateTo,
+                        it.idRol,
+                        it.blockDate,
+                        it.idCT,
+                        it.idAirbus,
+                        it.unblockDate
+                    )
+                )
             }
         }
         generateLock()
@@ -143,20 +162,35 @@ class CalendarBlockWeekViewModel {
     fun lockWeekEmployees() {
         employees.value.forEach {
             CoroutineScope(Dispatchers.IO).launch {
-                Database.updateEmployee(EmployeeUpdateDTO(it.idEmployee, it.nombre, it.apellidos, it.email, it.dateFrom, it.dateTo, it.idRol, it.blockDate, it.idCT, it.idAirbus, it.unblockDate))
+                Database.updateEmployee(
+                    EmployeeUpdateDTO(
+                        it.idEmployee,
+                        it.nombre,
+                        it.apellidos,
+                        it.email,
+                        it.dateFrom,
+                        it.dateTo,
+                        it.idRol,
+                        it.blockDate,
+                        it.idCT,
+                        it.idAirbus,
+                        it.unblockDate
+                    )
+                )
             }
         }
         generateLock()
     }
 
     fun getPreviousWeek(week: Pair<LocalDate, LocalDate>): Pair<LocalDate, LocalDate> {
-        val previousWeekEnd = week.first.minus(DatePeriod(days = 1)) // día anterior al primer día de la semana actual
+        val previousWeekEnd =
+            week.first.minus(DatePeriod(days = 1)) // día anterior al primer día de la semana actual
         val previousWeekStart = previousWeekEnd.minus(DatePeriod(days = 6))
         return previousWeekStart to previousWeekEnd
     }
 
     fun generateLock() {
-        val e = employees.value.maxBy { it.blockDate ?:"" }
+        val e = employees.value.maxBy { it.blockDate ?: "" }
         _blockDate.value = e.blockDate
     }
 

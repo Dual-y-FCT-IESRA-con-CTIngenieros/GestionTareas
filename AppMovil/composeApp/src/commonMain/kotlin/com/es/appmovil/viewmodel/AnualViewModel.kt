@@ -30,7 +30,7 @@ class AnualViewModel {
     private var _index = MutableStateFlow(setIndex())
     val index: StateFlow<Int> = _index
 
-    private fun setIndex():Int {
+    private fun setIndex(): Int {
         val current = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val month = current.monthNumber
         val i = if (month <= 6) 1 else 2
@@ -53,7 +53,7 @@ class AnualViewModel {
     fun calcularHorasPorMes(): List<Double> {
         val hourMonth = employeeActivities.value
             .filter { it.idEmployee == employee.idEmployee }
-            .groupBy { it.date.split("-")[1].toInt() -1 }
+            .groupBy { it.date.split("-")[1].toInt() - 1 }
             .mapValues { (_, timeMonth) ->
                 timeMonth.sumOf { it.time.toDouble() }
             }
@@ -156,24 +156,25 @@ class AnualViewModel {
         return CalendarYearDTO(1, festivos2025)
     }
 
-    private fun generarBarrasPorMes(i:Int) {
+    private fun generarBarrasPorMes(i: Int) {
         val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 
-        val actividadesPorMes = employeeActivities.value.filter{it.idEmployee == employee.idEmployee}.groupBy {
-            val fecha = LocalDate.parse(it.date)
-            fecha.monthNumber to fecha.year
-        }
+        val actividadesPorMes =
+            employeeActivities.value.filter { it.idEmployee == employee.idEmployee }.groupBy {
+                val fecha = LocalDate.parse(it.date)
+                fecha.monthNumber to fecha.year
+            }
 
         val current = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val year = current.year
 
-        val range = if (i  == 1) (1..6) else (7..12)
+        val range = if (i == 1) (1..6) else (7..12)
 
         _bars.value = range.map { mes ->
             val claveMes = mes to year
             val actividadesDelMes = actividadesPorMes[claveMes]
 
-            val dataPorTimeCode = actividadesDelMes?.groupBy { it.idTimeCode  }
+            val dataPorTimeCode = actividadesDelMes?.groupBy { it.idTimeCode }
                 ?.mapNotNull { (idTimeCode, listaActividades) ->
                     val timeCode = timeCodeMap[idTimeCode] ?: return@mapNotNull null
                     Bars.Data(

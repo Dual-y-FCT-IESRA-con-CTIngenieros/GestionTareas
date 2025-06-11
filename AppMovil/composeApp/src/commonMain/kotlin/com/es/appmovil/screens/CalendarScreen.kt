@@ -33,7 +33,7 @@ import com.es.appmovil.widgets.Calendar
 import com.es.appmovil.widgets.ResumenHorasDia
 import com.es.appmovil.widgets.ResumenHorasMensual
 
-class CalendarScreen() : Screen {
+class CalendarScreen : Screen {
     @Composable
     override fun Content() {
         // Generamos la navegación actual
@@ -57,11 +57,20 @@ class CalendarScreen() : Screen {
                 bottomBar = { BottomNavigationBar(navigator) },
                 floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },
                 floatingActionButtonPosition = FabPosition.Center, // o End
-                isFloatingActionButtonDocked = false) { innerPadding ->
+                isFloatingActionButtonDocked = false
+            ) { innerPadding ->
 
                 Box(Modifier.padding(innerPadding).fillMaxSize()) {
                     Column {
-                        Calendar(calendarViewmodel, dayMenuViewModel, fechaActual, showDialog, showDialogConfig, actividades, timeCodes)
+                        Calendar(
+                            calendarViewmodel,
+                            dayMenuViewModel,
+                            fechaActual,
+                            showDialog,
+                            showDialogConfig,
+                            actividades,
+                            timeCodes
+                        )
                         Row {
                             ElevatedCard(
                                 colors = CardColors(
@@ -70,7 +79,8 @@ class CalendarScreen() : Screen {
                                     disabledContainerColor = Color.Gray,
                                     disabledContentColor = Color.Black
                                 ),
-                                modifier = Modifier.weight(1f).padding(start = 20.dp, bottom = 20.dp).clickable {
+                                modifier = Modifier.weight(1f)
+                                    .padding(start = 20.dp, bottom = 20.dp).clickable {
                                     calendarViewmodel.changeDialogConfig(true)
                                 },
                                 elevation = CardDefaults.elevatedCardElevation(5.dp)
@@ -81,7 +91,9 @@ class CalendarScreen() : Screen {
 
                             Spacer(Modifier.size(16.dp))
 
-                            Column(modifier = Modifier.weight(1f).padding(end = 20.dp, bottom = 10.dp)) {
+                            Column(
+                                modifier = Modifier.weight(1f).padding(end = 20.dp, bottom = 10.dp)
+                            ) {
                                 ResumenHorasMensual() // ya no tiene medidas fijas dentro
                             }
                         }

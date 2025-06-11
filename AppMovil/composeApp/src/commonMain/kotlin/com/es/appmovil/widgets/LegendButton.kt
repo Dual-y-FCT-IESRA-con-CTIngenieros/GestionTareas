@@ -31,7 +31,7 @@ fun LegendButton(resumeViewmodel: ResumeViewmodel) {
 
     val colorMap = resumeViewmodel.getLegend()
     Box {
-        IconButton({expanded = !expanded}) {
+        IconButton({ expanded = !expanded }) {
             Icon(imageVector = Icons.Filled.Info, contentDescription = "Legend")
         }
 

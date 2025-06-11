@@ -18,14 +18,12 @@ import com.es.appmovil.database.Database
 import com.es.appmovil.model.Activity
 import com.es.appmovil.model.Aircraft
 import com.es.appmovil.model.Area
-import com.es.appmovil.model.Calendar
 import com.es.appmovil.model.Client
 import com.es.appmovil.model.Manager
 import com.es.appmovil.model.Project
 import com.es.appmovil.model.Rol
 import com.es.appmovil.model.TimeCode
 import com.es.appmovil.model.WorkOrder
-import com.es.appmovil.model.dto.TimeCodeDTO
 import com.es.appmovil.utils.DTOConverter.toDTO
 import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
@@ -33,7 +31,6 @@ import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.TableManageViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun claseTabla(tableName: String): Unit? {
@@ -290,7 +287,8 @@ fun ProjectDataEditor(viewModel: TableManageViewModel) {
     var descripcion by remember { mutableStateOf("") }
     var idCliente by remember { mutableStateOf(mapOf("" to "")) }
     var clienteSelection by remember { mutableStateOf(false) }
-    val clienteData = remember { viewModel.client.value.associate { it.idCliente.toString() to it.nombre } }
+    val clienteData =
+        remember { viewModel.client.value.associate { it.idCliente.toString() to it.nombre } }
 
     Column {
         OutlinedTextField(

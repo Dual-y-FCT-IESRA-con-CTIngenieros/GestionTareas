@@ -42,7 +42,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun ConteoHoras(currentHours: Int, dailyHours: Int, currentDay: Int){
+fun ConteoHoras(currentHours: Int, dailyHours: Int, currentDay: Int) {
     Column(Modifier.width(180.dp)) {
         Text("Horas realizadas", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.size(20.dp))
@@ -60,8 +60,8 @@ fun ProtectionMeter(
     modifier: Modifier = Modifier,
     currentHours: Int,
     progressColors: List<Color>,
-    dailyHours:Int,
-    currentDay:Int
+    dailyHours: Int,
+    currentDay: Int
 ) {
     val fechaActual by remember {
         mutableStateOf(
@@ -74,10 +74,11 @@ fun ProtectionMeter(
 
     ElevatedCard(
         colors = CardColors(
-        containerColor = Color.White,
-        contentColor = Color.Black,
-        disabledContainerColor = Color.Gray,
-        disabledContentColor = Color.Black),
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Black
+        ),
         modifier = modifier.size(180.dp),
         elevation = CardDefaults.elevatedCardElevation(5.dp)
     ) {
@@ -134,7 +135,7 @@ fun ShowCanvas(meterValue: Int, maxValue: Int, progressColors: List<Color>) {
         )
 
         drawCircle(
-            color = if(meterValue >= maxValue) Color.Green else Color.Red,
+            color = if (meterValue >= maxValue) Color.Green else Color.Red,
             radius = 24f,
             center = Offset(circleX, circleY),
             style = Stroke(width = 16f)
@@ -143,22 +144,30 @@ fun ShowCanvas(meterValue: Int, maxValue: Int, progressColors: List<Color>) {
 }
 
 @Composable
-fun HorasRealizadas(modifier: Modifier, meterValue:Int, maxValue:Int, fechaActual:LocalDate) {
-    Box(modifier = modifier.fillMaxWidth().height(163.dp),contentAlignment = Alignment.BottomCenter) {
+fun HorasRealizadas(modifier: Modifier, meterValue: Int, maxValue: Int, fechaActual: LocalDate) {
+    Box(
+        modifier = modifier.fillMaxWidth().height(163.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
         // Textos debajo de la barra de progreso
         Column(
             modifier = Modifier
                 .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = if(meterValue >= maxValue) Color.Green else Color.Red)) {
+                withStyle(style = SpanStyle(color = if (meterValue >= maxValue) Color.Green else Color.Red)) {
                     append(meterValue.toString())
                 }
                 withStyle(style = SpanStyle(color = Color.Gray)) {
                     append("/$maxValue")
                 }
             }, fontSize = calculateFontSize(meterValue, maxValue), lineHeight = 28.sp)
-            Text(text = "Horas realizadas", fontSize = 16.sp, lineHeight = 24.sp, color = Color.Black)
+            Text(
+                text = "Horas realizadas",
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                color = Color.Black
+            )
             Text(text = formatearFecha(fechaActual), fontSize = 14.sp)
         }
     }

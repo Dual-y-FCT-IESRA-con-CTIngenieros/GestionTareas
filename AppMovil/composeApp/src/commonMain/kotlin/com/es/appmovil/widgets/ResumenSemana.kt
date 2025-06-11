@@ -40,7 +40,7 @@ fun ResumenSemana(resumeViewmodel: ResumeViewmodel) {
 
     val listState = rememberLazyListState()
     val dayModifier = Modifier.padding(end = 5.dp, start = 5.dp).background(Color.White)
-    .width(65.dp).height(60.dp)
+        .width(65.dp).height(60.dp)
 
     val daysActivity = resumeViewmodel.getDayActivity()
     val fechaActual by today.collectAsState()
@@ -92,12 +92,16 @@ fun ResumenSemana(resumeViewmodel: ResumeViewmodel) {
         modifier = Modifier.fillMaxWidth().height(70.dp),
         elevation = CardDefaults.elevatedCardElevation(5.dp)
 
-    ){
+    ) {
         LaunchedEffect(Unit) {
             listState.animateScrollToItem(targetIndex)
         }
 
-        LazyRow(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, state = listState) {
+        LazyRow(
+            Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            state = listState
+        ) {
             items(semana.size) {
                 val diasSemana = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
                 Days(semana[it], dayModifier, diasSemana[it], daysActivity.value)
@@ -107,17 +111,22 @@ fun ResumenSemana(resumeViewmodel: ResumeViewmodel) {
 }
 
 @Composable
-fun Days(day:LocalDate, dayModifier: Modifier, diaSemana:String, daysActivity:MutableMap<String, MutableList<Color>>) {
+fun Days(
+    day: LocalDate,
+    dayModifier: Modifier,
+    diaSemana: String,
+    daysActivity: MutableMap<String, MutableList<Color>>
+) {
     val todayModifier = if (day == currentToday.value) {
         dayModifier.border(width = 2.dp, color = Color(0xFF000000))
-    }else{
+    } else {
         dayModifier
     }
 
     var colors = mutableListOf<Color>()
 
     daysActivity.forEach { (fc, color) ->
-        if(day.toString() == fc) colors = color
+        if (day.toString() == fc) colors = color
     }
 
     val backgroundModifier = if (colors.size >= 2) {

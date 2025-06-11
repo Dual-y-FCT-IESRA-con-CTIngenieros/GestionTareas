@@ -51,10 +51,9 @@ import com.es.appmovil.widgets.ResumenHorasAnual
 import com.es.appmovil.widgets.ResumenHorasMensual
 import com.es.appmovil.widgets.ResumenSemana
 
-
-class ResumeScreen: Screen{
+class ResumeScreen : Screen {
     @Composable
-    override fun Content(){
+    override fun Content() {
         val resumeViewmodel = ResumeViewmodel()
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
@@ -67,15 +66,21 @@ class ResumeScreen: Screen{
         val currentDay by resumeViewmodel.currentDay.collectAsState()
 
         MaterialTheme {
-            Scaffold(bottomBar = {
-                BottomNavigationBar(navigator)
-            },
+            Scaffold(
+                bottomBar = {
+                    BottomNavigationBar(navigator)
+                },
                 floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },
                 floatingActionButtonPosition = FabPosition.Center, // o End
-                isFloatingActionButtonDocked = false){
+                isFloatingActionButtonDocked = false
+            ) {
                 getHours()
                 Column(Modifier.padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)
                         LegendButton(resumeViewmodel)
                     }
@@ -86,7 +91,7 @@ class ResumeScreen: Screen{
                     Spacer(Modifier.size(20.dp))
 
                     Row {
-                        Column(Modifier.weight(1f)){
+                        Column(Modifier.weight(1f)) {
                             ConteoHoras(currentHours, dailyHours, currentDay)
                             Spacer(Modifier.size(20.dp))
                             Column(Modifier.clickable {
@@ -123,17 +128,19 @@ class ResumeScreen: Screen{
 
                     Spacer(Modifier.size(40.dp))
 
-                    if(employee.idRol == 2) {
-                        Button(onClick = {navigator.push(AdminScreen())},
+                    if (employee.idRol == 2) {
+                        Button(
+                            onClick = { navigator.push(AdminScreen()) },
                             elevation = ButtonDefaults.elevation(5.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                             shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                            modifier = Modifier.fillMaxWidth().height(60.dp)
+                        ) {
                             Text("ADMINISTRAR")
                         }
                     }
                 }
-                DayDialog(showDialog, today.value,dayMenuViewModel, calendarViewmodel) {
+                DayDialog(showDialog, today.value, dayMenuViewModel, calendarViewmodel) {
                     calendarViewmodel.changeDialog(it)
                 }
             }

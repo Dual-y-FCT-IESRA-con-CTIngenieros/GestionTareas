@@ -55,7 +55,12 @@ class AnualScreen : Screen {
                 BottomNavigationBar(navigator)
             }) { innerPadding ->
                 Column(Modifier.padding(innerPadding).fillMaxWidth()) {
-                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp, modifier = Modifier.padding(horizontal = 16.dp).padding(top =16.dp))
+                    Text(
+                        "Resumen Anual",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 25.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)
+                    )
 
                     Spacer(Modifier.size(30.dp))
                     LazyColumn {
@@ -122,12 +127,27 @@ class AnualScreen : Screen {
                                     .padding(start = 62.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val meses = listOf("E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
+                                val meses = listOf(
+                                    "E",
+                                    "F",
+                                    "M",
+                                    "A",
+                                    "M",
+                                    "J",
+                                    "J",
+                                    "A",
+                                    "S",
+                                    "O",
+                                    "N",
+                                    "D"
+                                )
                                 meses.forEach { mes ->
                                     Text(
                                         text = mes,
                                         fontSize = 12.sp,
-                                        modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(end = 12.dp),
+                                        modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(
+                                            end = 12.dp
+                                        ),
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -144,11 +164,14 @@ class AnualScreen : Screen {
                                 "V. Restantes" to (yearData?.currentHolidays?.toString() ?: "-")
                             )
 
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
                                 Text("Vacaciones")
                             }
 
-                            Column(Modifier.padding(horizontal = 16.dp)){
+                            Column(Modifier.padding(horizontal = 16.dp)) {
                                 cards.chunked(2).forEach { rowItems ->
                                     Row(
                                         modifier = Modifier

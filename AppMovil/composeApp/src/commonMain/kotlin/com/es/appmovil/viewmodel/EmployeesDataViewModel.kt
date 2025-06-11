@@ -67,7 +67,7 @@ class EmployeesDataViewModel : ViewModel() {
     fun onChangeEmail(newEmail: String) {
         val regex = ".+@".toRegex()
 //        if (!regex.containsMatchIn(_email.value)) {
-            _email.value = newEmail + _domain.value
+        _email.value = newEmail + _domain.value
 //        }
     }
 

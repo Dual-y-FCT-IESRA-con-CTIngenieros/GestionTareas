@@ -65,7 +65,12 @@ class CalendarManageScreen : Screen {
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
 
-                    HeaderSection(navigator, "Gestión De Calendario", Icons.Filled.Download, false) {}
+                    HeaderSection(
+                        navigator,
+                        "Gestión De Calendario",
+                        Icons.Filled.Download,
+                        false
+                    ) {}
 
                     Spacer(Modifier.size(30.dp))
 
@@ -82,7 +87,11 @@ class CalendarManageScreen : Screen {
                             ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    navigator.push(CalendarBlockWeekScreen(calendarBlockWeekViewModel))
+                                    navigator.push(
+                                        CalendarBlockWeekScreen(
+                                            calendarBlockWeekViewModel
+                                        )
+                                    )
                                     canClick = false
                                 }
                             },

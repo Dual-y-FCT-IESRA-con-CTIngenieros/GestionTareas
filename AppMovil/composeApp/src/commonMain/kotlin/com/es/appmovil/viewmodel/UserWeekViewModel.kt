@@ -9,10 +9,12 @@ import kotlinx.datetime.LocalDate
 class UserWeekViewModel {
 
 
-    fun getEmployeeByArea(area:String, semana:Pair<LocalDate, LocalDate>):Map<String, Int> {
-        val areaId = areas.value.find { it.desc.equals(area, ignoreCase = true) }?.idArea ?: return emptyMap()
+    fun getEmployeeByArea(area: String, semana: Pair<LocalDate, LocalDate>): Map<String, Int> {
+        val areaId = areas.value.find { it.desc.equals(area, ignoreCase = true) }?.idArea
+            ?: return emptyMap()
 
-        val workOrdersInArea = workOrders.value.filter { it.idArea == areaId }.map { it.idWorkOrder }.toSet()
+        val workOrdersInArea =
+            workOrders.value.filter { it.idArea == areaId }.map { it.idWorkOrder }.toSet()
 
         val (startDate, endDate) = semana
 

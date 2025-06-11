@@ -28,9 +28,15 @@ fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
     val data by calendarViewModel.bars.collectAsState()
 
     Column {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp),horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text("Total de hoy:")
-            Text("${data.sumOf { bar -> bar.values.sumOf { it.value } }}", fontWeight = FontWeight.Bold)
+            Text(
+                "${data.sumOf { bar -> bar.values.sumOf { it.value } }}",
+                fontWeight = FontWeight.Bold
+            )
         }
 
         ColumnChart(

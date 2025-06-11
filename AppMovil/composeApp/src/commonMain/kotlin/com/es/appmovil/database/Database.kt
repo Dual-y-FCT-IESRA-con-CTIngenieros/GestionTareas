@@ -210,20 +210,4 @@ object Database {
         }
     }
 
-    suspend fun deregister(table: String, fecha: String, idName: String, id: Any) {
-        try {
-            supabase.from(table).update(
-                {
-                    set("dateTo", fecha)
-                }
-            ) {
-                filter { eq(idName, id) }
-            }
-        } catch (
-            e: Exception
-        ) {
-            println(e)
-        }
-    }
-
 }

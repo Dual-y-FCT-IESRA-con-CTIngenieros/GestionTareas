@@ -87,7 +87,12 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection(navigator, "Control de Semanas", Icons.Filled.Download, true) { showDialog = true }
+            HeaderSection(
+                navigator,
+                "Control de Semanas",
+                Icons.Filled.Download,
+                true
+            ) { showDialog = true }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -133,8 +138,13 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
             Text("Semana $selectedWeek", modifier = Modifier.clickable { onExpandChange(true) })
 
             Text(
-                "${firstDay.dayOfMonth} ${firstDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                        "${lastDay.dayOfMonth} ${lastDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }}"
+                "${firstDay.dayOfMonth} ${
+                    firstDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+                } - " +
+                        "${lastDay.dayOfMonth} ${
+                            lastDay.month.name.take(3).lowercase()
+                                .replaceFirstChar { it.uppercase() }
+                        }"
             )
         }
 
@@ -146,8 +156,14 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                     onWeekSelected(week)
                     onExpandChange(false)
                 }) {
-                    Text("Semana $week (${weekStart.dayOfMonth} ${weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                            "${weekEnd.dayOfMonth} ${weekEnd.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }})")
+                    Text("Semana $week (${weekStart.dayOfMonth} ${
+                        weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+                    } - " +
+                            "${weekEnd.dayOfMonth} ${
+                                weekEnd.month.name.take(3).lowercase()
+                                    .replaceFirstChar { it.uppercase() }
+                            })"
+                    )
                 }
             }
         }
@@ -234,12 +250,20 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                     ) {
                         Text("Semana $selectedWeek")
                         Text(
-                            "${weekStart.dayOfMonth} ${weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                                    "${weekEnd.dayOfMonth} ${weekEnd.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }}"
+                            "${weekStart.dayOfMonth} ${
+                                weekStart.month.name.take(3).lowercase()
+                                    .replaceFirstChar { it.uppercase() }
+                            } - " +
+                                    "${weekEnd.dayOfMonth} ${
+                                        weekEnd.month.name.take(3).lowercase()
+                                            .replaceFirstChar { it.uppercase() }
+                                    }"
                         )
                     }
 
-                    DropdownMenu(expanded = expanded, onDismissRequest = { onExpandChange(false) }) {
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { onExpandChange(false) }) {
                         (1..52).forEach { week ->
                             val start = firstMonday.plus(DatePeriod(days = (week - 1) * 7))
                             val end = start.plus(DatePeriod(days = 6))
@@ -247,8 +271,15 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                                 onWeekSelected(week)
                                 onExpandChange(false)
                             }) {
-                                Text("Semana $week (${start.dayOfMonth} ${start.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                                        "${end.dayOfMonth} ${end.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }})")
+                                Text("Semana $week (${start.dayOfMonth} ${
+                                    start.month.name.take(3).lowercase()
+                                        .replaceFirstChar { it.uppercase() }
+                                } - " +
+                                        "${end.dayOfMonth} ${
+                                            end.month.name.take(3).lowercase()
+                                                .replaceFirstChar { it.uppercase() }
+                                        })"
+                                )
                             }
                         }
                     }
