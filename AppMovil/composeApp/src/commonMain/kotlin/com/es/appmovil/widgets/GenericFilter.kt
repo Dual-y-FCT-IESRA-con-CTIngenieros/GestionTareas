@@ -12,12 +12,12 @@ import androidx.compose.ui.unit.dp
 import com.es.appmovil.utils.customTextFieldColors
 
 /**
- * @description Componente que muestra un campo de texto para filtrar
+ * Componente que muestra un campo de texto para filtrar
+ * 
  * @param showFilter Booleano que indica si se debe mostrar el campo de texto
  * @param filter String que contiene el valor del campo de texto
  * @param onFilterChange Función que se llama cuando se cambia el valor del campo de texto
  */
-
 @Composable
 fun genericFilter(showFilter: Boolean, filter: String, onFilterChange: (String) -> Unit) {
     if (showFilter) {

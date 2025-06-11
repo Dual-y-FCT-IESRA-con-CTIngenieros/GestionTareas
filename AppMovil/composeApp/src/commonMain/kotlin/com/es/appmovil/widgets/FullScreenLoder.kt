@@ -17,6 +17,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
 
+/**
+ * Composable que muestra un diálogo de carga fullscreen bloqueante.
+ *
+ * @param bgColor Color de fondo del cuadro que contiene el indicador de carga. Por defecto blanco.
+ */
 @Composable
 fun FullScreenLoader(
     bgColor: Color = Color.White

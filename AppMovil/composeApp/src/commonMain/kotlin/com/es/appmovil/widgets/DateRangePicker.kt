@@ -36,6 +36,14 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
+/**
+ * Componente que muestra un campo de texto para seleccionar un rango de fechas.
+ * Al hacer click, abre un modal con un selector de rango de fechas.
+ *
+ * @param modifier Modificador para el componente.
+ * @param day Fecha inicial para mostrar.
+ * @param onGetListDates Callback que devuelve la lista de fechas seleccionadas.
+ */
 @Composable
 fun DatePickerFieldToModal(
     modifier: Modifier = Modifier,
@@ -108,6 +116,12 @@ fun DatePickerFieldToModal(
     }
 }
 
+/**
+ * Diálogo modal que muestra un selector de rango de fechas.
+ *
+ * @param onDateRangeSelected Callback que devuelve las fechas seleccionadas (inicio, fin) en milisegundos.
+ * @param onDismiss Callback para cerrar el diálogo.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -147,12 +161,26 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * Convierte milisegundos desde epoch a una cadena con formato "día/mes/año".
+ *
+ * @param millis Tiempo en milisegundos desde epoch.
+ * @return Fecha en formato legible "dd/MM/yyyy".
+ */
 fun convertMillisToDate(millis: Long): String {
     val instant = Instant.fromEpochMilliseconds(millis)
     val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
     return "${localDate.dayOfMonth}/${localDate.monthNumber}/${localDate.year}"
 }
 
+
+/**
+ * Genera una lista observable de fechas entre dos fechas dadas (inclusive).
+ *
+ * @param start Fecha inicial.
+ * @param end Fecha final.
+ * @return Lista observable de fechas entre start y end.
+ */
 fun generateDatesBetween(start: LocalDate, end: LocalDate): SnapshotStateList<LocalDate> {
     val dates = mutableStateListOf<LocalDate>()
     var current = start

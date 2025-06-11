@@ -32,29 +32,53 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+
+/**
+ * Objeto singleton que maneja la carga, almacenamiento y exposición reactiva
+ * de los datos principales de la app, provenientes de la base de datos.
+ *
+ * Utiliza 'MutableStateFlow' para el estado mutable interno y
+ * expone solo 'StateFlow' para lectura externa.
+ *
+ * Realiza carga inicial en 'init' mediante corrutinas en [Dispatchers.IO].
+ */
 object DataViewModel {
 
-    var today =
-        MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+    /** Fecha actual del sistema, actualizable y observable. */
+     var today =
+            MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
+
+    /** Fecha actual usada en pantallas o filtros (puede diferir de [today]). */
     var currentToday =
         MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
 
+    /** Empleado actualmente autenticado / activo. */
     var employee = Employee(-1, "", "", "", "", null, -1, null, "", "", null)
 
+    /** Datos anuales del usuario (uso personalizado). */
     var employeesYearData = MutableStateFlow<MutableList<UserYearData>>(mutableListOf())
+
+    /** Email del usuario actual, obtenido desde la configuración. */
     private var _currentEmail = MutableStateFlow("")
     val currentEmail: StateFlow<String> = _currentEmail
 
     // Variables comunes a varias pantallas
+
+    /** Horas totales actuales registradas para el empleado. */
     private var _currentHours = MutableStateFlow(0)
     val currentHours: StateFlow<Int> = _currentHours
 
+    /** Mes actual en formato string ("1".."12"). */
     private var _currentMonth = MutableStateFlow("0")
+
+    /** Año actual en formato string. */
     var _currentYear = MutableStateFlow("0")
 
+    /** Horas diarias predeterminadas para cálculo y UI. */
     private var _dailyHours = MutableStateFlow(8)
     val dailyHours: StateFlow<Int> = _dailyHours
 
+    /** Lista mutable para gráfico tipo Pie (composición de actividades). */
     private var _pieList = MutableStateFlow(mutableListOf<Pie>())
     val pieList: StateFlow<MutableList<Pie>> = _pieList
 
@@ -82,7 +106,10 @@ object DataViewModel {
     private val _employeeWO = MutableStateFlow<List<EmployeeWO>>(emptyList())
     val employeeWO: StateFlow<List<EmployeeWO>> = _employeeWO
 
-    // Carga de los datos de la base de datos
+    /**
+     * Inicializa la carga de todos los datos desde la base,
+     * cada uno en una corrutina con Dispatcher.IO para no bloquear UI.
+     */
     init {
         cargarTimeCodes()
         cargarEmployeeActivities()
@@ -99,6 +126,10 @@ object DataViewModel {
         cargarEmployeeWH()
     }
 
+    /**
+     * Obtiene y actualiza el email actual desde la base de configuración.
+     * @return email recuperado o cadena vacía si no existe.
+     */
     suspend fun cargarYObtenerEmail(): String {
         val datos = Database.getConfigData("email")
         if (datos != null) {
@@ -107,6 +138,8 @@ object DataViewModel {
         }
         return ""
     }
+
+    // Métodos privados para carga de datos individuales
 
     private fun cargarTimeCodes() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -268,6 +301,9 @@ object DataViewModel {
         }
     }
 
+    /**
+     * Carga datos anuales del usuario desde base y actualiza la lista.
+     */
     fun cargarUserYearData() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<UserYearData>("UserYearData")
@@ -275,6 +311,9 @@ object DataViewModel {
         }
     }
 
+    /**
+     * Actualiza [calendarFest] con las fechas festivas del calendario actual.
+     */
     fun cargarCalendarFest() {
         val festivos = calendar.value.map { it.date }
 
@@ -284,7 +323,9 @@ object DataViewModel {
         )
     }
 
-    // Funciones comunes a varias pantallas
+    /**
+     * Calcula y actualiza las horas totales registradas por el empleado actual.
+     */
     fun getHours() {
         _currentHours.value = 0
         employeeActivities.value
@@ -294,21 +335,36 @@ object DataViewModel {
             }
     }
 
+    /**
+     * Actualiza los valores de mes y año actuales según la fecha [today].
+     */
     fun getMonth() {
         _currentMonth.value = today.value.monthNumber.toString()
         _currentYear.value = today.value.year.toString()
     }
 
+    /**
+     * Resetea la fecha `today` al día actual del sistema
+     * y actualiza el mes y año activos mediante [changeMonth].
+     */
     fun resetToday() {
         today.value = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         changeMonth(today.value.monthNumber.toString(), today.value.year.toString())
     }
 
+    /**
+     * Cambia el mes actual usado en filtros y recarga las actividades.
+     * @param month nuevo mes en formato string.
+     */
     fun changeMonth(month: String, year: String) {
         _currentMonth.value = month
         _currentYear.value = year
     }
 
+    /**
+     * Construye y actualiza la lista para el gráfico Pie con
+     * colores y horas por cada código de tiempo.
+     */
     fun getPie() {
         val pies = mutableListOf<Pie>()
         val dateFilter =
@@ -326,6 +382,13 @@ object DataViewModel {
         _pieList.value = pies
     }
 
+    /**
+     * Actualiza la lista de gráficos de pastel (`pies`) agregando o sumando
+     * el tiempo de la actividad pasada según su TimeCode.
+     *
+     * @param pies Lista mutable de objetos [Pie] que representan segmentos del gráfico.
+     * @param activity Actividad del empleado cuya duración se añadirá al gráfico.
+     */
     private fun createPie(pies: MutableList<Pie>, activity: EmployeeActivity) {
         val timeCode = timeCodes.value.find { time -> time.idTimeCode == activity.idTimeCode }
         if (timeCode != null) {

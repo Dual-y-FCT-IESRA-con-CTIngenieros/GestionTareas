@@ -58,28 +58,52 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
+/**
+ * Pantalla para la gestión de usuarios (empleados).
+ * Permite visualizar empleados actuales y antiguos, filtrarlos por nombre, y agregar nuevos empleados.
+ *
+ * @param employeesDataViewModel ViewModel que contiene los datos y lógica de negocio relacionados con empleados.
+ */
 class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewModel) : Screen {
+    /**
+     * Composable principal que representa el contenido de la pantalla.
+     *
+     * - Ordena la lista de empleados actuales al cargar.
+     * - Muestra la lista de empleados actuales o antiguos, con opción para alternar entre ambas.
+     * - Permite filtrar empleados por nombre y apellido.
+     * - Permite agregar un nuevo empleado mediante un formulario en un modal bottom sheet.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        // Ordena los empleados actuales
         employeesDataViewModel.orderEmployees()
 
         val navigator: Navigator = LocalNavigator.currentOrThrow
+
+        // Estado reactivo de empleados actuales y antiguos
         val actualEmployees by employeesDataViewModel.actualEmployees.collectAsState()
         val exEmployees by employeesDataViewModel.exEmployees.collectAsState()
+        // Roles disponibles para asignar
         val roles by DataViewModel.roles.collectAsState()
+        // Estado del filtro de búsqueda (nombre/apellidos)
         val filter by employeesDataViewModel.filter.collectAsState()
 
+        // Lista de nombres de roles para el dropdown
         val opciones = roles.map { it.rol }
         val seleccionInicial = if (opciones.isNotEmpty()) opciones[0] else ""
         var seleccion by remember { mutableStateOf(seleccionInicial) }
 
+        // Control para alternar entre empleados actuales y antiguos
         var changeEmployees by remember { mutableStateOf(true) }
+        // Control para mostrar/ocultar diálogo modal para agregar empleado
         var showDialog by rememberSaveable { mutableStateOf(false) }
+        // Control para desplegar menú de selección de roles
         var expandido by remember { mutableStateOf(false) }
+        // Estado para modal bottom sheet
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+        // Campos del formulario para agregar empleado
         val name by employeesDataViewModel.name.collectAsState("")
         val lastName by employeesDataViewModel.lastName.collectAsState("")
         val user by employeesDataViewModel.user.collectAsState("")
@@ -88,11 +112,11 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         val idCT by employeesDataViewModel.idCT.collectAsState("")
         val idAirbus by employeesDataViewModel.idAirbus.collectAsState("")
 
-
+        // Texto que indica si se están viendo empleados actuales o antiguos
         val employeeText = if (changeEmployees) "Empleados actuales" else "Antiguos empleados"
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-
+            // Fila superior con botón atrás, título y botón para agregar usuario
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -112,6 +136,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                     Icon(Icons.Filled.Add, contentDescription = "Add")
                 }
             }
+            // Fila con texto que indica tipo de empleados y botón para cambiar
             Row(
                 modifier = Modifier.fillMaxWidth(), // Esto es crucial para que funcione
                 horizontalArrangement = Arrangement.SpaceBetween, // Distribuye el espacio entre los elementos
@@ -131,8 +156,10 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                 }
             }
 
+            // Filtro genérico para buscar empleados por nombre/apellidos
             genericFilter(true, filter) { employeesDataViewModel.changeFilter(it) }
 
+            // Lista de empleados filtrados y actualizados según selección (actuales o antiguos)
             LazyColumn {
                 if (changeEmployees) {
                     val actualEmployeesFilter = if (filter.isNotBlank()) {
@@ -162,6 +189,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
             }
 
         }
+        // Modal bottom sheet para agregar nuevo empleado
         if (showDialog) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -175,6 +203,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .padding(8.dp)
                 ) {
+                    // Campos de texto para ID CT y ID Airbus
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         colors = customTextFieldColors(),
@@ -189,6 +218,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         onValueChange = { employeesDataViewModel.onChangeIdAirbus(it) },
                         label = { Text("ID Airbus") },
                     )
+                    // Campos de texto para nombre y apellidos
                     Row {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
@@ -206,6 +236,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             label = { Text("Apellidos") },
                         )
                     }
+                    // Campos de texto para usuario y correo electrónico (correo es solo lectura)
                     Row(Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
@@ -225,7 +256,10 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             label = { Text("Correo electrónico") },
                         )
                     }
+                    // Selector de fecha para fecha de antigüedad
                     DatePickerDialogSample(dateFrom, "Fecha de antigüedad")
+
+                    // Dropdown para seleccionar el rol del empleado
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido }
@@ -255,6 +289,8 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             }
                         }
                     }
+
+                    // Botón para guardar el nuevo empleado
                     Button(
                         colors = customButtonColors(),
                         border = BorderStroke(0.5.dp, Color.Black),
@@ -264,7 +300,9 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 FullScreenLoadingManager.showLoader()
+                                // Actualiza email basado en usuario ingresado
                                 employeesDataViewModel.onChangeEmail(user)
+                                // Añade nuevo empleado con los datos proporcionados
                                 employeesDataViewModel.addEmployee(
                                     Employee(
                                         employeesDataViewModel.employees.value.maxByOrNull { it.idEmployee }!!.idEmployee,
@@ -288,8 +326,6 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                         Text("Guardar")
                     }
                 }
-
-
             }
         }
     }

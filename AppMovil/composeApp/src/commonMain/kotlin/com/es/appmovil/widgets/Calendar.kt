@@ -43,6 +43,17 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
+/**
+ * Composable que renderiza un calendario mensual con navegación y selección de días.
+ *
+ * @param calendarViewmodel ViewModel que maneja la lógica del calendario.
+ * @param dayMenuViewModel ViewModel para manejar el menú y diálogo de días.
+ * @param fechaActual Fecha actual mostrada en el calendario.
+ * @param showDialog Indica si se muestra el diálogo principal del día.
+ * @param showDialogConfig Indica si se muestra el diálogo de configuración.
+ * @param actividades Lista de actividades de empleados.
+ * @param timeCodes Lista de códigos de tiempo con colores asociados.
+ */
 @Composable
 fun Calendar(
     calendarViewmodel: CalendarViewModel,
@@ -301,9 +312,10 @@ fun Calendar(
 }
 
 /**
- * Función para obtener el nombre del mes en español
+ * Obtiene el nombre en español del mes basado en el nombre en inglés.
  *
- * @param monthNumber Número del mes
+ * @param monthNumber Nombre del mes en inglés en mayúsculas (ej. "JANUARY").
+ * @return Nombre del mes en español (ej. "Enero").
  */
 fun monthNameInSpanish(monthNumber: String): String {
     return when (monthNumber) {
@@ -323,6 +335,13 @@ fun monthNameInSpanish(monthNumber: String): String {
     }
 }
 
+/**
+ * Obtiene el color asociado a un código de tiempo.
+ *
+ * @param code Código de tiempo (id).
+ * @param timeCodes Lista de objetos TimeCodeDTO con id y color.
+ * @return Color correspondiente al código, o negro si no se encuentra.
+ */
 fun colorPorTimeCode(code: Int, timeCodes: List<TimeCodeDTO>): Color {
     val timeCode = timeCodes.find { it.idTimeCode == code }
     return if (timeCode != null) Color(timeCode.color)
@@ -330,11 +349,13 @@ fun colorPorTimeCode(code: Int, timeCodes: List<TimeCodeDTO>): Color {
 }
 
 
+
 /**
- * Función para obtener el número de días en un mes dado
+ * Obtiene el número de días que tiene un mes para un año dado.
  *
- * @param anio Número del año
- * @param mes Número del mes
+ * @param anio Año (ej. 2025).
+ * @param mes Número del mes (1-12).
+ * @return Número total de días en el mes.
  */
 fun obtenerDiasDelMes(anio: Int, mes: Int): Int {
     val fecha = LocalDate(anio, mes, 1)
@@ -349,10 +370,11 @@ fun obtenerDiasDelMes(anio: Int, mes: Int): Int {
 }
 
 /**
- *  Función para obtener el número del primer dia de la primera semana del mes dado
+ * Obtiene el índice del primer día de la semana del mes dado.
  *
- *  @param anio Número del año
- *  @param mes Número del mes
+ * @param anio Año (ej. 2025).
+ * @param mes Número del mes (1-12).
+ * @return Índice ordinal del primer día de la semana (0=lunes, 6=domingo).
  */
 fun primerDiaMes(anio: Int, mes: Int): Int {
     val primerDia = LocalDate(anio, mes, 1).dayOfWeek
@@ -360,10 +382,12 @@ fun primerDiaMes(anio: Int, mes: Int): Int {
 }
 
 /**
- * Función para obtener el número de los primeros dias del siguiente mes al dado
+ * Calcula cuántos días del siguiente mes deben mostrarse
+ * para completar la última fila del calendario.
  *
- * @param anio Número del año
- * @param mes Número del mes
+ * @param anio Año del mes actual.
+ * @param mes Número del mes actual.
+ * @return Número de días del siguiente mes a mostrar.
  */
 fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
     val primerDiaMesSiguiente = LocalDate(anio, mes, 1).plus(1, DateTimeUnit.MONTH)
@@ -374,11 +398,26 @@ fun obtenerMesSiguiente(anio: Int, mes: Int): Int {
     return 7 - diaSemanaUltimoDia
 }
 
+/**
+ * Verifica si una fecha está desbloqueada según fechas de bloqueo del empleado.
+ *
+ * @param date Fecha a verificar.
+ * @param startUnblockDate Fecha de inicio del periodo desbloqueado (String).
+ * @param endUnblockDate Fecha de fin del periodo desbloqueado (String).
+ * @return True si la fecha está desbloqueada, false en caso contrario.
+ */
 fun checkUnblockDate(date: LocalDate, startUnblockDate: String, endUnblockDate: String): Boolean {
     return employee.blockDate == null || date.toString() > (employee.blockDate
         ?: "") || employee.unblockDate == null || date.toString() in (startUnblockDate..endUnblockDate)
 }
 
+/**
+ * Verifica si en una fecha dada el total de horas registradas es menor a 8.
+ *
+ * @param fecha Fecha a verificar.
+ * @param actividades Lista de actividades.
+ * @return True si las horas totales son menos de 8, false si 8 o más.
+ */
 fun tieneMenosDe8Horas(fecha: LocalDate, actividades: List<EmployeeActivity>): Boolean {
     val totalHoras = actividades
         .filter { it.date == fecha.toString() && it.idEmployee == employee.idEmployee }

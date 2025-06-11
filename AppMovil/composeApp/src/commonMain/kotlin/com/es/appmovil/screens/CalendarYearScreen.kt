@@ -64,25 +64,53 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
+/**
+ * Pantalla para la gestión anual del calendario de empleados.
+ * Permite navegar entre años disponibles, ver detalles y estadísticas anuales por empleado,
+ * filtrar y ordenar la lista de empleados, y cerrar el año con opción de generar uno nuevo.
+ *
+ * @param calendarYearViewModel ViewModel que maneja la lógica y datos para esta pantalla.
+ */
 class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewModel) : Screen {
     @Composable
     override fun Content() {
+        // Lista de años disponibles con datos (únicos)
         val availableYears = employeesYearData.value.map { it.year }.distinct()
+
+        // Navegador para control de navegación
         val navigator: Navigator = LocalNavigator.currentOrThrow
+
+        // Control para evitar múltiples cambios de año simultáneos
         var yearChangeFlag = true
+
+        // Fecha actual reactiva
         val fechaActual by today.collectAsState()
+
+        // Lista de empleados reactiva
         val employees by employees.collectAsState()
+
+        // Filtro y estado de búsqueda
         val filter by calendarYearViewModel.filter.collectAsState()
         var selectedEmployee by remember { mutableStateOf<Employee?>(null) }
+
+        // Control para mostrar diálogo de cierre de año
         var showCloseYearDialog by remember { mutableStateOf(false) }
+
+        // Estado que indica si el año actual está cerrado
         val isYearClosed = calendarYearViewModel.isCurrentYearClosed()
+
+        // Control para mostrar filtro y modo de ordenamiento
         var showFilter by remember { mutableStateOf(false) }
         var orderDescendant by remember { mutableStateOf(true) }
+
+        // Control para mostrar diálogo de error o información
         val showDialog by calendarYearViewModel.showDialog.collectAsState()
 
+        // Gestión para generación y descarga CSV
         val manageCSV = ManageCSV()
         var showDialogDownload by rememberSaveable { mutableStateOf(false) }
 
+        // Diálogo para confirmación de descarga CSV del año
         if (showDialogDownload) {
             DownloadWeekDialog(
                 onDismiss = { showDialogDownload = false },
@@ -93,7 +121,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
             )
         }
 
-
+        // Diálogo para mostrar error al intentar cerrar año sin bloquear semanas
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { calendarYearViewModel.changeDialog(false) },
@@ -104,7 +132,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
-
+            // Encabezado con título y botón para descarga CSV
             HeaderSection(
                 navigator,
                 "Gestión anual",
@@ -114,6 +142,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
 
             Spacer(Modifier.size(16.dp))
 
+            // Navegación entre años disponibles con botones < y >
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -132,13 +161,16 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                     }
                 } else {
                     IconButton(onClick = {}, enabled = false) {
-                        Text(">", fontSize = 24.sp, color = Color.White)
+                        Text("<", fontSize = 24.sp, color = Color.White)
                     }
                 }
+
                 Text(
-                    "${fechaActual.year} ${if (isYearClosed) "" else ""}",
+                    "${fechaActual.year}",
                     fontSize = 20.sp,
-                    modifier = Modifier.clickable { resetToday() })
+                    modifier = Modifier.clickable { resetToday() }
+                )
+
                 val fc2 = fechaActual
                 val fechaPost = fc2.plus(DatePeriod(years = 1)).year
                 if (fechaPost in availableYears) {
@@ -155,13 +187,11 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                         Text(">", fontSize = 24.sp, color = Color.White)
                     }
                 }
-
             }
 
+            // Botones para cerrar año o mostrar que está cerrado, más opciones de filtro y orden
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -200,6 +230,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 }
             }
 
+            // Campo para aplicar filtro de búsqueda (nombre empleado)
             if (showFilter) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
                     OutlinedTextField(
@@ -214,19 +245,24 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 }
             }
 
+            // Lista de empleados filtrados y ordenados, con selección
             LazyColumn(
-                modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp).weight(1f)
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 8.dp)
+                    .weight(1f)
             ) {
                 val employeesFilter = if (filter.isNotBlank()) employees.filter {
                     val name = (it.nombre + " " + it.apellidos).lowercase()
                     filter.lowercase() in name
-                }
-                else employees
+                } else employees
 
                 val employeesOrder =
-                    if (!orderDescendant) employeesFilter.sortedByDescending { it.nombre.uppercase() } else employeesFilter.sortedBy { it.nombre.uppercase() }
+                    if (!orderDescendant) employeesFilter.sortedByDescending { it.nombre.uppercase() }
+                    else employeesFilter.sortedBy { it.nombre.uppercase() }
 
-                items(employeesOrder.size) { employee ->
+                items(employeesOrder.size) { index ->
+                    val employee = employeesOrder[index]
                     ElevatedCard(
                         colors = CardColors(
                             containerColor = Color.White,
@@ -234,10 +270,13 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                             disabledContainerColor = Color.Gray,
                             disabledContentColor = Color.Black
                         ),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(50.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .height(50.dp)
                             .clickable {
                                 selectedEmployee =
-                                    if (selectedEmployee != employeesOrder[employee]) employeesOrder[employee] else null
+                                    if (selectedEmployee != employee) employee else null
                             },
                         elevation = CardDefaults.elevatedCardElevation(5.dp)
                     ) {
@@ -248,15 +287,13 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "${employeesOrder[employee].nombre} ${employeesOrder[employee].apellidos}"
-
-                            )
+                            Text("${employee.nombre} ${employee.apellidos}")
                         }
                     }
                 }
             }
 
+            // Resumen de datos anuales del empleado seleccionado
             Box(
                 modifier = Modifier.fillMaxSize().padding(bottom = 16.dp).weight(1f),
                 contentAlignment = Alignment.BottomCenter
@@ -300,9 +337,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                                         colors = CardDefaults.cardColors(containerColor = Color.White)
                                     ) {
                                         Column(
-                                            modifier = Modifier
-                                                .padding(12.dp)
-                                                .fillMaxWidth(),
+                                            modifier = Modifier.padding(12.dp).fillMaxWidth(),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(text = label, fontSize = 14.sp, color = Color.Gray)
@@ -323,6 +358,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
             }
         }
 
+        // Diálogo para confirmar cierre de año y generar nuevo año si se desea
         if (showCloseYearDialog) {
             var vacationDaysInput by remember { mutableStateOf("") }
             var generateNewYear by remember { mutableStateOf(false) }
@@ -368,9 +404,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                             calendarYearViewModel.closeYear(generateNewYear, today.value.year)
                             showCloseYearDialog = false
                         },
-                        enabled = if (!generateNewYear || generateNewYear && (vacationDaysInput.toIntOrNull()
-                                ?: 0) > 0
-                        ) true else false
+                        enabled = !generateNewYear || (vacationDaysInput.toIntOrNull() ?: 0) > 0
                     ) {
                         Text("Cerrar año")
                     }
@@ -384,6 +418,9 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
         }
     }
 
+    /**
+     * Diálogo para confirmar la descarga de los datos del año en formato CSV.
+     */
     @Composable
     private fun DownloadWeekDialog(
         onDismiss: () -> Unit,

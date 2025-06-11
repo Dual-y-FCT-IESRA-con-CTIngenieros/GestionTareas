@@ -4,10 +4,10 @@ import com.es.appmovil.viewmodel.DataViewModel.today
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-
+/**
+ * ViewModel encargado de gestionar los días festivos del año.
+ */
 class CalendarFestViewModel {
-
-
     /**
      * Función para cambiar el mes que se muestra en el calendario
      * @param month Numero de meses que se van a cambiar hacia atras
@@ -23,5 +23,4 @@ class CalendarFestViewModel {
     fun onMonthChangeFordward(month: DatePeriod) {
         today.value = today.value.plus(month)
     }
-
 }

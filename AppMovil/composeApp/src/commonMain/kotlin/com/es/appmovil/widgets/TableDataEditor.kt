@@ -32,6 +32,11 @@ import com.es.appmovil.viewmodel.TableManageViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * Composable que genera el editor de datos correspondiente según la tabla seleccionada.
+ *
+ * @param tableName Nombre de la tabla para la que se quiere mostrar el editor.
+ */
 @Composable
 fun claseTabla(tableName: String): Unit? {
     val viewModel = TableManageViewModel()
@@ -51,6 +56,13 @@ fun claseTabla(tableName: String): Unit? {
 
 }
 
+/**
+ * Editor de datos para la tabla Activity.
+ *
+ * Permite crear nuevas actividades a través de un formulario.
+ *
+ * @param viewModel ViewModel que gestiona el estado de las actividades.
+ */
 @Composable
 fun ActivityDataEditor(viewModel: TableManageViewModel) {
     var idActivity by remember { mutableStateOf("") }
@@ -118,6 +130,14 @@ fun ActivityDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+
+/**
+ * Editor de datos para la tabla Aircraft.
+ *
+ * Permite crear nuevas aeronaves.
+ *
+ * @param viewModel ViewModel que gestiona el estado de las aeronaves.
+ */
 @Composable
 fun AircraftDataEditor(viewModel: TableManageViewModel) {
     var idAircraft by remember { mutableStateOf("") }
@@ -164,6 +184,14 @@ fun AircraftDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+
+/**
+ * Editor de datos para la tabla Area.
+ *
+ * Permite crear nuevas áreas.
+ *
+ * @param viewModel ViewModel que gestiona el estado de las áreas.
+ */
 @Composable
 fun AreaDataEditor(viewModel: TableManageViewModel) {
     var descripcion by remember { mutableStateOf("") }
@@ -199,6 +227,14 @@ fun AreaDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+
+/**
+ * Editor de datos para la tabla Client.
+ *
+ * Permite crear nuevos clientes.
+ *
+ * @param viewModel ViewModel que gestiona el estado de los clientes.
+ */
 @Composable
 fun ClientDataEditor(viewModel: TableManageViewModel) {
     var nombreCliente by remember { mutableStateOf("") }
@@ -234,6 +270,14 @@ fun ClientDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+
+/**
+ * Editor de datos para la tabla Manager.
+ *
+ * Permite crear nuevos managers.
+ *
+ * @param viewModel ViewModel que gestiona el estado de los managers.
+ */
 @Composable
 fun ManagerDataEditor(viewModel: TableManageViewModel) {
     var nombre by remember { mutableStateOf("") }
@@ -281,6 +325,13 @@ fun ManagerDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+/**
+ * Editor de datos para la tabla Project.
+ *
+ * Permite crear nuevos proyectos y asignarles clientes.
+ *
+ * @param viewModel ViewModel que gestiona el estado de los proyectos.
+ */
 @Composable
 fun ProjectDataEditor(viewModel: TableManageViewModel) {
     var idProject by remember { mutableStateOf("") }
@@ -341,6 +392,13 @@ fun ProjectDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+/**
+ * Editor de datos para la tabla Rol.
+ *
+ * Permite crear nuevos roles.
+ *
+ * @param viewModel ViewModel que gestiona el estado de los roles.
+ */
 @Composable
 fun RolDataEditor(viewModel: TableManageViewModel) {
     var rol by remember { mutableStateOf("") }
@@ -376,6 +434,13 @@ fun RolDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+/**
+ * Editor de datos para la tabla TimeCode.
+ *
+ * Permite crear nuevos time codes.
+ *
+ * @param viewModel ViewModel que gestiona el estado de los time codes.
+ */
 @Composable
 fun TimeCodeDataEditor(viewModel: TableManageViewModel) {
     var idTimeCode by remember { mutableStateOf("") }
@@ -435,6 +500,14 @@ fun TimeCodeDataEditor(viewModel: TableManageViewModel) {
     }
 }
 
+
+/**
+ * Editor de datos para la tabla WorkOrder.
+ *
+ * Permite crear nuevas órdenes de trabajo vinculadas a múltiples entidades.
+ *
+ * @param viewModel ViewModel que gestiona el estado de las órdenes de trabajo.
+ */
 @Composable
 fun WorkOrderDataEditor(viewModel: TableManageViewModel) {
     var idWorkOrder by remember { mutableStateOf("") }

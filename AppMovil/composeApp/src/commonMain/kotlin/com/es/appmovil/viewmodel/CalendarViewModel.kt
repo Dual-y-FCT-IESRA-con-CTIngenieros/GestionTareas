@@ -24,7 +24,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
 /**
- * Clase viewmodel para el calendario, donde guardaremos los datos del calendario y sus posibles funciones
+ * ViewModel para gestionar el calendario, actividades y visualización de barras por día.
  */
 class CalendarViewModel {
 
@@ -44,19 +44,23 @@ class CalendarViewModel {
 
     private var _reset = MutableStateFlow(false)
 
-
+    /**
+     * Cambia la visibilidad del diálogo principal.
+     */
     fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
 
+    /**
+     * Cambia la visibilidad del diálogo de configuración.
+     */
     fun changeDialogConfig(bool: Boolean) {
         _showDialogConfig.value = bool
     }
 
-
     /**
-     * Función para cambiar el mes que se muestra en el calendario
-     * @param month Numero de meses que se van a cambiar hacia atras
+     * Cambia el mes mostrado hacia atrás y actualiza datos y gráficos.
+     * @param month Periodo de meses a restar.
      */
     fun onMonthChangePrevious(month: DatePeriod) {
         today.value = today.value.minus(month)
@@ -66,8 +70,8 @@ class CalendarViewModel {
     }
 
     /**
-     * Función para cambiar el mes que se muestra en el calendario
-     * @param month Numero de meses que se van a cambiar hacia delante
+     * Cambia el mes mostrado hacia adelante y actualiza datos y gráficos.
+     * @param month Periodo de meses a sumar.
      */
     fun onMonthChangeFordward(month: DatePeriod) {
         today.value = today.value.plus(month)
@@ -76,12 +80,20 @@ class CalendarViewModel {
         _reset.value = true
     }
 
+    /**
+     * Obtiene las actividades del empleado para una fecha dada.
+     * @param fechaSeleccionada Fecha a consultar.
+     * @return Lista de actividades para el empleado y fecha.
+     */
     fun getActivitiesForDate(fechaSeleccionada: LocalDate): List<EmployeeActivity> {
         return employeeActivity.value.filter {
             LocalDate.parse(it.date) == fechaSeleccionada && it.idEmployee == employee.idEmployee
         }
     }
 
+    /**
+     * Resetea las barras de datos para mostrar gráfico vacío.
+     */
     private fun resetBars() {
         _bars.value = listOf(
             Bars(
@@ -97,6 +109,9 @@ class CalendarViewModel {
         )
     }
 
+    /**
+     * Añade o actualiza una actividad de empleado y actualiza base de datos y datos relacionados.
+     */
     fun addEmployeeActivity(employeeActivity: EmployeeActivity) {
         val filtro =
             employeeActivities.value.find { it.date == employeeActivity.date && it.idTimeCode == employeeActivity.idTimeCode }
@@ -121,7 +136,7 @@ class CalendarViewModel {
             }
         }
 
-        if (employeeActivity.idTimeCode == 900) {
+        if (employeeActivity.idTimeCode == 900) { // Código para vacaciones
             val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
             if (userYearData != null) {
                 userYearData.enjoyedHolidays += employeeActivity.time.toInt()
@@ -130,7 +145,7 @@ class CalendarViewModel {
                     Database.updateData("UserYearData", userYearData)
                 }
             }
-        } else if (employeeActivity.idEmployee == 100) {
+        } else if (employeeActivity.idEmployee == 100) { // Código para horas trabajadas
             val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
             if (userYearData != null) {
                 userYearData.workedHours += employeeActivity.time.toInt()
@@ -143,6 +158,10 @@ class CalendarViewModel {
         getPie()
     }
 
+    /**
+     * Genera las barras para un día específico basado en las actividades del empleado.
+     * @param fechaSeleccionada Fecha a mostrar.
+     */
     fun generarBarrasPorDia(fechaSeleccionada: LocalDate) {
         val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 

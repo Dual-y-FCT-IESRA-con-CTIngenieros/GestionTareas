@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -43,28 +42,43 @@ import com.es.appmovil.viewmodel.UserWeekViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.HeaderSection
 
+/**
+ * Pantalla principal para la gestión del calendario.
+ * Permite navegar a diferentes secciones para:
+ * - Bloqueo semanal de calendarios.
+ * - Gestión anual de calendario.
+ * - Gestión de horas semanales de usuario.
+ * - Calendario de días festivos.
+ *
+ * Utiliza un Scaffold con barra inferior de navegación y tarjetas para seleccionar cada opción.
+ */
 class CalendarManageScreen : Screen {
     @Composable
     override fun Content() {
+        // Tamaño de iconos en las tarjetas
         val size = 90
+        // Flag para evitar múltiples clics rápidos y navegación duplicada
         var canClick by remember { mutableStateOf(true) }
-        // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
 
+        // Instancias de ViewModel para pasar a cada pantalla de gestión
         val calendarBlockWeekViewModel = CalendarBlockWeekViewModel()
         val calendarYearViewModel = CalendarYearViewModel()
         val userWeekViewModel = UserWeekViewModel()
         val calendarFestViewModel = CalendarFestViewModel()
 
         MaterialTheme {
-            Scaffold(bottomBar = {
-                BottomNavigationBar(navigator)
-            }) {
+            Scaffold(
+                bottomBar = { BottomNavigationBar(navigator) }
+            ) {
+                // Reseteamos estado de día actual y semanas al iniciar
                 resetToday()
                 calendarBlockWeekViewModel.resetWeeks()
 
-                Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-
+                Column(
+                    Modifier.fillMaxSize()
+                        .padding(top = 30.dp, start = 16.dp, end = 16.dp)
+                ) {
                     HeaderSection(
                         navigator,
                         "Gestión De Calendario",
@@ -74,92 +88,63 @@ class CalendarManageScreen : Screen {
 
                     Spacer(Modifier.size(30.dp))
 
+                    // Primera fila: Bloqueo semanal y Gestión anual
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // Tarjeta para bloquear semanas
                         ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    navigator.push(
-                                        CalendarBlockWeekScreen(
-                                            calendarBlockWeekViewModel
-                                        )
-                                    )
+                                    navigator.push(CalendarBlockWeekScreen(calendarBlockWeekViewModel))
                                     canClick = false
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
+                                Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.FreeCancellation,
-                                    contentDescription = "Semanal",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
+                                Icon(Icons.Filled.FreeCancellation, contentDescription = "Semanal", modifier = Modifier.size(size.dp), tint = Color(0xFF707272))
                                 Text("Bloqueo Semanal")
                             }
-
                         }
 
                         Spacer(Modifier.size(16.dp))
 
+                        // Tarjeta para gestión anual
                         ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    canClick = false
                                     navigator.push(CalendarYearScreen(calendarYearViewModel))
+                                    canClick = false
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
+                                Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.EventBusy,
-                                    contentDescription = "Anual",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
+                                Icon(Icons.Filled.EventBusy, contentDescription = "Anual", modifier = Modifier.size(size.dp), tint = Color(0xFF707272))
                                 Text("Gestión Anual")
                             }
-
                         }
                     }
 
                     Spacer(Modifier.size(16.dp))
 
+                    // Segunda fila: Horas semanales y Calendario festivos
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // Tarjeta para gestión de horas semanales
                         ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     navigator.push(UserWeekScreen(userWeekViewModel))
@@ -169,52 +154,35 @@ class CalendarManageScreen : Screen {
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
+                                Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.EventNote,
-                                    contentDescription = " HoraSemanal",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
+                                Icon(Icons.AutoMirrored.Filled.EventNote, contentDescription = "Horas Semanales", modifier = Modifier.size(size.dp), tint = Color(0xFF707272))
                                 Text("Horas Semanales")
                             }
-
                         }
 
                         Spacer(Modifier.size(16.dp))
 
+                        // Tarjeta para calendario festivos
                         ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
-                                    canClick = false
                                     navigator.push(CalendarFestScreen(calendarFestViewModel))
+                                    canClick = false
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
+                                Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.EditCalendar,
-                                    contentDescription = "Anual",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
+                                Icon(Icons.Filled.EditCalendar, contentDescription = "Calendario Festivos", modifier = Modifier.size(size.dp), tint = Color(0xFF707272))
                                 Text("Calendario Festivos")
                             }
-
                         }
                     }
                 }

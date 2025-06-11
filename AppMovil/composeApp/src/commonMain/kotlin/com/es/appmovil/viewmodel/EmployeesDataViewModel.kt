@@ -16,19 +16,28 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * ViewModel para gestionar empleados: altas, bajas, edición y filtrado.
+ */
 class EmployeesDataViewModel : ViewModel() {
+
+    // Lista de todos los empleados (se carga inicialmente desde DataViewModel)
     private val _employees = MutableStateFlow(DataViewModel.employees.value)
     val employees: MutableStateFlow<MutableList<Employee>> = _employees
 
+    // Lista de empleados activos (sin fecha de baja o fecha de baja futura)
     private var _actualEmployees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
     val actualEmployees: MutableStateFlow<MutableList<Employee>> = _actualEmployees
 
+    // Lista de exempleados (fecha de baja pasada o incorrecta)
     private val _exEmployees = MutableStateFlow<MutableList<Employee>>(mutableListOf())
     val exEmployees: MutableStateFlow<MutableList<Employee>> = _exEmployees
 
+    // Texto actual del filtro de búsqueda
     private var _filter: MutableStateFlow<String> = MutableStateFlow("")
     val filter: StateFlow<String> = _filter
 
+    // Variables de edición de formulario
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name
     private val _lastName = MutableStateFlow("")
@@ -52,6 +61,7 @@ class EmployeesDataViewModel : ViewModel() {
     private val _idAirbus = MutableStateFlow("")
     val idAirbus: StateFlow<String> = _idAirbus
 
+    /** Setters de los campos de formulario **/
     fun onChangeName(newName: String) {
         _name.value = newName
     }
@@ -64,6 +74,7 @@ class EmployeesDataViewModel : ViewModel() {
         _user.value = newUser
     }
 
+    // Al cambiar el email concatenamos el dominio
     fun onChangeEmail(newEmail: String) {
         _email.value = newEmail + _domain.value
     }
@@ -76,6 +87,9 @@ class EmployeesDataViewModel : ViewModel() {
         _idAirbus.value = newIdAirbus
     }
 
+    /**
+     * Ordena los empleados en activos y exempleados según su fecha de baja.
+     */
     fun orderEmployees() {
         _actualEmployees.value.clear()
         _exEmployees.value.clear()
@@ -96,45 +110,53 @@ class EmployeesDataViewModel : ViewModel() {
                         _exEmployees.value.add(employee)
                     }
                 } catch (e: Exception) {
-                    // Manejo de error si el formato no es válido
+                    // Si el formato es inválido lo metemos como exempleado
                     _exEmployees.value.add(employee)
                 }
             }
         }
     }
 
+    /**
+     * Añade un nuevo empleado a la base de datos y lo registra.
+     */
     fun addEmployee(newEmployee: Employee) {
         viewModelScope.launch {
-            Database.addEmployee(
-                newEmployee.toInsertDTO()
-            )
-            Database.register(newEmployee.email, "ct1234")
+            Database.addEmployee(newEmployee.toInsertDTO())
+            Database.register(newEmployee.email, "ct1234") // registro inicial con password por defecto
+
+            // Lo añadimos a DataViewModel global
             DataViewModel.employees.value.add(newEmployee)
             orderEmployees()
         }
     }
 
+    /**
+     * Marca un empleado como baja (update de datos).
+     */
     fun removeEmployee(removeEmployee: EmployeeUpdateDTO) {
         viewModelScope.launch {
             FullScreenLoadingManager.showLoader()
-            Database.updateEmployee(
-                removeEmployee
-            )
+
+            Database.updateEmployee(removeEmployee)
 
             val updatedEmployee = removeEmployee.toEntity()
 
-            val employeeToRemove =
-                DataViewModel.employees.value.find { it.idEmployee == updatedEmployee.idEmployee }
+            val employeeToRemove = DataViewModel.employees.value
+                .find { it.idEmployee == updatedEmployee.idEmployee }
+
             DataViewModel.employees.value.remove(employeeToRemove)
-            DataViewModel.employees.value.add(removeEmployee.toEntity())
+            DataViewModel.employees.value.add(updatedEmployee)
 
             orderEmployees()
 
             FullScreenLoadingManager.hideLoader()
         }
-
     }
 
+    /**
+     * Cambia el valor del filtro de búsqueda de empleados.
+     */
     fun changeFilter(value: String) {
         _filter.value = value
     }

@@ -14,15 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
@@ -31,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +46,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
+import com.es.appmovil.utils.customButtonColors
+import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
@@ -67,6 +66,9 @@ import org.jetbrains.compose.resources.painterResource
  * @param userViewmodel:UserViewmodel viewmodel que guarda los datos del usuario para iniciar sesión.
  */
 class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
+    /**
+     * Composable principal que muestra el contenido de la pantalla de login.
+     */
     @Composable
     override fun Content() {
         // Generamos la navegación actual
@@ -81,15 +83,15 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
         val passChange by userViewmodel.passChange.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
-        cargarCalendarFest()
-
-        if (!checkSess) {
-            userViewmodel.checkSession()
+        // Efectos de carga inicial y chequeo de sesión
+        LaunchedEffect(Unit) {
+            cargarCalendarFest()
+            if (!checkSess) userViewmodel.checkSession()
         }
 
-        if (loginError) {
-            DialogError(loginErrorMesssage) { userViewmodel.resetError() }
-        }
+        // Mostrar diálogo de error si hay alguno
+        if (loginError) DialogError(loginErrorMesssage) { userViewmodel.resetError() }
+
 
         // Montamos la estructura
         Column(
@@ -126,21 +128,30 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
             )
             // Si la navegación no es nula, esto es para evitarnos de problemas, aparece el botón y
             // comprueba los campos
-            if (navigator != null) {
-                Boton {
-                    userViewmodel.checkLogin()
-                }
-                if (login && !passChange) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        FullScreenLoadingManager.showLoader()
+            Boton {
+                userViewmodel.checkLogin()
+            }
+            // Lanzar efecto de login cuando cambien las variables de estado login y passChange
+            LaunchedEffect(login, passChange) {
+                if (login && !passChange && navigator != null) {
+                    FullScreenLoadingManager.showLoader()
+                    try {
                         doLogin(email, navigator)
+                    } finally {
                         FullScreenLoadingManager.hideLoader()
                     }
                 }
             }
+
         }
     }
 
+    /**
+     * Realiza la lógica del login: obtiene los datos del empleado y navega a la pantalla de resumen.
+     *
+     * @param email Correo electrónico del usuario para buscar en la base de datos.
+     * @param navigator Navegador para cambiar de pantalla.
+     */
     private suspend fun doLogin(email: String, navigator: Navigator) {
         withContext(Dispatchers.IO) {
             Database.getEmployee(email)
@@ -226,29 +237,12 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
         }
     }
 
-    @Composable
-    fun customButtonColors(): ButtonColors {
-        return ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFF4A900),
-            contentColor = Color.Black,
-            disabledBackgroundColor = Color.Gray,
-            disabledContentColor = Color.Black
-        )
-    }
-
-    @Composable
-    fun customTextFieldColors(): TextFieldColors {
-        return TextFieldDefaults.outlinedTextFieldColors(
-            textColor = Color.Black,
-            backgroundColor = Color.Transparent,
-            focusedBorderColor = Color(0xFFF4A900),
-            unfocusedBorderColor = Color.Gray,
-            focusedLabelColor = Color(0xFFF4A900),
-            unfocusedLabelColor = Color.Gray,
-            cursorColor = Color(0xFFF4A900)
-        )
-    }
-
+    /**
+     * Composable que muestra un diálogo para cambiar la contraseña en caso de que se use la contraseña por defecto.
+     *
+     * @param alertOpen Indica si el diálogo está abierto.
+     * @param onDismiss Lambda para cerrar el diálogo.
+     */
     @Composable
     fun DialogChangePass(
         alertOpen: Boolean,
@@ -309,7 +303,7 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
-                                colors = com.es.appmovil.utils.customButtonColors(),
+                                colors = customButtonColors(),
                                 onClick = {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         Database.updateUser(pass.value)
@@ -381,5 +375,4 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
             }
         }
     }
-
 }

@@ -49,8 +49,17 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
+/**
+ * Pantalla para el control y gestión semanal de usuarios.
+ *
+ * @param userWeekViewModel ViewModel que maneja la lógica y datos para la vista semanal de usuarios.
+ */
 class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen {
 
+    /**
+     * Composable principal que define el contenido de la pantalla.
+     * Incluye selección de semana, área, listado de empleados y diálogo para descargar datos CSV.
+     */
     @Composable
     override fun Content() {
         val manageCSV = ManageCSV()
@@ -63,13 +72,16 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
         var showDialog by remember { mutableStateOf(false) }
         var downloadWeekExpanded by remember { mutableStateOf(false) }
 
+        // Obtiene el primer lunes del año actual para calcular semanas
         val firstDayOfYear = LocalDate(today.value.year, 1, 1)
         val firstMonday = generateSequence(firstDayOfYear) { it.plus(DatePeriod(days = 1)) }
             .first { it.dayOfWeek == DayOfWeek.MONDAY }
 
+        // Calcula primer y último día de la semana seleccionada
         val firstDayOfWeek = firstMonday.plus(DatePeriod(days = (selectedWeek - 1) * 7))
         val lastDayOfWeek = firstDayOfWeek.plus(DatePeriod(days = 6))
 
+        // Muestra diálogo para descargar CSV de la semana seleccionada
         if (showDialog) {
             DownloadWeekDialog(
                 selectedWeek = selectedWeek,
@@ -87,6 +99,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
+            // Encabezado con título y botón para descargar
             HeaderSection(
                 navigator,
                 "Control de Semanas",
@@ -96,6 +109,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Selector de semanas desplegable
             WeekSelector(
                 selectedWeek = selectedWeek,
                 onWeekSelected = { selectedWeek = it },
@@ -106,19 +120,31 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Selector horizontal de áreas
             AreaSelector(area = area, onAreaSelected = { areaIndex = it })
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Obtiene empleados filtrados por área y rango de fechas
             val employeeByArea = userWeekViewModel.getEmployeeByArea(
                 area[areaIndex].desc,
                 Pair(firstDayOfWeek, lastDayOfWeek)
             )
 
+            // Lista de empleados con horas trabajadas
             EmployeeList(employeeByArea = employeeByArea)
         }
     }
 
+    /**
+     * Composable para seleccionar la semana del año.
+     *
+     * @param selectedWeek Semana actualmente seleccionada.
+     * @param onWeekSelected Callback para actualizar la semana seleccionada.
+     * @param expanded Estado para mostrar u ocultar el menú desplegable.
+     * @param onExpandChange Callback para cambiar el estado expandido.
+     * @param firstMonday Primer lunes del año para calcular fechas.
+     */
     @Composable
     private fun WeekSelector(
         selectedWeek: Int,
@@ -135,8 +161,10 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Muestra semana seleccionada y abre el menú al hacer clic
             Text("Semana $selectedWeek", modifier = Modifier.clickable { onExpandChange(true) })
 
+            // Muestra rango de fechas de la semana
             Text(
                 "${firstDay.dayOfMonth} ${
                     firstDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
@@ -148,6 +176,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
             )
         }
 
+        // Menú desplegable con las 52 semanas del año
         DropdownMenu(expanded = expanded, onDismissRequest = { onExpandChange(false) }) {
             (1..52).forEach { week ->
                 val weekStart = firstMonday.plus(DatePeriod(days = (week - 1) * 7))
@@ -169,6 +198,12 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
         }
     }
 
+    /**
+     * Composable para seleccionar un área mediante botones en fila horizontal.
+     *
+     * @param area Lista de áreas disponibles.
+     * @param onAreaSelected Callback para actualizar el índice del área seleccionada.
+     */
     @Composable
     private fun AreaSelector(
         area: List<Area>,
@@ -176,15 +211,21 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
     ) {
         LazyRow(Modifier.fillMaxWidth()) {
             items(area.size) {
+                // No muestra área con id 1 (posiblemente área genérica o sin área)
                 if (area[it].idArea != 1)
                     Button(onClick = { onAreaSelected(it) }, colors = customButtonColors()) {
-                        Text(area[it].desc.take(15))
+                        Text(area[it].desc.take(15)) // Muestra nombre recortado a 15 caracteres
                     }
                 Spacer(Modifier.size(8.dp))
             }
         }
     }
 
+    /**
+     * Composable que muestra una lista con nombre y horas trabajadas por empleado.
+     *
+     * @param employeeByArea Mapa donde clave es el nombre del empleado y valor las horas trabajadas.
+     */
     @Composable
     private fun EmployeeList(employeeByArea: Map<String, Int>) {
         LazyColumn {
@@ -201,6 +242,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                         .padding(vertical = 8.dp),
                     elevation = CardDefaults.elevatedCardElevation(5.dp)
                 ) {
+                    // Recorre cada empleado mostrando su nombre y horas trabajadas con color según horas
                     employeeByArea.entries.forEach { (name, hours) ->
                         Row(
                             modifier = Modifier
@@ -220,6 +262,17 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
         }
     }
 
+    /**
+     * Diálogo para seleccionar una semana y descargar los datos en CSV.
+     *
+     * @param selectedWeek Semana actualmente seleccionada.
+     * @param onWeekSelected Callback para actualizar la semana seleccionada.
+     * @param onDismiss Callback para cerrar el diálogo.
+     * @param onConfirm Callback para confirmar descarga.
+     * @param expanded Estado del menú desplegable dentro del diálogo.
+     * @param onExpandChange Callback para cambiar el estado expandido del menú.
+     * @param firstMonday Primer lunes del año para cálculo de semanas.
+     */
     @Composable
     private fun DownloadWeekDialog(
         selectedWeek: Int,
@@ -241,6 +294,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                     val weekStart = firstMonday.plus(DatePeriod(days = (selectedWeek - 1) * 7))
                     val weekEnd = weekStart.plus(DatePeriod(days = 6))
 
+                    // Muestra la semana seleccionada y permite abrir menú para cambiar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -261,6 +315,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                         )
                     }
 
+                    // Menú desplegable con opciones de semanas
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { onExpandChange(false) }) {

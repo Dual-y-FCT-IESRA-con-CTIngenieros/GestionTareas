@@ -23,6 +23,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -48,10 +49,13 @@ import kotlinx.datetime.LocalDate
 
 
 /**
- * Funcion que muestra una ventana deslizante para reallenar los campos de un dia
+ * Muestra un modal bottom sheet para editar los datos de un día.
  *
- *@param showDialog Muestra o no el dialogo
- * @param onChangeDialog Función que cambia el valor de showDialog
+ * @param showDialog Controla la visibilidad del diálogo.
+ * @param day Día seleccionado.
+ * @param dayMenuViewModel ViewModel para manejar el estado y lógica del diálogo.
+ * @param calendarViewModel ViewModel para manejar actividades en el calendario.
+ * @param onChangeDialog Callback para cambiar el estado de visibilidad.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,7 +176,15 @@ fun DayDialog(
         }
     }
 }
-
+/**
+ * Botón que guarda los datos del día si todos los campos requeridos están completos.
+ *
+ * @param timeCode Código del tiempo seleccionado.
+ * @param workOrder Orden de trabajo seleccionada.
+ * @param activity Actividad seleccionada.
+ * @param onChangeDialog Callback para cerrar el diálogo.
+ * @param onSaveEmploye Callback para guardar la actividad.
+ */
 @Composable
 fun Save(
     timeCode: Int,
@@ -198,6 +210,16 @@ fun Save(
     }
 }
 
+/**
+ * Selector desplegable para elegir un TimeCode dentro de un proyecto.
+ *
+ * @param timecodeData Lista de TimeCodes disponibles.
+ * @param proyectTimecodesDTO Lista de proyectos con sus TimeCodes.
+ * @param onTimeCodeSelected Callback al seleccionar un TimeCode (string).
+ * @param timeCodeSeleccionado TimeCode actualmente seleccionado.
+ * @param onTimeCodeChange Callback cuando cambia el TimeCode (int).
+ * @param onProyectChange Callback cuando cambia el proyecto (string o null).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProyectoYTimeCodeSelector(
@@ -222,7 +244,7 @@ fun ProyectoYTimeCodeSelector(
             readOnly = true,
             label = { Text("TimeCode") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTimeCode) },
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
         )
 
         ExposedDropdownMenu(
@@ -248,6 +270,18 @@ fun ProyectoYTimeCodeSelector(
     }
 }
 
+
+/**
+ * Selector desplegable para elegir un proyecto asociado a un TimeCode.
+ *
+ * @param proyectTimecodesDTO Lista de proyectos con TimeCodes.
+ * @param timeCodeSeleccionado TimeCode seleccionado.
+ * @param proyectoSeleccionado Proyecto seleccionado.
+ * @param placeholder Texto de placeholder para el campo.
+ * @param modifier Modifier para el componente.
+ * @param onChangeProyect Callback al cambiar el proyecto.
+ * @param onProjectSelected Callback al seleccionar un proyecto.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsSelected(
@@ -281,7 +315,7 @@ fun ProjectsSelected(
             readOnly = true,
             label = { Text(placeholder) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirProyecto) },
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
             enabled = timeCodeSeleccionado != 0
         )
 
@@ -304,6 +338,13 @@ fun ProjectsSelected(
     }
 }
 
+
+/**
+ * Campo numérico para ingresar horas con botones para aumentar o disminuir valor.
+ *
+ * @param value Valor actual de horas.
+ * @param onValueChange Callback para actualizar el valor.
+ */
 
 @Composable
 fun NumberInputField(

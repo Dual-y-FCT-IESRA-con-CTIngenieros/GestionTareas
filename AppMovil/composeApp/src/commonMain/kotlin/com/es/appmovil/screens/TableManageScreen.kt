@@ -25,6 +25,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,21 +68,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 
+/**
+ * Clase principal para la pantalla de gestión de tablas.
+ * Implementa una pantalla que permite visualizar, editar y generar CSVs de diversas tablas.
+ */
 class TableManageScreen : Screen {
+
+    /**
+     * Composable principal que representa el contenido de la pantalla.
+     *
+     * - Carga los datos de las tablas al iniciarse.
+     * - Muestra un listado con los nombres de las tablas.
+     * - Permite editar o agregar entradas en cada tabla.
+     * - Permite abrir un diálogo para exportar la tabla seleccionada en formato CSV.
+     */
     @Composable
     override fun Content() {
 
         val navigator: Navigator = LocalNavigator.currentOrThrow
         var showDialog by remember { mutableStateOf(false) }
 
+        // Carga las tablas y muestra/oculta loader
         LaunchedEffect(Unit) {
             FullScreenLoadingManager.showLoader()
             DataViewModel.load_tables()
             FullScreenLoadingManager.hideLoader()
         }
 
+        // Mapa mutable que almacenará los datos de cada tabla por su nombre
         val tables = mutableMapOf<String, List<Any>>()
 
+        // Colección de estados para las distintas tablas del ViewModel
         val tablesData = listOf(
             DataViewModel.activities.collectAsState(),
             DataViewModel.aircraft.collectAsState(),
@@ -95,14 +112,16 @@ class TableManageScreen : Screen {
         )
         val tablesNames by DataViewModel.tablesNames.collectAsState()
 
+        // Asociar cada nombre de tabla con sus datos correspondientes
         tablesNames.forEachIndexed() { index, tableName ->
             tables[tableName] = tablesData[index].value
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-
+            // Cabecera con título, botón para descarga CSV y navegación
             HeaderSection(navigator, "Tablas", Icons.Filled.Download, true) { showDialog = true }
 
+            // Listado de tablas con botón para editar y añadir entradas
             LazyColumn {
                 tables.forEach { (tableName, tableData) ->
                     item {
@@ -126,9 +145,16 @@ class TableManageScreen : Screen {
                 }
             }
         }
+        // Diálogo para exportar tablas a CSV
         csvDialog(showDialog, tablesNames) { showDialog = false }
     }
 
+    /**
+     * Composable que representa un ítem de tabla en la lista.
+     *
+     * @param tableName Nombre de la tabla.
+     * @param onEditClick Lambda que se ejecuta al pulsar el botón de editar.
+     */
     @Composable
     fun TableItem(
         tableName: String,
@@ -167,12 +193,20 @@ class TableManageScreen : Screen {
                     }
                 }
             }
+            // Muestra un editor para agregar datos cuando showEditor es true
             if (showEditor) {
-                claseTabla(tableName)
+                claseTabla(tableName) // Función para mostrar formulario de edición/agregado
             }
         }
     }
 
+    /**
+     * Composable que muestra un diálogo para seleccionar una tabla y generar su CSV.
+     *
+     * @param showDialog Controla si el diálogo está visible.
+     * @param tables Lista con los nombres de las tablas disponibles.
+     * @param onDismiss Lambda para cerrar el diálogo.
+     */
     @Composable
     fun csvDialog(showDialog: Boolean, tables: List<String>, onDismiss: () -> Unit) {
 
@@ -232,6 +266,13 @@ class TableManageScreen : Screen {
         }
     }
 
+    /**
+     * Composable que muestra un Dropdown para seleccionar una tabla.
+     *
+     * @param tablesNames Lista con los nombres de las tablas.
+     * @param tableSelected Tabla actualmente seleccionada.
+     * @param onTableSelection Callback para actualizar la tabla seleccionada.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TableSelector(
@@ -253,7 +294,7 @@ class TableManageScreen : Screen {
                 readOnly = true,
                 label = { Text("Seleccione Tabla") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandirTablas) },
-                modifier = Modifier.menuAnchor()
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
             )
 
             ExposedDropdownMenu(
@@ -274,6 +315,13 @@ class TableManageScreen : Screen {
         }
     }
 
+    /**
+     * Actualiza la tabla especificada con los datos recibidos.
+     * Ejecuta la actualización en un hilo de background y maneja el loader de pantalla completa.
+     *
+     * @param tableName Nombre de la tabla a actualizar.
+     * @param data Mapa con los campos y valores para la actualización.
+     */
     private fun updateTable(tableName: String, data: Map<String, Any?>) {
         CoroutineScope(Dispatchers.IO).launch {
             FullScreenLoadingManager.showLoader()
@@ -367,6 +415,14 @@ class TableManageScreen : Screen {
         }
     }
 
+    /**
+     * Reconstruye una instancia de TableEntry a partir de un mapa de datos y el nombre de la tabla.
+     *
+     * @param tableName Nombre de la tabla.
+     * @param data Mapa con los campos y valores de la tabla.
+     * @return Una instancia específica de TableEntry con los datos recibidos.
+     * @throws IllegalArgumentException si el nombre de la tabla no coincide con ninguna conocida.
+     */
     private fun reconstructEntry(tableName: String, data: Map<String, Any?>): TableEntry {
         return when (tableName) {
             "Activity" -> {
@@ -431,5 +487,4 @@ class TableManageScreen : Screen {
             else -> error("Tipo de tabla desconocido: $tableName")
         }
     }
-
 }

@@ -39,23 +39,29 @@ import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
 
-
+/**
+ * Pantalla principal de administración.
+ * Permite navegar a:
+ * - Gestión de Usuarios
+ * - Gestión de Tablas
+ * - Gestión de Calendario
+ */
 class AdminScreen : Screen {
     @Composable
     override fun Content() {
-        val size = 90
-        var canClick by remember { mutableStateOf(true) }
-        // Generamos la navegación actual
-        val navigator = LocalNavigator.currentOrThrow
-        val employeesDataViewModel = EmployeesDataViewModel()
+        val size = 90 // Tamaño base para los íconos
+        var canClick by remember { mutableStateOf(true) } // Previene múltiples clics rápidos
+        val navigator = LocalNavigator.currentOrThrow // Objeto de navegación actual
+        val employeesDataViewModel = EmployeesDataViewModel() // ViewModel para empleados
 
         MaterialTheme {
-            Scaffold(bottomBar = {
-                BottomNavigationBar(navigator)
-            }) {
-                resetToday()
+            Scaffold(
+                bottomBar = { BottomNavigationBar(navigator) } // Barra de navegación inferior
+            ) {
+                resetToday() // Resetea el estado del día actual si es necesario
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+                    // Título principal
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,12 +74,14 @@ class AdminScreen : Screen {
                         )
                     }
 
-                    Spacer(Modifier.size(30.dp))
+                    Spacer(Modifier.size(30.dp)) // Espaciado vertical
 
+                    // Fila con las dos primeras opciones: Usuarios y Tablas
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // Opción: Gestión de Usuarios
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
@@ -102,11 +110,11 @@ class AdminScreen : Screen {
                                 )
                                 Text("Gestión de Usuarios")
                             }
-
                         }
 
-                        Spacer(Modifier.size(16.dp))
+                        Spacer(Modifier.size(16.dp)) // Espaciado entre tarjetas
 
+                        // Opción: Gestión de Tablas
                         ElevatedCard(
                             colors = CardColors(
                                 containerColor = Color.White,
@@ -135,12 +143,12 @@ class AdminScreen : Screen {
                                 )
                                 Text("Gestión de Tablas")
                             }
-
                         }
                     }
 
-                    Spacer(Modifier.size(16.dp))
+                    Spacer(Modifier.size(16.dp)) // Espacio entre filas
 
+                    // Fila con una sola tarjeta: Gestión de Calendario
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center

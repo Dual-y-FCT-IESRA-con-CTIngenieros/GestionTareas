@@ -33,35 +33,47 @@ import com.es.appmovil.widgets.Calendar
 import com.es.appmovil.widgets.ResumenHorasDia
 import com.es.appmovil.widgets.ResumenHorasMensual
 
+/**
+ * Pantalla principal del calendario de actividades del empleado.
+ * Muestra un calendario con las actividades del día y códigos de tiempo asociados.
+ * Contiene además un resumen de horas del día y del mes.
+ * Permite abrir diálogos para añadir o configurar actividades.
+ */
 class CalendarScreen : Screen {
     @Composable
     override fun Content() {
-        // Generamos la navegación actual
+        // Navegador actual para controlar la navegación entre pantallas
         val navigator = LocalNavigator.currentOrThrow
+
+        // ViewModels necesarios para la pantalla
         val calendarViewmodel = CalendarViewModel()
         val dayMenuViewModel = DayMenuViewModel()
 
-        // Creamos las variables necesarias desde el viewmodel
+        // Estado actual de la fecha
         val fechaActual by today.collectAsState()
+        // Actividades del empleado para mostrar en el calendario
         val actividades by calendarViewmodel.employeeActivity.collectAsState()
+        // Códigos de tiempo relacionados con las actividades
         val timeCodes by calendarViewmodel.timeCodes.collectAsState()
 
-        // Creamos la variable que nos permite mostrar el dialogo
+        // Estados para mostrar diálogos (agregar o configurar actividades)
         val showDialog by calendarViewmodel.showDialog.collectAsState()
         val showDialogConfig by calendarViewmodel.showDialogConfig.collectAsState()
 
+        // Actualiza el pie de datos (puede ser para estadísticas o visualizaciones)
         DataViewModel.getPie()
 
         MaterialTheme {
             Scaffold(
-                bottomBar = { BottomNavigationBar(navigator) },
-                floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },
-                floatingActionButtonPosition = FabPosition.Center, // o End
+                bottomBar = { BottomNavigationBar(navigator) },   // Barra de navegación inferior
+                floatingActionButton = { ActionButton { calendarViewmodel.changeDialog(true) } },  // Botón flotante para abrir diálogo
+                floatingActionButtonPosition = FabPosition.Center, // Posición centrada del botón flotante
                 isFloatingActionButtonDocked = false
             ) { innerPadding ->
 
                 Box(Modifier.padding(innerPadding).fillMaxSize()) {
                     Column {
+                        // Componente principal del calendario que muestra actividades y códigos de tiempo
                         Calendar(
                             calendarViewmodel,
                             dayMenuViewModel,
@@ -71,7 +83,10 @@ class CalendarScreen : Screen {
                             actividades,
                             timeCodes
                         )
+
+                        // Fila con resumen de horas del día y resumen mensual
                         Row {
+                            // Tarjeta con resumen de horas del día, abre diálogo de configuración
                             ElevatedCard(
                                 colors = CardColors(
                                     containerColor = Color.White,
@@ -79,22 +94,22 @@ class CalendarScreen : Screen {
                                     disabledContainerColor = Color.Gray,
                                     disabledContentColor = Color.Black
                                 ),
-                                modifier = Modifier.weight(1f)
-                                    .padding(start = 20.dp, bottom = 20.dp).clickable {
-                                    calendarViewmodel.changeDialogConfig(true)
-                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 20.dp, bottom = 20.dp)
+                                    .clickable { calendarViewmodel.changeDialogConfig(true) },
                                 elevation = CardDefaults.elevatedCardElevation(5.dp)
-
                             ) {
                                 ResumenHorasDia(calendarViewmodel)
                             }
 
                             Spacer(Modifier.size(16.dp))
 
+                            // Columna con resumen mensual de horas (sin tamaño fijo para mejor flexibilidad)
                             Column(
                                 modifier = Modifier.weight(1f).padding(end = 20.dp, bottom = 10.dp)
                             ) {
-                                ResumenHorasMensual() // ya no tiene medidas fijas dentro
+                                ResumenHorasMensual()
                             }
                         }
                     }
