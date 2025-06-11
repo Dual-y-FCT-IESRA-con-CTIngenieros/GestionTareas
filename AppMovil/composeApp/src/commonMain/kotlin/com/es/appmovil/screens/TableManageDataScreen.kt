@@ -40,13 +40,28 @@ import com.es.appmovil.viewmodel.TableManageViewModel
 import com.es.appmovil.widgets.DatePickerDialogSample
 import com.es.appmovil.widgets.DropdownMenu
 
-// Pantalla dinámica
+/**
+ * Pantalla para gestionar datos de una tabla genérica.
+ *
+ * Muestra una tabla con entradas editables dinámicamente según los campos de cada fila.
+ * Permite seleccionar una entrada para editar sus campos, los cuales pueden ser texto,
+ * fechas, colores, booleanos o selecciones desplegables dependiendo del tipo y contexto.
+ *
+ * @property tableName Nombre de la tabla que se muestra en el título.
+ * @property entries Lista de entradas a mostrar y editar.
+ * @property onUpdate Callback que se invoca al guardar cambios en una entrada,
+ * recibiendo la entrada modificada y un mapa con los campos actualizados.
+ */
 class TableManageDataScreen(
     private val tableName: String,
     private val entries: List<TableEntry>,
     private val onUpdate: (TableEntry, Map<String, Any?>) -> Unit
 ) : Screen {
 
+    /**
+     * Composable principal que monta la UI completa de la pantalla,
+     * incluyendo el título, la tabla, y el editor dinámico para la entrada seleccionada.
+     */
     @Composable
     override fun Content() {
         var selectedEntry by remember { mutableStateOf<TableEntry?>(null) }
@@ -118,7 +133,9 @@ class TableManageDataScreen(
         }
     }
 
-    // 🔹 Título de la pantalla
+    /**
+     * Composable que muestra el título con el nombre de la tabla.
+     */
     @Composable
     private fun TitleSection(tableName: String) {
         Row(
@@ -133,7 +150,10 @@ class TableManageDataScreen(
         }
     }
 
-    // 🔹 Encabezados y filas de la tabla
+    /**
+     * Composable que muestra la tabla con encabezados y filas clicables.
+     * Al seleccionar una fila, se activa el modo edición para esa entrada.
+     */
     @Composable
     private fun TableSection(entries: List<TableEntry>, onEntryClick: (TableEntry) -> Unit) {
         val columnHeaders = entries.firstOrNull()?.getFieldMap()?.keys?.toList().orEmpty()
@@ -195,6 +215,10 @@ class TableManageDataScreen(
         }
     }
 
+    /**
+     * Composable que muestra campos editables dinámicos según el tipo y nombre del campo.
+     * Puede mostrar campos de texto, dropdowns, selectores de color, checkboxes, o pickers de fecha.
+     */
     @Composable
     private fun EditableFields(
         key: String,
@@ -356,6 +380,9 @@ class TableManageDataScreen(
         }
     }
 
+    /**
+     * Composable auxiliar que muestra un campo de texto editable.
+     */
     @Composable
     private fun EditText(
         key: String,
@@ -371,7 +398,13 @@ class TableManageDataScreen(
         )
     }
 
-    // Ayudante para convertir String a tipo original
+    /**
+     * Convierte un valor en formato String al tipo original esperado según el valor original.
+     *
+     * @param originalValue Valor original del campo para inferir el tipo.
+     * @param newValue Valor en String a convertir.
+     * @return Valor convertido al tipo original o null si no se puede convertir.
+     */
     private fun parseValue(originalValue: Any?, newValue: String): Any? {
         return when (originalValue) {
             is Int -> newValue.toIntOrNull()
@@ -386,6 +419,9 @@ class TableManageDataScreen(
         }
     }
 
+    /**
+     * Composable que muestra una fila con un selector de color y un diálogo para escogerlo.
+     */
     @Composable
     fun ColorSelectorRow(
         selectedColor: Color,
@@ -422,6 +458,9 @@ class TableManageDataScreen(
         }
     }
 
+    /**
+     * Composable que muestra un diálogo con una paleta de colores para seleccionar uno.
+     */
     @Composable
     fun ColorPickerDialog(
         onColorSelected: (Color) -> Unit,

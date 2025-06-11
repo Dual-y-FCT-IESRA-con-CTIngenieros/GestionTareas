@@ -48,6 +48,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 
+/**
+ * Composable que renderiza la barra de navegación inferior con navegación entre pantallas.
+ *
+ * @param navigator Controlador de navegación de Voyager.
+ */
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
     val selected by remember { selectScreen(navigator) }
@@ -142,6 +147,13 @@ fun BottomNavigationBar(navigator: Navigator) {
     ) { showDialog = false }
 }
 
+/**
+ * Diálogo de confirmación para cerrar sesión.
+ *
+ * @param showDialog Indica si el diálogo está visible.
+ * @param onAccept Acción a ejecutar al confirmar.
+ * @param onDismiss Acción al cancelar o cerrar el diálogo.
+ */
 @Composable
 fun DialogSession(showDialog: Boolean, onAccept: () -> Unit, onDismiss: () -> Unit) {
     if (showDialog) {
@@ -158,6 +170,14 @@ fun DialogSession(showDialog: Boolean, onAccept: () -> Unit, onDismiss: () -> Un
     }
 }
 
+/**
+ * Realiza el cierre de sesión del usuario:
+ * - Cierra sesión en Supabase.
+ * - Elimina los tokens almacenados.
+ * - Redirige a la pantalla de login.
+ *
+ * @param navigator Controlador de navegación para redirigir.
+ */
 suspend fun signOut(navigator: Navigator) {
     val settings = Settings()
     supabase.auth.signOut()
@@ -166,6 +186,12 @@ suspend fun signOut(navigator: Navigator) {
     navigator.replaceAll(LoginScreen(UserViewModel()))
 }
 
+/**
+ * Obtiene el índice de la pantalla actual para mantener el icono seleccionado.
+ *
+ * @param navigator Controlador de navegación actual.
+ * @return Estado mutable con el índice de la pantalla seleccionada.
+ */
 fun selectScreen(navigator: Navigator): MutableState<Int> {
     val currentScreen = navigator.lastItem
     return when (currentScreen) {

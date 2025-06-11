@@ -19,17 +19,31 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * ViewModel responsable de calcular y preparar los datos anuales del empleado
+ * para visualización gráfica y generación de reportes. Incluye manejo de índices
+ * semestrales, cálculo de horas trabajadas, horas teóricas y agrupación por meses.
+ */
 class AnualViewModel {
 
+    // Fuente de actividades de los empleados y time codes
     private val employeeActivities = DataViewModel.employeeActivities
     private val timeCodes: StateFlow<List<TimeCodeDTO>> = DataViewModel.timeCodes
 
+    // Lista de barras agrupadas por mes (semestre 1 o 2)
     private val _bars = MutableStateFlow<List<Bars>>(emptyList())
     val bars: StateFlow<List<Bars>> = _bars
 
+    // Índice del semestre actual (1 o 2)
     private var _index = MutableStateFlow(setIndex())
     val index: StateFlow<Int> = _index
 
+    /**
+     * Establece el índice inicial del semestre en función del mes actual.
+     * También genera las barras correspondientes a dicho semestre.
+     *
+     * @return 1 si es de enero a junio, 2 si es de julio a diciembre.
+     */
     private fun setIndex(): Int {
         val current = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val month = current.monthNumber
@@ -38,6 +52,12 @@ class AnualViewModel {
         return i
     }
 
+    /**
+     * Recupera los datos anuales del empleado actual para el año en curso.
+     *
+     * @param employeeId ID del empleado.
+     * @return Datos anuales del usuario si existen, o null si no hay coincidencia.
+     */
     fun getEmployeeYearData(employeeId: Int): UserYearData? {
         val currentYear = today.value.year
         return employeesYearData.value.firstOrNull {
@@ -45,11 +65,21 @@ class AnualViewModel {
         }
     }
 
+    /**
+     * Cambia el semestre (índice) y regenera las barras correspondientes.
+     *
+     * @param i Índice del semestre (1 o 2).
+     */
     fun changeIndex(i: Int) {
         _index.value = i
         generarBarrasPorMes(_index.value)
     }
 
+    /**
+     * Calcula las horas trabajadas por mes del empleado actual, agrupadas de enero a diciembre.
+     *
+     * @return Lista con 12 elementos correspondientes a cada mes.
+     */
     fun calcularHorasPorMes(): List<Double> {
         val hourMonth = employeeActivities.value
             .filter { it.idEmployee == employee.idEmployee }
@@ -64,6 +94,12 @@ class AnualViewModel {
         }
     }
 
+    /**
+     * Calcula las horas teóricas de trabajo por mes basándose en un calendario laboral.
+     *
+     * @param calendar Calendario laboral que incluye días festivos.
+     * @return Lista de 12 valores correspondientes a las horas por mes.
+     */
     fun calcularHorasTeoricasPorMes(calendar: CalendarYearDTO): List<Double> {
         val festive = calendar.date.map { LocalDate.parse(it) }.toSet()
         val dayHours = 8.0
@@ -90,6 +126,11 @@ class AnualViewModel {
         return horasPorMes
     }
 
+    /**
+     * Genera un calendario laboral del año 2025 con los días festivos predefinidos.
+     *
+     * @return Objeto CalendarYearDTO con los días festivos de 2025.
+     */
     fun generarCalendar(): CalendarYearDTO {
         val festivos2025 = listOf(
             // Enero
@@ -156,6 +197,12 @@ class AnualViewModel {
         return CalendarYearDTO(1, festivos2025)
     }
 
+    /**
+     * Genera los datos de barras agrupados por mes, basados en las actividades del semestre indicado.
+     * Cada barra contiene una lista de valores por tipo de código de tiempo.
+     *
+     * @param i Índice del semestre: 1 (enero-junio) o 2 (julio-diciembre).
+     */
     private fun generarBarrasPorMes(i: Int) {
         val timeCodeMap = timeCodes.value.associateBy { it.idTimeCode }
 
@@ -191,5 +238,4 @@ class AnualViewModel {
             )
         }
     }
-
 }

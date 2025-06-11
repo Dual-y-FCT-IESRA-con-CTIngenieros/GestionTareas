@@ -6,6 +6,18 @@ import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * Guarda un archivo de texto (formato CSV) en la carpeta de Descargas del dispositivo Android.
+ *
+ * Esta función utiliza la API de `MediaStore` para insertar el archivo en el almacenamiento externo
+ * de manera moderna y segura (recomendado desde Android Q en adelante).
+ *
+ * @param data Contenido del archivo en formato `String`.
+ * @param filename Nombre que tendrá el archivo (por ejemplo: "reporte.csv").
+ * @return `true` si el archivo fue guardado correctamente, `false` si ocurrió un error.
+ *
+ * @throws Exception Captura y reporta cualquier excepción lanzada durante la escritura del archivo.
+ */
 @SuppressLint("InlinedApi")
 actual suspend fun saveToDownloads(data: String, filename: String): Boolean {
     return withContext(Dispatchers.IO) {

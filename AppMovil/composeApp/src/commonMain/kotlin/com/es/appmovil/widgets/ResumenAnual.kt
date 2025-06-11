@@ -12,6 +12,13 @@ import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 
+/**
+ * Composable que muestra el resumen anual en forma de gráfico de barras horizontales.
+ *
+ * Los datos se obtienen desde el AnualViewModel y se renderizan con RowChart.
+ *
+ * @param anualViewModel ViewModel que proporciona la lista de barras anuales.
+ */
 @Composable
 fun ResumenAnual(anualViewModel: AnualViewModel) {
     val data2 by anualViewModel.bars.collectAsState()

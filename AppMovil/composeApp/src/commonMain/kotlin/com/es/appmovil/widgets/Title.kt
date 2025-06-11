@@ -17,6 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
 
+/**
+ * Composable que representa un encabezado común para las pantallas de la aplicación.
+ *
+ * Muestra un botón de retroceso, un título y opcionalmente un botón de acción con un icono.
+ *
+ * @param navigator Instancia de [Navigator] utilizada para navegar hacia atrás.
+ * @param tittle Texto que se muestra como título.
+ * @param icon Icono que se muestra en el botón de acción.
+ * @param isIcon Indica si el botón de acción debe estar habilitado o deshabilitado.
+ * @param onDownloadClick Acción que se ejecuta al pulsar el botón de acción.
+ */
 @Composable
 fun HeaderSection(
     navigator: Navigator,

@@ -41,6 +41,13 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Composable que muestra un resumen de horas realizadas con un medidor visual.
+ *
+ * @param currentHours Horas actuales realizadas.
+ * @param dailyHours Horas diarias esperadas.
+ * @param currentDay Día actual del conteo.
+ */
 @Composable
 fun ConteoHoras(currentHours: Int, dailyHours: Int, currentDay: Int) {
     Column(Modifier.width(180.dp)) {
@@ -55,6 +62,16 @@ fun ConteoHoras(currentHours: Int, dailyHours: Int, currentDay: Int) {
     }
 }
 
+
+/**
+ * Composable que dibuja un medidor circular semi-arco para mostrar progreso de horas.
+ *
+ * @param modifier Modificador para aplicar a la vista.
+ * @param currentHours Horas actuales realizadas.
+ * @param progressColors Lista de colores para el gradiente del arco.
+ * @param dailyHours Horas diarias esperadas.
+ * @param currentDay Día actual del conteo.
+ */
 @Composable
 fun ProtectionMeter(
     modifier: Modifier = Modifier,
@@ -91,6 +108,13 @@ fun ProtectionMeter(
     }
 }
 
+/**
+ * Dibuja el arco de progreso y la aguja del medidor en un Canvas.
+ *
+ * @param meterValue Valor actual del medidor.
+ * @param maxValue Valor máximo del medidor.
+ * @param progressColors Colores para el gradiente del arco.
+ */
 @Composable
 fun ShowCanvas(meterValue: Int, maxValue: Int, progressColors: List<Color>) {
     Canvas(modifier = Modifier.fillMaxSize().padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
@@ -143,6 +167,15 @@ fun ShowCanvas(meterValue: Int, maxValue: Int, progressColors: List<Color>) {
     }
 }
 
+
+/**
+ * Muestra debajo del medidor el texto con horas realizadas y la fecha actual.
+ *
+ * @param modifier Modificador para aplicar.
+ * @param meterValue Valor actual del medidor.
+ * @param maxValue Valor máximo del medidor.
+ * @param fechaActual Fecha actual para mostrar.
+ */
 @Composable
 fun HorasRealizadas(modifier: Modifier, meterValue: Int, maxValue: Int, fechaActual: LocalDate) {
     Box(
@@ -173,6 +206,14 @@ fun HorasRealizadas(modifier: Modifier, meterValue: Int, maxValue: Int, fechaAct
     }
 }
 
+
+/**
+ * Calcula el tamaño de fuente para el texto del medidor basado en la longitud del número.
+ *
+ * @param meterValue Valor actual del medidor.
+ * @param maxValue Valor máximo del medidor.
+ * @return Tamaño de fuente a usar.
+ */
 fun calculateFontSize(meterValue: Int, maxValue: Int): TextUnit {
     val longestLength = maxOf(meterValue.toString().length, maxValue.toString().length)
     return when (longestLength) {
@@ -184,6 +225,12 @@ fun calculateFontSize(meterValue: Int, maxValue: Int): TextUnit {
     }
 }
 
+/**
+ * Formatea una fecha en formato dd-MM-yyyy.
+ *
+ * @param fecha Fecha a formatear.
+ * @return Cadena con la fecha formateada.
+ */
 fun formatearFecha(fecha: LocalDate): String {
     val dia = fecha.dayOfMonth.toString().padStart(2, '0')
     val mes = fecha.monthNumber.toString().padStart(2, '0')
@@ -191,6 +238,12 @@ fun formatearFecha(fecha: LocalDate): String {
     return "$dia-$mes-$anio"
 }
 
+/**
+ * Asegura que el valor del medidor no sea menor que cero.
+ *
+ * @param inputPercentage Valor de entrada.
+ * @return Valor corregido, mínimo 0.
+ */
 private fun getMeterValue(inputPercentage: Int): Int {
     return if (inputPercentage < 0) {
         0
@@ -199,4 +252,10 @@ private fun getMeterValue(inputPercentage: Int): Int {
     }
 }
 
+/**
+ * Convierte un ángulo en grados a radianes.
+ *
+ * @receiver Ángulo en grados.
+ * @return Ángulo en radianes.
+ */
 fun Float.toRadians(): Float = this * (PI / 180).toFloat()

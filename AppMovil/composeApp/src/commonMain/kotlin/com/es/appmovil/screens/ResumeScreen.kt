@@ -51,7 +51,25 @@ import com.es.appmovil.widgets.ResumenHorasAnual
 import com.es.appmovil.widgets.ResumenHorasMensual
 import com.es.appmovil.widgets.ResumenSemana
 
+/**
+ * Pantalla principal de resumen donde se muestran distintas vistas relacionadas
+ * con las horas trabajadas, resumen semanal, mensual y anual, además de un botón
+ * para acceder a la administración si el usuario tiene el rol adecuado.
+ *
+ * Esta pantalla utiliza múltiples ViewModels para gestionar los datos y la navegación.
+ */
 class ResumeScreen : Screen {
+    /**
+     * Composable principal que monta la UI de la pantalla de resumen.
+     *
+     * Muestra el título, leyenda, resumen semanal, conteo de horas, resumen anual,
+     * resumen mensual y un botón de administración para usuarios con rol específico.
+     * También incluye una barra inferior de navegación y un botón flotante para abrir
+     * un diálogo de calendario.
+     *
+     * Utiliza [Scaffold] para estructurar la pantalla y maneja la navegación interna
+     * mediante [Navigator].
+     */
     @Composable
     override fun Content() {
         val resumeViewmodel = ResumeViewmodel()

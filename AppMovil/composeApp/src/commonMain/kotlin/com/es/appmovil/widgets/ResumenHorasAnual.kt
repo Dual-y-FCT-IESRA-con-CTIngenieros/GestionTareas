@@ -31,6 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.es.appmovil.viewmodel.ResumeViewmodel
 
+/**
+ * Composable que muestra un resumen anual de horas trabajadas.
+ *
+ * Visualiza proporcionalmente las horas por tipo de actividad usando colores, junto con los totales.
+ * Los datos se obtienen desde el ResumeViewmodel.
+ *
+ * @param resumeViewmodel ViewModel que proporciona el mapa de actividades y horas.
+ */
 @Composable
 fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
     // Creamos la variable de modificador base de los box

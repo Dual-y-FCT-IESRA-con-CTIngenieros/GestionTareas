@@ -60,6 +60,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * Composable que muestra y permite editar los datos de un empleado.
+ *
+ * @param index Índice del empleado en la lista.
+ * @param employee Objeto [Employee] con los datos actuales del empleado.
+ * @param roles Lista de roles disponibles.
+ * @param employeesDataViewModel ViewModel para gestionar las operaciones sobre empleados.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserData(
@@ -262,6 +270,15 @@ fun UserData(
     }
 }
 
+/**
+ * Diálogo de confirmación para eliminar un empleado.
+ *
+ * @param employeesDataViewModel ViewModel encargado de gestionar los empleados.
+ * @param alertOpen Estado que indica si el diálogo está abierto.
+ * @param dateTo Fecha de fin de contrato.
+ * @param employee Objeto [EmployeeUpdateDTO] con los datos actualizados del empleado.
+ * @param onDismissRequest Callback para cerrar el diálogo.
+ */
 @Composable
 fun confirmRemove(
     employeesDataViewModel: EmployeesDataViewModel,
@@ -316,7 +333,12 @@ fun confirmRemove(
     }
 }
 
-
+/**
+ * Composable que muestra un selector de fecha utilizando un diálogo.
+ *
+ * @param dateFrom Estado que contiene la fecha seleccionada en formato yyyy-MM-dd.
+ * @param titulo Texto que se muestra como etiqueta del campo de fecha.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialogSample(dateFrom: MutableState<String>, titulo: String = "Fecha") {

@@ -57,33 +57,56 @@ import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 
-class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBlockWeekViewModel) :
-    Screen {
+/**
+ * Pantalla para gestionar el bloqueo semanal del calendario de empleados.
+ * Permite visualizar semanas del mes, bloquear o desbloquear semanas,
+ * así como modificar el estado de bloqueo de empleados individualmente.
+ *
+ * @param calendarBlockWeekViewModel ViewModel que maneja la lógica y estado de la pantalla.
+ */
+class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBlockWeekViewModel) : Screen {
+
     @Composable
     override fun Content() {
+        // Flag para evitar cambios múltiples simultáneos en el mes
         var monthChangeFlag = true
+
+        // Navegador para navegación en la aplicación
         val navigator: Navigator = LocalNavigator.currentOrThrow
+
+        // Estado observado de la fecha actual
         val fechaActual by today.collectAsState()
+
+        // Estado para mostrar el diálogo de bloqueo
         val showDialog by calendarBlockWeekViewModel.showDialog.collectAsState()
+
+        // Índice de la semana seleccionada en el listado de semanas
         val weekIndex by calendarBlockWeekViewModel.weekIndex.collectAsState()
+
+        // Lista de semanas bloqueadas
         val locked by calendarBlockWeekViewModel.locked.collectAsState()
+
+        // Estado para saber si se está modificando un empleado
         val employeeModifie by calendarBlockWeekViewModel.employeeModifie.collectAsState()
+
+        // Listado de pares de fechas que representan las semanas del mes actual
         val weeksInMonth by calendarBlockWeekViewModel.weeksInMonth.collectAsState()
+
+        // Lista completa de empleados
         val employees by employees.collectAsState()
+
+        // Filtro para búsqueda de empleados
         val filter by calendarBlockWeekViewModel.filter.collectAsState()
+
+        // Inicializa o actualiza el estado de bloqueo
         calendarBlockWeekViewModel.generateLock()
 
-
+        // Mostrar diálogo de confirmación de bloqueo/desbloqueo si está activo
         if (showDialog) {
+            // Obtener fecha para bloqueo/desbloqueo
             val generateBlock by calendarBlockWeekViewModel.blockDate.collectAsState()
             val date = generateBlock?.let {
-                runCatching { LocalDate.parse(it) }.getOrDefault(
-                    LocalDate(
-                        1900,
-                        1,
-                        1
-                    )
-                )
+                runCatching { LocalDate.parse(it) }.getOrDefault(LocalDate(1900, 1, 1))
             } ?: LocalDate(1900, 1, 1)
 
             DialogLock(
@@ -92,29 +115,32 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                 date = date,
                 locked = locked,
                 onAdd = {
-                    if (weeksInMonth[weekIndex].second > date) calendarBlockWeekViewModel.lockWeek(
-                        weeksInMonth[weekIndex]
-                    )
-                    else {
-                        if (weekIndex > 0) calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
-                        else {
-                            val previousWeek =
-                                calendarBlockWeekViewModel.getPreviousWeek(weeksInMonth[0])
+                    // Lógica para bloquear la semana seleccionada o la anterior si corresponde
+                    if (weeksInMonth[weekIndex].second > date) {
+                        calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex])
+                    } else {
+                        if (weekIndex > 0) {
+                            calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
+                        } else {
+                            val previousWeek = calendarBlockWeekViewModel.getPreviousWeek(weeksInMonth[0])
                             calendarBlockWeekViewModel.lockWeek(previousWeek)
                         }
                     }
                     calendarBlockWeekViewModel.changeDialog(false)
                 },
                 onRemove = {
+                    // Lógica para desbloquear la semana anterior
                     calendarBlockWeekViewModel.lockWeek(weeksInMonth[weekIndex - 1])
                     calendarBlockWeekViewModel.changeDialog(false)
-                }) { calendarBlockWeekViewModel.changeDialog(false) }
+                }
+            ) { calendarBlockWeekViewModel.changeDialog(false) }
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
-
+            // Encabezado de la pantalla con título y acción de añadir (sin acción aquí)
             HeaderSection(navigator, "Bloqueo Semanal", Icons.Filled.Add, false) { }
 
+            // Controles para cambiar el mes (anterior y siguiente) y mostrar mes actual
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -128,10 +154,13 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                 }) {
                     Text("<", fontSize = 24.sp)
                 }
+
                 Text(
                     "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
                     fontSize = 20.sp,
-                    modifier = Modifier.clickable { resetToday() })
+                    modifier = Modifier.clickable { resetToday() }
+                )
+
                 IconButton(onClick = {
                     if (monthChangeFlag) {
                         monthChangeFlag = false
@@ -142,17 +171,13 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                 }
             }
 
+            // Lista de semanas con opción a bloquear/desbloquear y modificar empleados
             weeksInMonth.forEachIndexed { index, pair ->
                 val generateBlock by calendarBlockWeekViewModel.blockDate.collectAsState()
                 val date = generateBlock?.let {
-                    runCatching { LocalDate.parse(it) }.getOrDefault(
-                        LocalDate(
-                            1900,
-                            1,
-                            1
-                        )
-                    )
+                    runCatching { LocalDate.parse(it) }.getOrDefault(LocalDate(1900, 1, 1))
                 } ?: LocalDate(1900, 1, 1)
+
                 ElevatedCard(
                     colors = CardColors(
                         containerColor = Color.White,
@@ -164,40 +189,40 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                     elevation = CardDefaults.elevatedCardElevation(5.dp)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp),
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Semana del ${pair.first.dayOfMonth} al ${pair.second.dayOfMonth}")
+
                         Row {
+                            // Obtener icono y color según estado de bloqueo de la semana
                             val colors = calendarBlockWeekViewModel.getWeekColor(pair, employees)
+
+                            // Botón para abrir diálogo de bloqueo/desbloqueo
                             IconButton(onClick = {
                                 calendarBlockWeekViewModel.changeDialog(true)
                                 calendarBlockWeekViewModel.changeWeekIndex(index)
                                 calendarBlockWeekViewModel.changeEmployeesModifie(false)
                             }) {
-                                if (weeksInMonth[index].second <= date) Icon(
+                                Icon(
                                     imageVector = colors.first,
-                                    contentDescription = "",
-                                    tint = colors.second
-                                )
-                                else Icon(
-                                    imageVector = colors.first,
-                                    contentDescription = "",
+                                    contentDescription = "Bloquear/Desbloquear Semana",
                                     tint = colors.second
                                 )
                             }
+
+                            // Botón para modificar empleados de la semana
                             IconButton(onClick = {
-                                if (employeeModifie && index == weekIndex) calendarBlockWeekViewModel.changeEmployeesModifie(
-                                    false
-                                ) else calendarBlockWeekViewModel.changeEmployeesModifie(true)
+                                if (employeeModifie && index == weekIndex)
+                                    calendarBlockWeekViewModel.changeEmployeesModifie(false)
+                                else
+                                    calendarBlockWeekViewModel.changeEmployeesModifie(true)
                                 calendarBlockWeekViewModel.changeWeekIndex(index)
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = "",
+                                    contentDescription = "Modificar Empleados",
                                     tint = Color.Black
                                 )
                             }
@@ -206,6 +231,7 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                 }
             }
 
+            // Sección para modificar bloqueo de empleados individualmente, si está activa
             if (employeeModifie) {
                 ElevatedCard(
                     colors = CardColors(
@@ -218,34 +244,38 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                     elevation = CardDefaults.elevatedCardElevation(5.dp)
                 ) {
                     Spacer(Modifier.size(20.dp))
+
                     var showFilter by remember { mutableStateOf(false) }
                     var changeDetected by remember { mutableStateOf(false) }
                     var orderDescendant by remember { mutableStateOf(false) }
+
+                    // Fila con botón para filtro, título y ordenamiento
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp).weight(1f),
+                            .padding(horizontal = 8.dp)
+                            .weight(1f),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton({ showFilter = !showFilter }) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = "Filtrar"
-                            )
+                            Icon(imageVector = Icons.Filled.Search, contentDescription = "Filtrar")
                         }
+
                         Text(
                             "Semana del ${weeksInMonth[weekIndex].first.dayOfMonth} al ${weeksInMonth[weekIndex].second.dayOfMonth}",
                             fontWeight = FontWeight.Bold
                         )
+
                         IconButton({ orderDescendant = !orderDescendant }) {
                             Icon(
                                 imageVector = if (orderDescendant) Icons.Filled.ArrowDownward else Icons.Filled.ArrowUpward,
-                                contentDescription = "Filtrar"
+                                contentDescription = "Ordenar"
                             )
                         }
-
                     }
+
+                    // Campo de texto para filtro de empleados
                     if (showFilter) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
                             OutlinedTextField(
@@ -260,6 +290,7 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                         }
                     }
 
+                    // Lista filtrada y ordenada de empleados con checkbox para bloqueo
                     LazyColumn(modifier = Modifier.padding(horizontal = 8.dp).weight(6f)) {
                         val employeesFilter = if (filter.isNotBlank()) {
                             employees.filter {
@@ -271,8 +302,13 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                         }
 
                         items(employeesFilter.size) { employee ->
-                            val employeesOrder =
-                                if (!orderDescendant) employeesFilter.sortedByDescending { it.unblockDate } else employeesFilter.sortedBy { it.unblockDate }
+                            val employeesOrder = if (!orderDescendant)
+                                employeesFilter.sortedByDescending { it.unblockDate }
+                            else
+                                employeesFilter.sortedBy { it.unblockDate }
+
+                            val currentEmployee = employeesOrder[employee]
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -280,45 +316,29 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    "${employeesOrder[employee].nombre} ${employeesOrder[employee].apellidos}"
+                                Text("${currentEmployee.nombre} ${currentEmployee.apellidos}")
 
-                                )
-                                val blockDate = employeesOrder[employee].blockDate
+                                val blockDate = currentEmployee.blockDate
                                 val date = blockDate?.let {
-                                    runCatching { LocalDate.parse(it) }.getOrDefault(
-                                        LocalDate(
-                                            2025,
-                                            1,
-                                            1
-                                        )
-                                    )
+                                    runCatching { LocalDate.parse(it) }.getOrDefault(LocalDate(2025, 1, 1))
                                 } ?: LocalDate(2025, 1, 1)
 
-                                val unblockDate =
-                                    employeesOrder[employee].unblockDate?.split("/")?.get(1)
+                                val unblockDate = currentEmployee.unblockDate?.split("/")?.get(1)
                                 val dateUnblock = unblockDate?.let { LocalDate.parse(it) }
 
                                 Checkbox(
                                     checked = date >= weeksInMonth[weekIndex].second && weeksInMonth[weekIndex].second != dateUnblock,
                                     onCheckedChange = {
                                         val currentWeek = weeksInMonth[weekIndex]
-                                        val employeeId = employeesOrder[employee]
-
-                                        val shouldUnlock =
-                                            date >= currentWeek.second && currentWeek.second != dateUnblock
-
+                                        val employeeId = currentEmployee
+                                        val shouldUnlock = date >= currentWeek.second && currentWeek.second != dateUnblock
                                         val targetWeek = if (shouldUnlock && weekIndex == 0) {
                                             calendarBlockWeekViewModel.getPreviousWeek(currentWeek)
                                         } else {
                                             currentWeek
                                         }
 
-                                        calendarBlockWeekViewModel.lockWeekEmployee(
-                                            targetWeek,
-                                            employeeId,
-                                            !shouldUnlock
-                                        )
+                                        calendarBlockWeekViewModel.lockWeekEmployee(targetWeek, employeeId, !shouldUnlock)
 
                                         changeDetected = true
                                     }
@@ -327,6 +347,7 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
                         }
                     }
 
+                    // Botón para guardar cambios si se detectaron modificaciones
                     if (changeDetected) {
                         Button({
                             calendarBlockWeekViewModel.lockWeekEmployees()
@@ -340,6 +361,18 @@ class CalendarBlockWeekScreen(private val calendarBlockWeekViewModel: CalendarBl
         }
     }
 
+
+    /**
+     * Composable que muestra un diálogo para confirmar bloqueo o desbloqueo de una semana.
+     *
+     * @param week Lista de pares de fechas que representan las semanas disponibles.
+     * @param index Índice de la semana seleccionada en la lista.
+     * @param date Fecha usada para comparar estado de bloqueo.
+     * @param locked Lista de semanas bloqueadas.
+     * @param onAdd Callback a ejecutar cuando se confirma el bloqueo.
+     * @param onRemove Callback a ejecutar cuando se confirma el desbloqueo.
+     * @param onDismiss Callback a ejecutar al cerrar el diálogo sin cambios.
+     */
     @Composable
     fun DialogLock(
         week: List<Pair<LocalDate, LocalDate>>,

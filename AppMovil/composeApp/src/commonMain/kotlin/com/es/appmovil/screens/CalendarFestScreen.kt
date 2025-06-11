@@ -61,48 +61,73 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * Pantalla para gestionar el calendario de días festivos.
+ * Permite visualizar, añadir, actualizar y eliminar fechas festivas del año seleccionado.
+ *
+ * @param calendarFestViewModel ViewModel que maneja la lógica y estado de la pantalla.
+ */
 class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewModel) : Screen {
+
     @Composable
     override fun Content() {
+        // Flag para evitar cambios simultáneos rápidos en el año
         var monthChangeFlag = true
+
+        // Navegador para navegación en la app
         val navigator: Navigator = LocalNavigator.currentOrThrow
+
+        // Estado de la fecha actual observado
         val fechaActual by today.collectAsState()
+
+        // Estados para mostrar los diálogos: actualizar, eliminar y añadir
         var showDialog by remember { mutableStateOf(false) }
         var showDialogDelete by remember { mutableStateOf(false) }
         var showDialogAdd by remember { mutableStateOf(false) }
-        var festIndex by remember { mutableStateOf(0) }
-        val festivos =
-            calendar.value.filter { it.idCalendar.toString() == fechaActual.year.toString() }
-                .sortedBy { it.date }
 
+        // Índice del festivo seleccionado en la lista
+        var festIndex by remember { mutableStateOf(0) }
+
+        // Filtrado y ordenamiento de festivos para el año actual
+        val festivos = calendar.value
+            .filter { it.idCalendar.toString() == fechaActual.year.toString() }
+            .sortedBy { it.date }
+
+        // Diálogo para actualizar la fecha de un festivo
         if (showDialog)
             CalendarDialog(
-                "Actualizar",
+                text = "Actualizar",
                 onDismiss = { showDialog = false },
-                onDateSelected = {
-                    val calendarUpdate = Calendar(festivos[festIndex].idCalendar, it.toString())
+                onDateSelected = { selectedDate ->
+                    val calendarUpdate = Calendar(festivos[festIndex].idCalendar, selectedDate.toString())
                     CoroutineScope(Dispatchers.IO).launch {
+                        // Primero elimina el festivo antiguo y luego añade el actualizado
                         Database.deleteCalendar("Calendar", festivos[festIndex])
                         Database.addData("Calendar", calendarUpdate)
                     }
+                    // Actualiza la lista localmente
                     calendar.value.remove(festivos[festIndex])
                     calendar.value.add(calendarUpdate)
                     showDialog = false
-                })
+                }
+            )
 
+        // Diálogo para añadir un nuevo festivo
         if (showDialogAdd)
             CalendarDialog(
-                "Guardar",
+                text = "Guardar",
                 onDismiss = { showDialogAdd = false },
-                onDateSelected = {
+                onDateSelected = { selectedDate ->
                     showDialogAdd = false
-                    val calendarUpdate = Calendar(festivos[festIndex].idCalendar, it.toString())
+                    val calendarUpdate = Calendar(festivos[festIndex].idCalendar, selectedDate.toString())
                     CoroutineScope(Dispatchers.IO).launch {
                         Database.addData("Calendar", calendarUpdate)
                     }
                     calendar.value.add(calendarUpdate)
-                })
+                }
+            )
 
+        // Diálogo para confirmar eliminación de un festivo
         if (showDialogDelete)
             DeleteDialog(
                 onConfirm = {
@@ -117,14 +142,17 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
+            // Encabezado con título y botón para añadir festivo
             HeaderSection(
-                navigator,
+                navigator = navigator,
                 "Calendario Festivos",
-                Icons.Filled.Add,
-                true
-            ) { showDialogAdd = true }
+                icon = Icons.Filled.Add,
+                 true
+            ) {
+                showDialogAdd = true
+            }
 
-
+            // Controles para navegar entre años
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -139,9 +167,10 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                     Text("<", fontSize = 24.sp)
                 }
                 Text(
-                    "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
+                    text = "${monthNameInSpanish(fechaActual.month.name)} ${fechaActual.year}",
                     fontSize = 20.sp,
-                    modifier = Modifier.clickable { resetToday() })
+                    modifier = Modifier.clickable { resetToday() }
+                )
                 IconButton(onClick = {
                     if (monthChangeFlag) {
                         monthChangeFlag = false
@@ -152,7 +181,7 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                 }
             }
 
-
+            // Lista de días festivos del año
             LazyColumn {
                 item {
                     festivos.forEachIndexed { index, fest ->
@@ -163,34 +192,39 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.fillMaxWidth().height(70.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(70.dp)
                                 .padding(vertical = 8.dp),
                             elevation = CardDefaults.elevatedCardElevation(5.dp)
                         ) {
                             Row(
-                                Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .padding(horizontal = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(fest.date)
 
                                 Row {
-                                    IconButton({
+                                    IconButton(onClick = {
                                         showDialog = true
                                         festIndex = index
                                     }) {
                                         Icon(
                                             imageVector = Icons.Filled.CalendarMonth,
-                                            contentDescription = ""
+                                            contentDescription = "Actualizar festivo"
                                         )
                                     }
-                                    IconButton({
+                                    IconButton(onClick = {
                                         showDialogDelete = true
                                         festIndex = index
                                     }) {
                                         Icon(
                                             imageVector = Icons.Filled.Delete,
-                                            contentDescription = ""
+                                            contentDescription = "Eliminar festivo"
                                         )
                                     }
                                 }
@@ -202,7 +236,13 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
         }
     }
 
-
+    /**
+     * Diálogo para seleccionar una fecha en el calendario.
+     *
+     * @param text Texto del botón de confirmación.
+     * @param onDismiss Callback que se ejecuta al cerrar el diálogo sin seleccionar.
+     * @param onDateSelected Callback que recibe la fecha seleccionada.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CalendarDialog(
@@ -215,17 +255,15 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
         DatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                Button(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val selectedDate = Instant.fromEpochMilliseconds(millis)
-                                .toLocalDateTime(TimeZone.currentSystemDefault())
-                                .date
-                            onDateSelected(selectedDate)
-                        }
-                        onDismiss()
+                Button(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val selectedDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                            .date
+                        onDateSelected(selectedDate)
                     }
-                ) {
+                    onDismiss()
+                }) {
                     Text(text)
                 }
             },
@@ -246,11 +284,17 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
         }
     }
 
+    /**
+     * Diálogo de confirmación para eliminar un festivo.
+     *
+     * @param onConfirm Callback que se ejecuta al confirmar la eliminación.
+     * @param onDismiss Callback que se ejecuta al cancelar o cerrar el diálogo.
+     */
     @Composable
     fun DeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("¿Eliminar este día?.") },
+            title = { Text("¿Eliminar este día?") },
             confirmButton = {
                 Button(onClick = onConfirm, colors = customButtonColors()) {
                     Text("Eliminar")

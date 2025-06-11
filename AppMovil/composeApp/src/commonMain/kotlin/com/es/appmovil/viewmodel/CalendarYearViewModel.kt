@@ -18,7 +18,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-
+/**
+ * ViewModel para gestionar la lógica del calendario anual y datos asociados.
+ */
 class CalendarYearViewModel {
 
     private var _showDialog = MutableStateFlow(false)
@@ -29,34 +31,51 @@ class CalendarYearViewModel {
 
     private var _nextDaysHolidays: MutableStateFlow<Int> = MutableStateFlow(0)
 
+    /**
+     * Cambia el estado de visibilidad del diálogo.
+     * @param bool true para mostrar, false para ocultar.
+     */
     fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
 
     /**
-     * Función para cambiar el año que se muestra en el calendario
-     * @param year Numero de años que se van a cambiar hacia atras
+     * Cambia el año del calendario restando el periodo dado.
+     * @param year Periodo de años a restar (ejemplo: DatePeriod(years = 1))
      */
     fun onYearChangePrevious(year: DatePeriod) {
         today.value = today.value.minus(year)
     }
 
     /**
-     * Función para cambiar el año que se muestra en el calendario
-     * @param year Numero de años que se van a cambiar hacia delante
+     * Cambia el año del calendario sumando el periodo dado.
+     * @param year Periodo de años a sumar (ejemplo: DatePeriod(years = 1))
      */
     fun onYearChangeFordward(year: DatePeriod) {
         today.value = today.value.plus(year)
     }
 
+    /**
+     * Cambia el filtro para búsqueda o visualización.
+     * @param value Nuevo valor de filtro.
+     */
     fun changeFilter(value: String) {
         _filter.value = value
     }
 
+    /**
+     * Establece los días de vacaciones próximos a considerar.
+     * @param days Número de días próximos.
+     */
     fun setNextHolidaysDays(days: Int) {
         _nextDaysHolidays.value = days
     }
 
+    /**
+     * Obtiene los datos anuales de un empleado para el año actual.
+     * @param employeeId Id del empleado.
+     * @return Datos de año del empleado o null si no existen.
+     */
     fun getEmployeeYearData(employeeId: Int): UserYearData? {
         val currentYear = today.value.year
         return employeesYearData.value.firstOrNull {
@@ -64,14 +83,18 @@ class CalendarYearViewModel {
         }
     }
 
+    /**
+     * Cierra el año actual para todos los empleados y opcionalmente genera datos para el nuevo año.
+     * @param generateNewYear True para generar datos para el año siguiente.
+     * @param currentYear Año actual a cerrar.
+     */
     fun closeYear(generateNewYear: Boolean, currentYear: Int) {
-
-        val blockDate =
-            employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
+        val blockDate = employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
         if (blockDate.isNotEmpty()) {
             val nextYear = currentYear + 1
             val days = _nextDaysHolidays.value
             val hours = days * 8
+            // Marca los años actuales como cerrados y actualiza en base de datos
             employeesYearData.value.map {
                 it.closedYear = true
                 CoroutineScope(Dispatchers.IO).launch {
@@ -80,11 +103,10 @@ class CalendarYearViewModel {
             }
 
             if (generateNewYear) {
+                // Crea nuevos registros para el próximo año
                 employees.value.forEach {
-                    val enjooyedHours =
-                        employeesYearData.value.find { data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays
-                            ?: 0
-                    val holidaysHours = hours + (hours - enjooyedHours)
+                    val enjoyedHours = employeesYearData.value.find { data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays ?: 0
+                    val holidaysHours = hours + (hours - enjoyedHours)
                     CoroutineScope(Dispatchers.IO).launch {
                         val employeeData = UserYearData(
                             it.idEmployee,
@@ -100,6 +122,7 @@ class CalendarYearViewModel {
                     }
                 }
 
+                // Copia las fechas del calendario al siguiente año
                 calendar.value.forEach {
                     val year = (_currentYear.value.toIntOrNull() ?: 2025) + 1
                     val newCalendar = Calendar(year, it.date)
@@ -112,17 +135,21 @@ class CalendarYearViewModel {
             }
 
         } else {
+            // Si no hay bloqueos, muestra diálogo de aviso
             _showDialog.value = true
         }
-
     }
 
+    /**
+     * Indica si el año actual está cerrado para los empleados.
+     * @return True si está cerrado, false si no.
+     */
     fun isCurrentYearClosed(): Boolean {
         val currentYear = today.value.year
         return employeesYearData.value.firstOrNull { it.year == currentYear }?.closedYear == true
     }
 
-
+    // Función comentada para generar UserYearData (se conserva por importancia)
 //    fun generateUserYearData() { NO BORRAR AÚN FUNCION IMPORTANTE PARA GENERAR LOS USERYEARDATA
 //        val daysHolidays = 23
 //        val currentHolidays = daysHolidays * 8

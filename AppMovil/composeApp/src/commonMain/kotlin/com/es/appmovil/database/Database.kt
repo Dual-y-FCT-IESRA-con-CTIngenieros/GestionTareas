@@ -22,7 +22,9 @@ import kotlinx.serialization.json.jsonObject
  */
 object Database {
 
-    // Inicializamos la conexión con la base de datos
+    /**
+     * Cliente de Supabase configurado con autenticación y acceso a PostgREST.
+     */
     val supabase = createSupabaseClient(
         supabaseUrl = "https://ydbqllrkbfhbiiztytbc.supabase.co/",
         supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkYnFsbHJrYmZoYmlpenR5dGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTgzNDksImV4cCI6MjA1ODM5NDM0OX0.tA9s6ktm3wyPLf4ynZhivu68hkA6JsUBvKeAL6tC9yM"
@@ -32,7 +34,12 @@ object Database {
         //install other modules
     }
 
-
+    /**
+     * Registra un nuevo usuario con correo y contraseña mediante autenticación de Supabase.
+     *
+     * @param correo Dirección de correo electrónico del nuevo usuario.
+     * @param contrasenia Contraseña para la cuenta del usuario.
+     */
     suspend fun register(correo: String, contrasenia: String) {
         supabase.auth.signUpWith(Email) {
             email = correo
@@ -40,6 +47,13 @@ object Database {
         }
     }
 
+    /**
+     * Obtiene datos de una tabla de Supabase y los decodifica como una lista del tipo especificado.
+     *
+     * @param T Tipo de datos esperado.
+     * @param table Nombre de la tabla a consultar.
+     * @return Lista de elementos del tipo [T], o vacía si ocurre un error.
+     */
     suspend inline fun <reified T : Any> getData(table: String): List<T> {
         try {
             return supabase
@@ -54,7 +68,11 @@ object Database {
         }
     }
 
-
+    /**
+     * Obtiene una lista de nombres de tablas disponibles excluyendo la tabla "Config".
+     *
+     * @return Lista de nombres de tablas como [String].
+     */
     suspend fun getTablesNames(): List<String> {
         return try {
             val response = supabase
@@ -72,6 +90,12 @@ object Database {
         }
     }
 
+    /**
+     * Obtiene un valor de configuración por su clave.
+     *
+     * @param clave Clave identificadora de la configuración.
+     * @return Objeto [Config] o `null` si no se encuentra.
+     */
     suspend fun getConfigData(clave: String): Config? {
         try {
             return supabase
@@ -88,6 +112,11 @@ object Database {
         }
     }
 
+    /**
+     * Obtiene los datos de un empleado por correo electrónico y los asigna a [DataViewModel.employee].
+     *
+     * @param email Correo del empleado a buscar.
+     */
     suspend fun getEmployee(email: String) {
         try {
             val employees = supabase.from("Employee").select().decodeList<Employee>()
@@ -102,6 +131,13 @@ object Database {
 
     }
 
+    /**
+     * Inserta un nuevo registro en la tabla especificada.
+     *
+     * @param T Tipo de datos del objeto a insertar.
+     * @param table Nombre de la tabla.
+     * @param data Datos a insertar.
+     */
     suspend inline fun <reified T: Any> addData(table: String, data: T) {
 
         try {
@@ -113,6 +149,11 @@ object Database {
         }
     }
 
+    /**
+     * Inserta un nuevo empleado en la tabla "Employee".
+     *
+     * @param data Datos del empleado en formato [EmployeeInsertDTO].
+     */
     suspend fun addEmployee(data: EmployeeInsertDTO) {
         try {
             supabase.from("Employee").insert(data)
@@ -123,6 +164,11 @@ object Database {
         }
     }
 
+    /**
+     * Actualiza o inserta (upsert) un empleado en la tabla "Employee".
+     *
+     * @param data Datos actualizados del empleado en formato [EmployeeUpdateDTO].
+     */
     suspend fun updateEmployee(data: EmployeeUpdateDTO) {
         try {
             supabase.from("Employee").upsert(data)
@@ -133,6 +179,11 @@ object Database {
         }
     }
 
+    /**
+     * Inserta una nueva actividad del empleado en la tabla "EmployeeActivity".
+     *
+     * @param data Datos de la actividad del empleado.
+     */
     suspend fun addEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").insert(data)
@@ -143,6 +194,13 @@ object Database {
         }
     }
 
+    /**
+     * Realiza un upsert genérico sobre la tabla especificada.
+     *
+     * @param T Tipo de los datos.
+     * @param table Nombre de la tabla.
+     * @param data Datos a actualizar o insertar.
+     */
     suspend inline fun <reified T:Any> updateData(table: String, data: T) {
         try {
             println("Datos nuevos: $data")
@@ -154,6 +212,11 @@ object Database {
         }
     }
 
+    /**
+     * Actualiza o inserta una actividad del empleado.
+     *
+     * @param data Datos de la actividad.
+     */
     suspend fun updateEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").upsert(data)
@@ -164,6 +227,12 @@ object Database {
         }
     }
 
+    /**
+     * Elimina un registro de calendario con el ID y fecha especificados.
+     *
+     * @param table Nombre de la tabla.
+     * @param data Objeto [Calendar] con los datos a eliminar.
+     */
     suspend fun deleteCalendar(table:String, data: Calendar){
         try {
             supabase.from(table).delete {
@@ -179,6 +248,11 @@ object Database {
         }
     }
 
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     *
+     * @param newPassword Nueva contraseña a establecer.
+     */
     suspend fun updateUser(newPassword: String) {
         try {
             supabase.auth.updateUser {
@@ -191,7 +265,11 @@ object Database {
         }
     }
 
-
+    /**
+     * Elimina una actividad del empleado con base en varias condiciones.
+     *
+     * @param data Actividad del empleado a eliminar.
+     */
     suspend fun deleteEmployeeActivity(data: EmployeeActivity) {
         try {
             supabase.from("EmployeeActivity").delete() {

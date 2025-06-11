@@ -8,6 +8,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Botón flotante con icono de "Agregar" que ejecuta una acción al pulsar.
+ *
+ * @param pageFunc Función que se ejecuta al hacer clic en el botón.
+ */
 @Composable
 fun ActionButton(pageFunc: () -> Unit) {
     FloatingActionButton(

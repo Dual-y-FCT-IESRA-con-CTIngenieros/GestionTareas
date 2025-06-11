@@ -18,8 +18,20 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
+/**
+ * Clase responsable de la generación de archivos CSV a partir de datos de empleados,
+ * actividades, proyectos, y órdenes de trabajo. Incluye funciones para exportar reportes
+ * semanales, anuales y tablas completas desde Supabase.
+ */
 class ManageCSV {
 
+    /**
+     * Genera un archivo CSV con el resumen anual de horas de recuperación y vacaciones por empleado.
+     *
+     * @param currentYear Año del que se desea generar el reporte.
+     *
+     * El archivo generado se guarda con el nombre "Resumen_Anual.csv" en la carpeta de descargas.
+     */
     fun generateYearCsv(currentYear: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -55,6 +67,14 @@ class ManageCSV {
         }
     }
 
+    /**
+     * Genera un archivo CSV con un resumen de actividades realizadas en una semana específica.
+     *
+     * @param start Fecha de inicio de la semana (inclusive).
+     * @param end Fecha de fin de la semana (inclusive).
+     *
+     * El archivo generado se guarda como "reporte_semanal.csv".
+     */
     fun generateWeekCsv(start: LocalDate, end: LocalDate) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -131,6 +151,13 @@ class ManageCSV {
         }
     }
 
+    /**
+     * Genera un archivo CSV con todos los datos de una tabla específica de Supabase.
+     *
+     * @param table Nombre de la tabla a exportar.
+     *
+     * Recupera los datos en formato JSON, convierte el contenido a CSV y lo almacena como texto.
+     */
     fun generateCSV(table: String) {
         CoroutineScope(Dispatchers.IO).launch {
 

@@ -25,13 +25,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.es.appmovil.viewmodel.ResumeViewmodel
 
+/**
+ * Composable que muestra un botón de información que despliega una leyenda con colores y textos.
+ *
+ * @param resumeViewmodel ViewModel que provee la leyenda como un mapa nombre-color.
+ */
 @Composable
 fun LegendButton(resumeViewmodel: ResumeViewmodel) {
     var expanded by remember { mutableStateOf(false) }
 
     val colorMap = resumeViewmodel.getLegend()
+
     Box {
-        IconButton({ expanded = !expanded }) {
+        IconButton(onClick = { expanded = !expanded }) {
             Icon(imageVector = Icons.Filled.Info, contentDescription = "Legend")
         }
 
@@ -39,11 +45,10 @@ fun LegendButton(resumeViewmodel: ResumeViewmodel) {
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
+            // Itera sobre cada entrada en la leyenda y crea un item con un círculo de color y texto
             colorMap.value.forEach { (name, color) ->
-                DropdownMenuItem({}) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                DropdownMenuItem(onClick = {}) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
                                 .size(16.dp)

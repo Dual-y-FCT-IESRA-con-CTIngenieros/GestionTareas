@@ -23,6 +23,13 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 
+/**
+ * Composable que muestra el resumen de horas trabajadas en el día mediante un gráfico de barras.
+ *
+ * Obtiene los datos desde el CalendarViewModel y presenta el total diario junto con un gráfico animado.
+ *
+ * @param calendarViewModel ViewModel que proporciona la lista de barras a mostrar.
+ */
 @Composable
 fun ResumenHorasDia(calendarViewModel: CalendarViewModel) {
     val data by calendarViewModel.bars.collectAsState()

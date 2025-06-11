@@ -35,6 +35,13 @@ import com.es.appmovil.viewmodel.ResumeViewmodel
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 
+/**
+ * Composable que muestra el resumen semanal.
+ *
+ * Permite visualizar los días de la semana actual con sus respectivas actividades y navegar entre semanas.
+ *
+ * @param resumeViewmodel ViewModel encargado de gestionar los datos de la semana.
+ */
 @Composable
 fun ResumenSemana(resumeViewmodel: ResumeViewmodel) {
 
@@ -110,6 +117,16 @@ fun ResumenSemana(resumeViewmodel: ResumeViewmodel) {
     }
 }
 
+/**
+ * Composable que representa visualmente un único día dentro del resumen semanal.
+ *
+ * Aplica colores de fondo según las actividades del día.
+ *
+ * @param day Día que se va a mostrar.
+ * @param dayModifier Modificador base para el diseño del día.
+ * @param diaSemana Nombre del día de la semana (por ejemplo: "Lun", "Mar").
+ * @param daysActivity Mapa de actividades del día, asociadas a sus colores.
+ */
 @Composable
 fun Days(
     day: LocalDate,

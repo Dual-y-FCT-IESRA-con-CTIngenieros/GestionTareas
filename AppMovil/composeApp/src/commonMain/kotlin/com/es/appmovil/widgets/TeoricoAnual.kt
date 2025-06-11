@@ -16,6 +16,16 @@ import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.Line
 
+/**
+ * Composable que muestra un gráfico de líneas con las horas teóricas y reales por mes.
+ *
+ * Genera el gráfico utilizando datos proporcionados por el [AnualViewModel].
+ *
+ * - La primera línea representa las horas teóricas.
+ * - La segunda línea representa las horas realizadas.
+ *
+ * @param anualViewModel ViewModel que proporciona los datos anuales para el gráfico.
+ */
 @Composable
 fun TeoricoAnual(anualViewModel: AnualViewModel) {
     val calendar = anualViewModel.generarCalendar()

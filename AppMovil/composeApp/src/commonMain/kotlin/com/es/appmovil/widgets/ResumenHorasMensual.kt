@@ -31,6 +31,11 @@ import com.es.appmovil.viewmodel.DataViewModel
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
+/**
+ * Composable que muestra el resumen de horas mensuales en formato gráfico (Pie Chart).
+ *
+ * Obtiene los datos desde el DataViewModel y presenta un gráfico de sectores interactivo.
+ */
 @Composable
 fun ResumenHorasMensual() {
     DataViewModel.getPie()
@@ -92,6 +97,11 @@ fun ResumenHorasMensual() {
 
 }
 
+/**
+ * Composable auxiliar que muestra el detalle numérico de cada sector del gráfico de pastel.
+ *
+ * @param data Lista de datos del gráfico (Pie), cada uno contiene el valor y el color correspondiente.
+ */
 @Composable
 fun PieInfo(data: List<Pie>) {
     LazyColumn(Modifier.padding(bottom = 20.dp)) {

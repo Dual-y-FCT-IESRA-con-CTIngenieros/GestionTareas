@@ -40,10 +40,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 /**
- * Funcion que muestra una ventana deslizante para reallenar los campos de un dia
+ * Muestra un diálogo modal para configurar las actividades de un día específico.
  *
- *@param showDialog Muestra o no el dialogo
- * @param onChangeDialog Función que cambia el valor de showDialog
+ * @param showDialog Indica si el diálogo debe mostrarse.
+ * @param day Día seleccionado para configurar.
+ * @param calendarViewModel ViewModel que maneja la lógica del calendario.
+ * @param dayMenuViewModel ViewModel que maneja los datos y estados del menú del día.
+ * @param onChangeDialog Callback para cambiar el estado de visibilidad del diálogo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +93,20 @@ fun DayConfigDialog(
     }
 }
 
+/**
+ * Componente que muestra una tarjeta editable para una actividad específica.
+ *
+ * Permite modificar horas, TimeCode, WorkOrder, Activity y comentario.
+ * Actualiza la actividad usando [onUpdate] y puede cerrar el diálogo con [onChangeDialog].
+ *
+ * @param activity Actividad del empleado a editar.
+ * @param day Día asociado a la actividad.
+ * @param calendarViewModel ViewModel del calendario.
+ * @param workOrdersTimeCodes Lista de proyectos y timecodes para work orders.
+ * @param activitiesTimeCodes Lista de proyectos y timecodes para actividades.
+ * @param onChangeDialog Callback para cambiar el estado de visibilidad del diálogo.
+ * @param onUpdate Callback para actualizar la actividad editada.
+ */
 @Composable
 fun EditableActivityCard(
     activity: EmployeeActivity,
