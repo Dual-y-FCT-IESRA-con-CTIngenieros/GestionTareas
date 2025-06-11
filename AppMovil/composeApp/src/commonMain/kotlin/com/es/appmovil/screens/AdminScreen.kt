@@ -19,7 +19,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.filled.EditCalendar
-import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material.icons.filled.TableView
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.es.appmovil.viewmodel.CalendarManageViewModel
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.EmployeesDataViewModel
 import com.es.appmovil.widgets.BottomNavigationBar
@@ -50,14 +48,12 @@ class AdminScreen : Screen {
         // Generamos la navegación actual
         val navigator = LocalNavigator.currentOrThrow
         val employeesDataViewModel = EmployeesDataViewModel()
-        val calendarManageViewModel = CalendarManageViewModel()
 
         MaterialTheme {
             Scaffold(bottomBar = {
                 BottomNavigationBar(navigator)
             }) {
                 resetToday()
-                calendarManageViewModel.resetWeeks()
 
                 Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
                     Row(
@@ -147,7 +143,7 @@ class AdminScreen : Screen {
 
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         ElevatedCard(
                             colors = CardColors(
@@ -159,40 +155,7 @@ class AdminScreen : Screen {
                             modifier = Modifier.weight(1f).height(180.dp).clickable {
                                 if (canClick) {
                                     canClick = false
-                                    navigator.push(GenerateCSVScreen())
-                                }
-                            },
-                            elevation = CardDefaults.elevatedCardElevation(8.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Summarize,
-                                    contentDescription = "Informe",
-                                    modifier = Modifier.size(size.dp),
-                                    tint = Color(0xFF707272)
-                                )
-                                Text("Generar Informes")
-                            }
-
-                        }
-
-                        Spacer(Modifier.size(16.dp))
-
-                        ElevatedCard(
-                            colors = CardColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Gray,
-                                disabledContentColor = Color.Black
-                            ),
-                            modifier = Modifier.weight(1f).height(180.dp).clickable {
-                                if (canClick) {
-                                    canClick = false
-                                    navigator.push(CalendarManageScreen(calendarManageViewModel))
+                                    navigator.push(CalendarManageScreen())
                                 }
                             },
                             elevation = CardDefaults.elevatedCardElevation(8.dp)

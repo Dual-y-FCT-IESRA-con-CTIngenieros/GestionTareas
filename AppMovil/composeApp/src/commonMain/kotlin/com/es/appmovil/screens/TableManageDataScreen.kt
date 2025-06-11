@@ -64,7 +64,8 @@ class TableManageDataScreen(
                     entries = entries,
                     onEntryClick = { entry ->
                         selectedEntry = entry
-                        editableFields = if (entry is TimeCodeDTO) entry.toEntity().getFieldMap() else entry.getFieldMap()
+                        editableFields = if (entry is TimeCodeDTO) entry.toEntity()
+                            .getFieldMap() else entry.getFieldMap()
                     }
                 )
             }
@@ -72,13 +73,17 @@ class TableManageDataScreen(
             // Editor dinámico
             selectedEntry?.let { entry ->
                 Spacer(modifier = Modifier.height(16.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = "Editando: ${entry.getId()}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
-                    IconButton({selectedEntry = null}) {
+                    IconButton({ selectedEntry = null }) {
                         Icon(imageVector = Icons.Filled.Close, contentDescription = "Cerrar")
                     }
                 }
@@ -87,7 +92,7 @@ class TableManageDataScreen(
 
                 editableFields.forEach { (key, value) ->
 
-                    EditableFields(key,editableFields, value, { newValue ->
+                    EditableFields(key, editableFields, value, { newValue ->
                         editableFields = editableFields.toMutableMap().apply {
                             this[key] = parseValue(value, newValue)
                         }
@@ -127,7 +132,6 @@ class TableManageDataScreen(
             )
         }
     }
-
 
     // 🔹 Encabezados y filas de la tabla
     @Composable
@@ -192,11 +196,19 @@ class TableManageDataScreen(
     }
 
     @Composable
-    private fun EditableFields(key:String ,editableFields: Map<String, Any?>,value:Any?, onChangeValue: (String) -> Unit, onColorSelected: (Color) -> Unit, onCheckedSelected: (Boolean) -> Unit) {
+    private fun EditableFields(
+        key: String,
+        editableFields: Map<String, Any?>,
+        value: Any?,
+        onChangeValue: (String) -> Unit,
+        onColorSelected: (Color) -> Unit,
+        onCheckedSelected: (Boolean) -> Unit
+    ) {
         when (key) {
             "dateFrom" -> {
                 DatePickerDialogSample(mutableStateOf(value.toString()), "Date From")
             }
+
             "projectManager" -> {
                 var projectManager by remember { mutableStateOf(mapOf("" to "")) }
                 var projectManagerSelection by remember { mutableStateOf(false) }
@@ -214,87 +226,104 @@ class TableManageDataScreen(
                     onValueChange = { projectManager = it }
                 )
             }
+
             "idPoject" -> {
-                if(entries.all { it is WorkOrder }) {
+                if (entries.all { it is WorkOrder }) {
                     var idProject by remember { mutableStateOf(mapOf("" to "")) }
                     var projectSelection by remember { mutableStateOf(false) }
-                    val projectData = TableManageViewModel().project.value.associate { it.idProject to it.desc }
+                    val projectData =
+                        TableManageViewModel().project.value.associate { it.idProject to it.desc }
 
                     DropdownMenu(
                         label = "Projects",
                         expandido = projectSelection,
                         opciones = projectData,
-                        seleccion = idProject.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        seleccion = idProject.values.first().toString()
+                            .ifEmpty { editableFields[key]?.toString() ?: "" },
                         onExapandedChange = { projectSelection = !projectSelection },
                         onValueChange = { idProject = it }
                     )
-                } else EditText(key,editableFields,onChangeValue)
+                } else EditText(key, editableFields, onChangeValue)
             }
+
             "idAircraft" -> {
-                if(entries.all { it is WorkOrder }) {
+                if (entries.all { it is WorkOrder }) {
                     var idAircraft by remember { mutableStateOf(mapOf("" to "")) }
                     var aircraftSelection by remember { mutableStateOf(false) }
-                    val aircraftData = TableManageViewModel().aircraft.value.associate { it.idAircraft to it.desc }
+                    val aircraftData =
+                        TableManageViewModel().aircraft.value.associate { it.idAircraft to it.desc }
 
                     DropdownMenu(
                         label = "Aircrafts",
                         expandido = aircraftSelection,
                         opciones = aircraftData,
-                        seleccion = idAircraft.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        seleccion = idAircraft.values.first().toString()
+                            .ifEmpty { editableFields[key]?.toString() ?: "" },
                         onExapandedChange = { aircraftSelection = !aircraftSelection },
                         onValueChange = { idAircraft = it }
                     )
-                } else EditText(key,editableFields,onChangeValue)
+                } else EditText(key, editableFields, onChangeValue)
             }
+
             "idArea" -> {
-                if(entries.all { it is WorkOrder }) {
+                if (entries.all { it is WorkOrder }) {
                     var idArea by remember { mutableStateOf(mapOf("" to "")) }
                     var areaSelection by remember { mutableStateOf(false) }
-                    val areaData = TableManageViewModel().area.value.associate { it.idArea.toString() to it.desc }
+                    val areaData =
+                        TableManageViewModel().area.value.associate { it.idArea.toString() to it.desc }
 
                     DropdownMenu(
                         label = "Areas",
                         expandido = areaSelection,
                         opciones = areaData,
-                        seleccion = idArea.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        seleccion = idArea.values.first().toString()
+                            .ifEmpty { editableFields[key]?.toString() ?: "" },
                         onExapandedChange = { areaSelection = !areaSelection },
                         onValueChange = { idArea = it }
                     )
-                } else EditText(key,editableFields,onChangeValue)
+                } else EditText(key, editableFields, onChangeValue)
             }
+
             "idCliente" -> {
-                if(entries.all { it is Project }) {
+                if (entries.all { it is Project }) {
                     var idCliente by remember { mutableStateOf(mapOf("" to "")) }
                     var clienteSelection by remember { mutableStateOf(false) }
-                    val clienteData = remember { TableManageViewModel().client.value.associate { it.idCliente.toString() to it.nombre } }
+                    val clienteData =
+                        remember { TableManageViewModel().client.value.associate { it.idCliente.toString() to it.nombre } }
                     DropdownMenu(
                         label = "Clients",
                         expandido = clienteSelection,
                         opciones = clienteData,
-                        seleccion = idCliente.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        seleccion = idCliente.values.first().toString()
+                            .ifEmpty { editableFields[key]?.toString() ?: "" },
                         onExapandedChange = { clienteSelection = !clienteSelection },
                         onValueChange = { idCliente = it }
                     )
-                } else EditText(key,editableFields,onChangeValue)
+                } else EditText(key, editableFields, onChangeValue)
             }
+
             "idTimeCode" -> {
-                if(entries.all { it is Activity }) {
+                if (entries.all { it is Activity }) {
                     var idTimeCode by remember { mutableStateOf(mapOf("" to "")) }
                     var timeCodeSelection by remember { mutableStateOf(false) }
-                    val timeCodeData = TableManageViewModel().timeCode.value.associate { it.idTimeCode.toString() to it.desc }
+                    val timeCodeData =
+                        TableManageViewModel().timeCode.value.associate { it.idTimeCode.toString() to it.desc }
                     DropdownMenu(
                         label = "TimeCodes",
                         expandido = timeCodeSelection,
                         opciones = timeCodeData,
-                        seleccion = idTimeCode.values.first().toString().ifEmpty { editableFields[key]?.toString() ?: "" },
+                        seleccion = idTimeCode.values.first().toString()
+                            .ifEmpty { editableFields[key]?.toString() ?: "" },
                         onExapandedChange = { timeCodeSelection = !timeCodeSelection },
                         onValueChange = { idTimeCode = it }
                     )
-                } else EditText(key,editableFields,onChangeValue)
+                } else EditText(key, editableFields, onChangeValue)
             }
+
             "dateTo" -> {
                 DatePickerDialogSample(mutableStateOf(value.toString()), "Date To")
             }
+
             "color" -> {
                 val color = editableFields[key]
                 var selectedColor = if (color is Long) Color(color) else Color.Red
@@ -307,9 +336,14 @@ class TableManageDataScreen(
                     }
                 )
             }
+
             "chkProd" -> {
                 val currentValue = editableFields[key]?.toString()?.toBooleanStrictOrNull() ?: false
-                Row(Modifier.fillMaxWidth().padding(start = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier.fillMaxWidth().padding(start = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text("Check Producción")
                     Checkbox(
                         checked = currentValue,
@@ -317,12 +351,17 @@ class TableManageDataScreen(
                     )
                 }
             }
-            else -> EditText(key,editableFields,onChangeValue)
+
+            else -> EditText(key, editableFields, onChangeValue)
         }
     }
 
     @Composable
-    private fun EditText(key:String, editableFields: Map<String, Any?>, onChangeValue:(String)-> Unit) {
+    private fun EditText(
+        key: String,
+        editableFields: Map<String, Any?>,
+        onChangeValue: (String) -> Unit
+    ) {
         val currentValue = editableFields[key]?.toString() ?: ""
         OutlinedTextField(
             value = currentValue,

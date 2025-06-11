@@ -47,6 +47,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.model.Employee
 import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
@@ -56,6 +59,7 @@ import com.es.appmovil.viewmodel.DataViewModel.employees
 import com.es.appmovil.viewmodel.DataViewModel.employeesYearData
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.widgets.HeaderSection
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -64,6 +68,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
     @Composable
     override fun Content() {
         val availableYears = employeesYearData.value.map { it.year }.distinct()
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         var yearChangeFlag = true
         val fechaActual by today.collectAsState()
         val employees by employees.collectAsState()
@@ -91,7 +96,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
 
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = {calendarYearViewModel.changeDialog(false)},
+                onDismissRequest = { calendarYearViewModel.changeDialog(false) },
                 title = { Text("Error") },
                 text = { Text("Debes bloquear todas las semanas para poder bloquear este año.") },
                 confirmButton = {}
@@ -100,7 +105,12 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, end = 16.dp, start = 16.dp)) {
 
-            HeaderSection { showDialogDownload = true }
+            HeaderSection(
+                navigator,
+                "Gestión anual",
+                Icons.Filled.Download,
+                true
+            ) { showDialogDownload = true }
 
             Spacer(Modifier.size(16.dp))
 
@@ -172,7 +182,8 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 }
 
                 Row {
-                    IconButton({ showFilter = !showFilter
+                    IconButton({
+                        showFilter = !showFilter
                         if (filter.isNotBlank()) calendarYearViewModel.changeFilter("")
                     }) {
                         Icon(
@@ -203,11 +214,14 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 }
             }
 
-            LazyColumn(modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp).weight(1f)) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp).weight(1f)
+            ) {
                 val employeesFilter = if (filter.isNotBlank()) employees.filter {
-                        val name = (it.nombre + " " + it.apellidos).lowercase()
-                        filter.lowercase() in name }
-                 else employees
+                    val name = (it.nombre + " " + it.apellidos).lowercase()
+                    filter.lowercase() in name
+                }
+                else employees
 
                 val employeesOrder =
                     if (!orderDescendant) employeesFilter.sortedByDescending { it.nombre.uppercase() } else employeesFilter.sortedBy { it.nombre.uppercase() }
@@ -318,7 +332,11 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                 title = { Text("Cerrar año") },
                 text = {
                     Column {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text("¿Generar nuevo año con el mismo calendario?")
                             Checkbox(
                                 checked = generateNewYear,
@@ -329,7 +347,7 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                             )
                         }
                         Spacer(Modifier.size(5.dp))
-                        if(generateNewYear) {
+                        if (generateNewYear) {
                             Text("Introduce los días de vacaciones para el nuevo año:")
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedTextField(
@@ -343,12 +361,17 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                     }
                 },
                 confirmButton = {
-                    Button(onClick = {
-                        val dias = vacationDaysInput.toIntOrNull() ?: 0
-                        calendarYearViewModel.setNextHolidaysDays(dias)
-                        calendarYearViewModel.closeYear(generateNewYear, today.value.year)
-                        showCloseYearDialog = false
-                    }, enabled = if(!generateNewYear || generateNewYear && (vacationDaysInput.toIntOrNull() ?: 0) > 0) true else false) {
+                    Button(
+                        onClick = {
+                            val dias = vacationDaysInput.toIntOrNull() ?: 0
+                            calendarYearViewModel.setNextHolidaysDays(dias)
+                            calendarYearViewModel.closeYear(generateNewYear, today.value.year)
+                            showCloseYearDialog = false
+                        },
+                        enabled = if (!generateNewYear || generateNewYear && (vacationDaysInput.toIntOrNull()
+                                ?: 0) > 0
+                        ) true else false
+                    ) {
                         Text("Cerrar año")
                     }
                 },
@@ -358,21 +381,6 @@ class CalendarYearScreen(private val calendarYearViewModel: CalendarYearViewMode
                     }
                 }
             )
-        }
-    }
-
-
-    @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Gestión anual", fontSize = 22.sp)
-            androidx.compose.material3.IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Download, contentDescription = "")
-            }
         }
     }
 

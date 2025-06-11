@@ -35,16 +35,16 @@ import ir.ehsannarmani.compose_charts.models.Pie
 fun ResumenHorasMensual() {
     DataViewModel.getPie()
     val dataGraphic by DataViewModel.pieList.collectAsState()
-        Column {
-            ElevatedCard(
-                colors = CardColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.Black
-                ),
-                modifier = Modifier.width(180.dp).height(306.dp).align(Alignment.CenterHorizontally),
-                elevation = CardDefaults.elevatedCardElevation(5.dp)
+    Column {
+        ElevatedCard(
+            colors = CardColors(
+                containerColor = Color.White,
+                contentColor = Color.Black,
+                disabledContainerColor = Color.Gray,
+                disabledContentColor = Color.Black
+            ),
+            modifier = Modifier.width(180.dp).height(306.dp).align(Alignment.CenterHorizontally),
+            elevation = CardDefaults.elevatedCardElevation(5.dp)
 
         ) {
             Column(
@@ -77,7 +77,10 @@ fun ResumenHorasMensual() {
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Total")
-                        Text("${dataGraphic.sumOf { it.data.toInt() }}", fontWeight = FontWeight.Bold)
+                        Text(
+                            "${dataGraphic.sumOf { it.data.toInt() }}",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
                 Spacer(Modifier.size(20.dp))

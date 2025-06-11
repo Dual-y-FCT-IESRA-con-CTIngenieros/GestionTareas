@@ -39,6 +39,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.database.Database
 import com.es.appmovil.model.Calendar
 import com.es.appmovil.utils.customButtonColors
@@ -46,6 +49,7 @@ import com.es.appmovil.viewmodel.CalendarFestViewModel
 import com.es.appmovil.viewmodel.DataViewModel.calendar
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.DataViewModel.today
+import com.es.appmovil.widgets.HeaderSection
 import com.es.appmovil.widgets.monthNameInSpanish
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,21 +61,24 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewModel):Screen {
+class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewModel) : Screen {
     @Composable
     override fun Content() {
         var monthChangeFlag = true
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val fechaActual by today.collectAsState()
         var showDialog by remember { mutableStateOf(false) }
         var showDialogDelete by remember { mutableStateOf(false) }
         var showDialogAdd by remember { mutableStateOf(false) }
         var festIndex by remember { mutableStateOf(0) }
-        val festivos = calendar.value.filter { it.idCalendar.toString() == fechaActual.year.toString() }.sortedBy { it.date }
+        val festivos =
+            calendar.value.filter { it.idCalendar.toString() == fechaActual.year.toString() }
+                .sortedBy { it.date }
 
         if (showDialog)
             CalendarDialog(
                 "Actualizar",
-                onDismiss = {showDialog = false},
+                onDismiss = { showDialog = false },
                 onDateSelected = {
                     val calendarUpdate = Calendar(festivos[festIndex].idCalendar, it.toString())
                     CoroutineScope(Dispatchers.IO).launch {
@@ -80,13 +87,15 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                     }
                     calendar.value.remove(festivos[festIndex])
                     calendar.value.add(calendarUpdate)
+                    showDialog = false
                 })
 
         if (showDialogAdd)
             CalendarDialog(
                 "Guardar",
-                onDismiss = {showDialog = false},
+                onDismiss = { showDialogAdd = false },
                 onDateSelected = {
+                    showDialogAdd = false
                     val calendarUpdate = Calendar(festivos[festIndex].idCalendar, it.toString())
                     CoroutineScope(Dispatchers.IO).launch {
                         Database.addData("Calendar", calendarUpdate)
@@ -102,13 +111,19 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                         Database.deleteCalendar("Calendar", festivos[festIndex])
                     }
                     calendar.value.remove(festivos[festIndex])
-                            },
-                onDismiss = {showDialogDelete = false}
+                },
+                onDismiss = { showDialogDelete = false }
             )
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection { showDialogAdd = true }
+            HeaderSection(
+                navigator,
+                "Calendario Festivos",
+                Icons.Filled.Add,
+                true
+            ) { showDialogAdd = true }
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -148,10 +163,15 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                                 disabledContainerColor = Color.Gray,
                                 disabledContentColor = Color.Black
                             ),
-                            modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 8.dp),
+                            modifier = Modifier.fillMaxWidth().height(70.dp)
+                                .padding(vertical = 8.dp),
                             elevation = CardDefaults.elevatedCardElevation(5.dp)
                         ) {
-                            Row(Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(fest.date)
 
                                 Row {
@@ -159,13 +179,19 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                                         showDialog = true
                                         festIndex = index
                                     }) {
-                                        Icon(imageVector = Icons.Filled.CalendarMonth, contentDescription = "")
+                                        Icon(
+                                            imageVector = Icons.Filled.CalendarMonth,
+                                            contentDescription = ""
+                                        )
                                     }
                                     IconButton({
                                         showDialogDelete = true
                                         festIndex = index
                                     }) {
-                                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "")
+                                        Icon(
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = ""
+                                        )
                                     }
                                 }
                             }
@@ -180,7 +206,7 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CalendarDialog(
-        text:String,
+        text: String,
         onDismiss: () -> Unit,
         onDateSelected: (LocalDate) -> Unit
     ) {
@@ -221,7 +247,7 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
     }
 
     @Composable
-    fun DeleteDialog(onConfirm:() -> Unit,onDismiss:() -> Unit) {
+    fun DeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text("¿Eliminar este día?.") },
@@ -236,19 +262,5 @@ class CalendarFestScreen(private val calendarFestViewModel: CalendarFestViewMode
                 }
             }
         )
-    }
-
-    @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Calendario Festivos", fontSize = 22.sp)
-            IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "")
-            }
-        }
     }
 }

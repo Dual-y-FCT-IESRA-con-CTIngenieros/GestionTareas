@@ -24,7 +24,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +60,7 @@ import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.utils.customTextFieldColors
 import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
+import com.es.appmovil.widgets.HeaderSection
 import com.es.appmovil.widgets.claseTabla
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,9 +74,10 @@ class TableManageScreen : Screen {
         val navigator: Navigator = LocalNavigator.currentOrThrow
         var showDialog by remember { mutableStateOf(false) }
 
-
         LaunchedEffect(Unit) {
+            FullScreenLoadingManager.showLoader()
             DataViewModel.load_tables()
+            FullScreenLoadingManager.hideLoader()
         }
 
         val tables = mutableMapOf<String, List<Any>>()
@@ -84,7 +85,7 @@ class TableManageScreen : Screen {
         val tablesData = listOf(
             DataViewModel.activities.collectAsState(),
             DataViewModel.aircraft.collectAsState(),
-            DataViewModel.area.collectAsState(),
+            DataViewModel.areas.collectAsState(),
             DataViewModel.cliente.collectAsState(),
             DataViewModel.manager.collectAsState(),
             DataViewModel.projects.collectAsState(),
@@ -99,23 +100,9 @@ class TableManageScreen : Screen {
         }
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { navigator.pop() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Return")
-                }
-                Text(
-                    "Tablas",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 25.sp
-                )
-                IconButton(onClick = { showDialog = true }) {
-                    Icon(Icons.Filled.Download, contentDescription = "Download")
-                }
-            }
+
+            HeaderSection(navigator, "Tablas", Icons.Filled.Download, true) { showDialog = true }
+
             LazyColumn {
                 tables.forEach { (tableName, tableData) ->
                     item {

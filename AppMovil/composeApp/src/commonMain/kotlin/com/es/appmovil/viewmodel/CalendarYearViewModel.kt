@@ -24,12 +24,12 @@ class CalendarYearViewModel {
     private var _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
-    private var _filter:MutableStateFlow<String> = MutableStateFlow("")
+    private var _filter: MutableStateFlow<String> = MutableStateFlow("")
     val filter: StateFlow<String> = _filter
 
     private var _nextDaysHolidays: MutableStateFlow<Int> = MutableStateFlow(0)
 
-    fun changeDialog(bool:Boolean) {
+    fun changeDialog(bool: Boolean) {
         _showDialog.value = bool
     }
 
@@ -49,7 +49,7 @@ class CalendarYearViewModel {
         today.value = today.value.plus(year)
     }
 
-    fun changeFilter(value:String) {
+    fun changeFilter(value: String) {
         _filter.value = value
     }
 
@@ -64,9 +64,10 @@ class CalendarYearViewModel {
         }
     }
 
-    fun closeYear(generateNewYear:Boolean, currentYear:Int){
+    fun closeYear(generateNewYear: Boolean, currentYear: Int) {
 
-        val blockDate = employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
+        val blockDate =
+            employees.value.filter { (it.blockDate ?: "") > "${_currentYear.value}/12/31" }
         if (blockDate.isNotEmpty()) {
             val nextYear = currentYear + 1
             val days = _nextDaysHolidays.value
@@ -80,16 +81,27 @@ class CalendarYearViewModel {
 
             if (generateNewYear) {
                 employees.value.forEach {
-                    val enjooyedHours = employeesYearData.value.find {data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays ?: 0
+                    val enjooyedHours =
+                        employeesYearData.value.find { data -> data.idEmployee == it.idEmployee }?.enjoyedHolidays
+                            ?: 0
                     val holidaysHours = hours + (hours - enjooyedHours)
                     CoroutineScope(Dispatchers.IO).launch {
-                        val employeeData = UserYearData(it.idEmployee, nextYear, days, holidaysHours, 0, 0, 0, false)
+                        val employeeData = UserYearData(
+                            it.idEmployee,
+                            nextYear,
+                            days,
+                            holidaysHours,
+                            0,
+                            0,
+                            0,
+                            false
+                        )
                         Database.addData("UserYearData", employeeData)
                     }
                 }
 
                 calendar.value.forEach {
-                    val year = (_currentYear.value.toIntOrNull() ?: 2025)+ 1
+                    val year = (_currentYear.value.toIntOrNull() ?: 2025) + 1
                     val newCalendar = Calendar(year, it.date)
                     CoroutineScope(Dispatchers.IO).launch {
                         Database.addData("Calendar", newCalendar)
@@ -104,13 +116,11 @@ class CalendarYearViewModel {
         }
 
     }
+
     fun isCurrentYearClosed(): Boolean {
         val currentYear = today.value.year
         return employeesYearData.value.firstOrNull { it.year == currentYear }?.closedYear == true
     }
-
-
-
 
 
 //    fun generateUserYearData() { NO BORRAR AÚN FUNCION IMPORTANTE PARA GENERAR LOS USERYEARDATA

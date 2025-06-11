@@ -16,14 +16,15 @@ import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.TransferWithinAStation
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -91,13 +92,14 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
         val employeeText = if (changeEmployees) "Empleados actuales" else "Antiguos empleados"
 
         Column(Modifier.fillMaxSize().padding(top = 30.dp, start = 16.dp, end = 16.dp)) {
+
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navigator.pop() }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Return")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Return")
                 }
                 Text(
                     "Usuarios",
@@ -204,14 +206,14 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             label = { Text("Apellidos") },
                         )
                     }
-                    Row(Modifier.fillMaxWidth()){
+                    Row(Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
                             colors = customTextFieldColors(),
                             value = user,
                             onValueChange = {
                                 employeesDataViewModel.onChangeUser(it)
-                                            },
+                            },
                             label = { Text("Usuario") },
                         )
                         OutlinedTextField(
@@ -235,7 +237,7 @@ class UserManageScreen(private val employeesDataViewModel: EmployeesDataViewMode
                             readOnly = true,
                             label = { Text("Rol") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                            modifier = Modifier.menuAnchor()
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                         )
                         ExposedDropdownMenu(
                             expanded = expandido,

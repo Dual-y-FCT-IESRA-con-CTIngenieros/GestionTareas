@@ -36,12 +36,10 @@ class UserViewModel : ViewModel() {
             FullScreenLoadingManager.hideLoader()
         }
     }
+
     // Contraseña del usuario con la que iniciará sesión.
     private var _password = MutableStateFlow("")
     val passwordText: StateFlow<String> = _password
-
-    private var _passForgot = MutableStateFlow(false)
-    val passForgot: StateFlow<Boolean> = _passForgot
 
     private var _passChange = MutableStateFlow(false)
     val passChange: StateFlow<Boolean> = _passChange
@@ -73,17 +71,13 @@ class UserViewModel : ViewModel() {
         _password.value = pass
     }
 
-    fun onPassForgotChange() {
-        _passForgot.value = !_passForgot.value
-    }
-
-    fun onPassChangeChange(){
+    fun onPassChangeChange() {
         _passChange.value = !_passChange.value
     }
 
     private fun completeEmail() {
         val regex = ".+@".toRegex()
-        if (!regex.containsMatchIn(_email.value)){
+        if (!regex.containsMatchIn(_email.value)) {
             _email.value = _username.value + _email.value
         }
     }
@@ -132,7 +126,6 @@ class UserViewModel : ViewModel() {
     fun checkSession() {
         _checkSess.value = true
         val settings = Settings()
-        val emailUser = settings.getStringOrNull("email_user")
         val accessToken = settings.getStringOrNull("access_token")
         val refreshToken = settings.getStringOrNull("refresh_token")
 
@@ -159,8 +152,7 @@ class UserViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 _password.value = ""
-            }
-            finally {
+            } finally {
                 FullScreenLoadingManager.hideLoader()
             }
         }

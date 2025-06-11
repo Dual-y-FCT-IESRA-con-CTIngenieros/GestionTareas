@@ -164,16 +164,6 @@ object Database {
         }
     }
 
-    suspend inline fun <reified T : Any> updateData(table:String, data:T){
-        try {
-            supabase.from(table).upsert(data)
-        }catch (
-            e:Exception
-        ){
-            println(e)
-        }
-    }
-
     suspend fun deleteCalendar(table:String, data: Calendar){
         try {
             supabase.from(table).delete {
@@ -212,22 +202,6 @@ object Database {
                     eq("idActivity", data.idActivity)
                     eq("date", data.date)
                 }
-            }
-        } catch (
-            e: Exception
-        ) {
-            println(e)
-        }
-    }
-
-    suspend fun deregister(table: String, fecha: String, idName: String, id: Any) {
-        try {
-            supabase.from(table).update(
-                {
-                    set("dateTo", fecha)
-                }
-            ) {
-                filter { eq(idName, id) }
             }
         } catch (
             e: Exception

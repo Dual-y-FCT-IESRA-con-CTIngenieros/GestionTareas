@@ -39,7 +39,6 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-
 /**
  * Funcion que muestra una ventana deslizante para reallenar los campos de un dia
  *
@@ -52,7 +51,7 @@ fun DayConfigDialog(
     showDialog: Boolean,
     day: LocalDate,
     calendarViewModel: CalendarViewModel,
-    dayMenuViewModel:DayMenuViewModel,
+    dayMenuViewModel: DayMenuViewModel,
     onChangeDialog: (Boolean) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -94,7 +93,7 @@ fun DayConfigDialog(
 @Composable
 fun EditableActivityCard(
     activity: EmployeeActivity,
-    day:LocalDate,
+    day: LocalDate,
     calendarViewModel: CalendarViewModel,
     workOrdersTimeCodes: MutableList<ProjectTimeCodeDTO>,
     activitiesTimeCodes: MutableList<ProjectTimeCodeDTO>,
@@ -115,7 +114,10 @@ fun EditableActivityCard(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text("TimeCode: ${activity.idTimeCode}", modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp))
+        Text(
+            "TimeCode: ${activity.idTimeCode}",
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
+        )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             NumberInputField(value = horas.toInt(), onValueChange = { horas = it.toFloat() })
@@ -130,14 +132,16 @@ fun EditableActivityCard(
                     onUpdate(activity.copy(idTimeCode = it, idWorkOrder = "", idActivity = 0))
                 },
                 timeCodeSeleccionado = timeCodeString,
-                onTimeCodeSelected = {timeCodeString = it ?: ""},
+                onTimeCodeSelected = { timeCodeString = it ?: "" },
                 onProyectChange = {
                     workSeleccionado = it ?: ""
                     activitySeleccionado = it ?: ""
-                    onUpdate(activity.copy(
-                        idWorkOrder = workSeleccionado,
-                        idActivity = it?.toIntOrNull() ?: 0
-                    ))
+                    onUpdate(
+                        activity.copy(
+                            idWorkOrder = workSeleccionado,
+                            idActivity = it?.toIntOrNull() ?: 0
+                        )
+                    )
                 }
             )
         }
@@ -161,7 +165,8 @@ fun EditableActivityCard(
                 "Activity",
                 Modifier.weight(1f).padding(end = 16.dp, top = 8.dp),
                 {
-                    val idActivity = activities.value.find { act -> it.split("-")[1].trim() == act.desc }
+                    val idActivity =
+                        activities.value.find { act -> it.split("-")[1].trim() == act.desc }
                     activityInt = idActivity?.idActivity ?: 0
                     onUpdate(activity.copy(idActivity = activityInt))
                 }
@@ -176,7 +181,7 @@ fun EditableActivityCard(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
 
-        Save(timeCodeSeleccionado, workSeleccionado , activityInt, { onChangeDialog(false) }, {
+        Save(timeCodeSeleccionado, workSeleccionado, activityInt, { onChangeDialog(false) }, {
             dates.value.forEach { date ->
                 val blockDate = employee.blockDate?.let { LocalDate.parse(it) }
                 if (blockDate == null || date > blockDate) { // PONER BLOCK DATE NO NULO

@@ -28,6 +28,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -84,7 +85,7 @@ fun UserData(
     val user = remember { mutableStateOf(employee.email.substring(0, employee.email.indexOf('@'))) }
     val domain = remember { mutableStateOf(employee.email.substring(employee.email.indexOf('@'))) }
     val idCT = remember { mutableStateOf(employee.idCT) }
-    val idAirbus = remember { mutableStateOf(employee.idAirbus)}
+    val idAirbus = remember { mutableStateOf(employee.idAirbus) }
     val dateFrom = remember { mutableStateOf(employee.dateFrom) }
     val dateTo = remember { mutableStateOf("") }
 
@@ -133,7 +134,7 @@ fun UserData(
                 modifier = Modifier.fillMaxWidth(),
                 colors = customTextFieldColors(),
                 value = idAirbus.value,
-                onValueChange = { idAirbus.value = it},
+                onValueChange = { idAirbus.value = it },
                 label = { Text("ID Airbus") },
             )
             Row {
@@ -141,18 +142,18 @@ fun UserData(
                     colors = customTextFieldColors(),
                     modifier = Modifier.weight(1f),
                     value = name.value,
-                    onValueChange = { name.value = it},
+                    onValueChange = { name.value = it },
                     label = { Text("Nombre") },
                 )
                 OutlinedTextField(
                     colors = customTextFieldColors(),
                     modifier = Modifier.weight(2f),
                     value = lastName.value,
-                    onValueChange = { lastName.value = it},
+                    onValueChange = { lastName.value = it },
                     label = { Text("Apellidos") },
                 )
             }
-            Row(Modifier.fillMaxWidth()){
+            Row(Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
                     colors = customTextFieldColors(),
@@ -184,7 +185,7 @@ fun UserData(
                     readOnly = true,
                     label = { Text("Rol") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                 )
                 ExposedDropdownMenu(
                     expanded = expandido,
@@ -192,7 +193,7 @@ fun UserData(
                 ) {
                     opciones.forEach { opcion ->
                         DropdownMenuItem(
-                            text = { androidx.compose.material.Text(opcion) },
+                            text = { Text(opcion) },
                             onClick = {
                                 seleccion = opcion
                                 expandido = false
@@ -288,8 +289,7 @@ fun confirmRemove(
                     )
 
                     DatePickerDialogSample(
-                        dateTo
-                        ,"Fecha de fin de contrato"
+                        dateTo, "Fecha de fin de contrato"
                     )
 
                     Row(

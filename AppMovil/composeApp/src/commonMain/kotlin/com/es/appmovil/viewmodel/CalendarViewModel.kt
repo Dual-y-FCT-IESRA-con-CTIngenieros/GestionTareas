@@ -83,20 +83,23 @@ class CalendarViewModel {
     }
 
     private fun resetBars() {
-        _bars.value = listOf(Bars(
-            label = "",
-            values = listOf(
-                Bars.Data(
-                    label = "",
-                    value = 0.0,
-                    color = SolidColor(Color.Black)
+        _bars.value = listOf(
+            Bars(
+                label = "",
+                values = listOf(
+                    Bars.Data(
+                        label = "",
+                        value = 0.0,
+                        color = SolidColor(Color.Black)
+                    )
                 )
             )
-        ))
+        )
     }
 
-    fun addEmployeeActivity(employeeActivity: EmployeeActivity){
-        val filtro = employeeActivities.value.find { it.date == employeeActivity.date && it.idTimeCode == employeeActivity.idTimeCode }
+    fun addEmployeeActivity(employeeActivity: EmployeeActivity) {
+        val filtro =
+            employeeActivities.value.find { it.date == employeeActivity.date && it.idTimeCode == employeeActivity.idTimeCode }
         if (filtro == null) {
             if (employeeActivity.time != 0f) {
                 employeeActivities.value.add(employeeActivity)
@@ -104,8 +107,7 @@ class CalendarViewModel {
                     Database.addEmployeeActivity(employeeActivity)
                 }
             }
-        }
-        else {
+        } else {
             employeeActivities.value.remove(filtro)
             if (employeeActivity.time != 0f) {
                 employeeActivities.value.add(employeeActivity)
@@ -119,9 +121,9 @@ class CalendarViewModel {
             }
         }
 
-        if (employeeActivity.idTimeCode == 900){
+        if (employeeActivity.idTimeCode == 900) {
             val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
-            if(userYearData != null){
+            if (userYearData != null) {
                 userYearData.enjoyedHolidays += employeeActivity.time.toInt()
                 userYearData.currentHolidays -= employeeActivity.time.toInt()
                 CoroutineScope(Dispatchers.IO).launch {
@@ -130,7 +132,7 @@ class CalendarViewModel {
             }
         } else if (employeeActivity.idEmployee == 100) {
             val userYearData = employeesYearData.value.find { it.idEmployee == employee.idEmployee }
-            if(userYearData != null){
+            if (userYearData != null) {
                 userYearData.workedHours += employeeActivity.time.toInt()
                 CoroutineScope(Dispatchers.IO).launch {
                     Database.updateData("UserYearData", userYearData)

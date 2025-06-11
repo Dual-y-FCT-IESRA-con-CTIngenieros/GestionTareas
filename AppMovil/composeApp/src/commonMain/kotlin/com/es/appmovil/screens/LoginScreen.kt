@@ -2,7 +2,6 @@ package com.es.appmovil.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +49,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database
-import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.cargarCalendarFest
 import com.es.appmovil.viewmodel.FullScreenLoadingManager
 import com.es.appmovil.viewmodel.UserViewModel
@@ -81,7 +78,6 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
         val visibility by userViewmodel.visibility.collectAsState(false)
         val login by userViewmodel.login.collectAsState(false)
         val checkSess by userViewmodel.checkSess.collectAsState(false)
-        val passForgot by userViewmodel.passForgot.collectAsState(false)
         val passChange by userViewmodel.passChange.collectAsState(false)
         val loginError by userViewmodel.loginError.collectAsState(false)
         val loginErrorMesssage by userViewmodel.loginErrorMessage.collectAsState("")
@@ -122,20 +118,6 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Text(
-                    "¿Olvidaste tu contraseña?",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = Color(0xFFF4A900),
-                    modifier = Modifier.clickable {
-                        userViewmodel.onPassForgotChange()
-                    })
-                DialogResetPass(passForgot) {
-                    userViewmodel.onPassForgotChange()
-                }
-            }
 
             Spacer(modifier = Modifier.height(20.dp))
             DialogChangePass(
@@ -268,60 +250,6 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
     }
 
     @Composable
-    fun DialogResetPass(alertOpen: Boolean, onDismiss: (Boolean) -> Unit) {
-        val user = remember { mutableStateOf("") }
-
-        if (alertOpen) {
-            Dialog(onDismissRequest = { onDismiss(false) }) {
-                androidx.compose.material3.Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            "Escriba su usuario",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        OutlinedTextField(
-                            value = user.value,
-                            colors = customTextFieldColors(),
-                            onValueChange = { user.value = it },
-                            label = { Text("Usuario") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            TextButton(onClick = { onDismiss(false) }) {
-                                Text("Cancelar")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                colors = com.es.appmovil.utils.customButtonColors(),
-                                onClick = {
-                                    onDismiss(false)
-                                    user.value = ""
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        Database.sendResetPass(user.value + DataViewModel.currentEmail.value)
-                                    }
-                                }) {
-                                Text("Aceptar")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
     fun DialogChangePass(
         alertOpen: Boolean,
         onDismiss: () -> Unit
@@ -397,6 +325,7 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
             }
         }
     }
+
     /**
      * Dialog de error que nos indica el error al iniciar sesión
      *

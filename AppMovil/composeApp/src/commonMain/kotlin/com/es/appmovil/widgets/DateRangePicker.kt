@@ -37,7 +37,11 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 
 @Composable
-fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate, onGetListDates:(SnapshotStateList<LocalDate>)->Unit) {
+fun DatePickerFieldToModal(
+    modifier: Modifier = Modifier,
+    day: LocalDate,
+    onGetListDates: (SnapshotStateList<LocalDate>) -> Unit
+) {
     var selectedStartDate by remember { mutableStateOf<Long?>(null) }
     var selectedEndDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
@@ -84,13 +88,17 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier, day: LocalDate, onGetL
                 selectedEndDate = endDate
 
                 if (startDate != null && endDate != null) {
-                    val start = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
-                    val end = Instant.fromEpochMilliseconds(endDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val start = Instant.fromEpochMilliseconds(startDate)
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val end = Instant.fromEpochMilliseconds(endDate)
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
                     val listOfDates = generateDatesBetween(start, end)
                     onGetListDates(listOfDates)
-                } else if (startDate != null){
-                    val start = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
-                    val end = Instant.fromEpochMilliseconds(startDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+                } else if (startDate != null) {
+                    val start = Instant.fromEpochMilliseconds(startDate)
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                    val end = Instant.fromEpochMilliseconds(startDate)
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
                     val listOfDates = generateDatesBetween(start, end)
                     onGetListDates(listOfDates)
                 }

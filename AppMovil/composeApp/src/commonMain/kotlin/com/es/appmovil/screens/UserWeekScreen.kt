@@ -22,8 +22,6 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,8 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.model.Area
 import com.es.appmovil.utils.ManageCSV
 import com.es.appmovil.utils.customButtonColors
@@ -43,6 +43,7 @@ import com.es.appmovil.viewmodel.DataViewModel
 import com.es.appmovil.viewmodel.DataViewModel.dailyHours
 import com.es.appmovil.viewmodel.DataViewModel.today
 import com.es.appmovil.viewmodel.UserWeekViewModel
+import com.es.appmovil.widgets.HeaderSection
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -53,6 +54,7 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
     @Composable
     override fun Content() {
         val manageCSV = ManageCSV()
+        val navigator: Navigator = LocalNavigator.currentOrThrow
         val area by DataViewModel.areas.collectAsState()
         var areaIndex by remember { mutableStateOf(0) }
         var selectedWeek by remember { mutableStateOf(1) }
@@ -85,7 +87,12 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
 
         Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-            HeaderSection { showDialog = true }
+            HeaderSection(
+                navigator,
+                "Control de Semanas",
+                Icons.Filled.Download,
+                true
+            ) { showDialog = true }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -113,20 +120,6 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
     }
 
     @Composable
-    private fun HeaderSection(onDownloadClick: () -> Unit) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Control de Semanas", fontSize = 22.sp)
-            IconButton(onClick = onDownloadClick) {
-                Icon(imageVector = Icons.Filled.Download, contentDescription = "")
-            }
-        }
-    }
-
-    @Composable
     private fun WeekSelector(
         selectedWeek: Int,
         onWeekSelected: (Int) -> Unit,
@@ -145,8 +138,13 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
             Text("Semana $selectedWeek", modifier = Modifier.clickable { onExpandChange(true) })
 
             Text(
-                "${firstDay.dayOfMonth} ${firstDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                        "${lastDay.dayOfMonth} ${lastDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }}"
+                "${firstDay.dayOfMonth} ${
+                    firstDay.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+                } - " +
+                        "${lastDay.dayOfMonth} ${
+                            lastDay.month.name.take(3).lowercase()
+                                .replaceFirstChar { it.uppercase() }
+                        }"
             )
         }
 
@@ -158,8 +156,14 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                     onWeekSelected(week)
                     onExpandChange(false)
                 }) {
-                    Text("Semana $week (${weekStart.dayOfMonth} ${weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                            "${weekEnd.dayOfMonth} ${weekEnd.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }})")
+                    Text("Semana $week (${weekStart.dayOfMonth} ${
+                        weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+                    } - " +
+                            "${weekEnd.dayOfMonth} ${
+                                weekEnd.month.name.take(3).lowercase()
+                                    .replaceFirstChar { it.uppercase() }
+                            })"
+                    )
                 }
             }
         }
@@ -246,12 +250,20 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                     ) {
                         Text("Semana $selectedWeek")
                         Text(
-                            "${weekStart.dayOfMonth} ${weekStart.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                                    "${weekEnd.dayOfMonth} ${weekEnd.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }}"
+                            "${weekStart.dayOfMonth} ${
+                                weekStart.month.name.take(3).lowercase()
+                                    .replaceFirstChar { it.uppercase() }
+                            } - " +
+                                    "${weekEnd.dayOfMonth} ${
+                                        weekEnd.month.name.take(3).lowercase()
+                                            .replaceFirstChar { it.uppercase() }
+                                    }"
                         )
                     }
 
-                    DropdownMenu(expanded = expanded, onDismissRequest = { onExpandChange(false) }) {
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { onExpandChange(false) }) {
                         (1..52).forEach { week ->
                             val start = firstMonday.plus(DatePeriod(days = (week - 1) * 7))
                             val end = start.plus(DatePeriod(days = 6))
@@ -259,8 +271,15 @@ class UserWeekScreen(private val userWeekViewModel: UserWeekViewModel) : Screen 
                                 onWeekSelected(week)
                                 onExpandChange(false)
                             }) {
-                                Text("Semana $week (${start.dayOfMonth} ${start.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} - " +
-                                        "${end.dayOfMonth} ${end.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }})")
+                                Text("Semana $week (${start.dayOfMonth} ${
+                                    start.month.name.take(3).lowercase()
+                                        .replaceFirstChar { it.uppercase() }
+                                } - " +
+                                        "${end.dayOfMonth} ${
+                                            end.month.name.take(3).lowercase()
+                                                .replaceFirstChar { it.uppercase() }
+                                        })"
+                                )
                             }
                         }
                     }

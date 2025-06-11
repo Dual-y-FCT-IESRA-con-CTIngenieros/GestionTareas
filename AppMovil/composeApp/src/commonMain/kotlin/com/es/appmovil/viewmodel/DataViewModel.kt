@@ -96,6 +96,7 @@ object DataViewModel {
         cargarCalendar()
         cargarUserYearData()
         cargarArea()
+        cargarEmployeeWH()
     }
 
     suspend fun cargarYObtenerEmail(): String {
@@ -170,7 +171,7 @@ object DataViewModel {
     private val _roles = MutableStateFlow<List<Rol>>(emptyList())
     val roles: StateFlow<List<Rol>> = _roles
 
-    fun cargarRoles() {
+    private fun cargarRoles() {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Rol>("Rol")
             _roles.value = datos
@@ -184,16 +185,6 @@ object DataViewModel {
         CoroutineScope(Dispatchers.IO).launch {
             val datos = Database.getData<Aircraft>("Aircraft")
             _aircraft.value = datos
-        }
-    }
-
-    private val _area = MutableStateFlow<List<Area>>(emptyList())
-    val area: StateFlow<List<Area>> = _area
-
-    private fun cargarArea() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val datos = Database.getData<Area>("Area")
-            _area.value = datos
         }
     }
 
@@ -235,8 +226,9 @@ object DataViewModel {
         }
     }
 
+
     private val _employeeWH = MutableStateFlow<List<EmployeeWorkHours>>(emptyList())
-    val employeeWH: StateFlow<List<EmployeeWorkHours>> = _employeeWH
+    //val employeeWH: StateFlow<List<EmployeeWorkHours>> = _employeeWH
 
     private fun cargarEmployeeWH() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -264,7 +256,7 @@ object DataViewModel {
             _tablesNames.value = datos
         }
     }
-    
+
     private var _areas = MutableStateFlow<List<Area>>(emptyList())
     val areas = _areas
 

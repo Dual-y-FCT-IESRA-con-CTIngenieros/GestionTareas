@@ -22,8 +22,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +51,8 @@ fun ResumenHorasAnual(resumeViewmodel: ResumeViewmodel) {
             containerColor = Color.White,
             contentColor = Color.Black,
             disabledContainerColor = Color.Gray,
-            disabledContentColor = Color.Black),
+            disabledContentColor = Color.Black
+        ),
         modifier = Modifier.size(180.dp, 63.dp),
         elevation = CardDefaults.elevatedCardElevation(5.dp)
     ) {

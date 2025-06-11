@@ -43,7 +43,6 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
-
 @Composable
 fun Calendar(
     calendarViewmodel: CalendarViewModel,

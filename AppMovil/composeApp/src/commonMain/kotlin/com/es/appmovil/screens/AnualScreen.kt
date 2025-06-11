@@ -55,7 +55,12 @@ class AnualScreen : Screen {
                 BottomNavigationBar(navigator)
             }) { innerPadding ->
                 Column(Modifier.padding(innerPadding).fillMaxWidth()) {
-                    Text("Resumen Anual", fontWeight = FontWeight.Black, fontSize = 25.sp, modifier = Modifier.padding(horizontal = 16.dp).padding(top =16.dp))
+                    Text(
+                        "Resumen Anual",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 25.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)
+                    )
 
                     Spacer(Modifier.size(30.dp))
                     LazyColumn {
@@ -122,12 +127,27 @@ class AnualScreen : Screen {
                                     .padding(start = 62.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val meses = listOf("E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
+                                val meses = listOf(
+                                    "E",
+                                    "F",
+                                    "M",
+                                    "A",
+                                    "M",
+                                    "J",
+                                    "J",
+                                    "A",
+                                    "S",
+                                    "O",
+                                    "N",
+                                    "D"
+                                )
                                 meses.forEach { mes ->
                                     Text(
                                         text = mes,
                                         fontSize = 12.sp,
-                                        modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(end = 12.dp),
+                                        modifier = if (mes != "D") Modifier.padding(end = 16.dp) else Modifier.padding(
+                                            end = 12.dp
+                                        ),
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -144,36 +164,47 @@ class AnualScreen : Screen {
                                 "V. Restantes" to (yearData?.currentHolidays?.toString() ?: "-")
                             )
 
-                            Text("Vacaciones")
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text("Vacaciones")
+                            }
 
-                            cards.chunked(2).forEach { rowItems ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    rowItems.forEach { (label, value) ->
-                                        Card(
-                                            modifier = Modifier.weight(1f),
-                                            elevation = CardDefaults.cardElevation(4.dp),
-                                            shape = RoundedCornerShape(8.dp),
-                                            colors = CardDefaults.cardColors(containerColor = Color.White)
-                                        ) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .padding(12.dp)
-                                                    .fillMaxWidth(),
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                            Column(Modifier.padding(horizontal = 16.dp)) {
+                                cards.chunked(2).forEach { rowItems ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        rowItems.forEach { (label, value) ->
+                                            Card(
+                                                modifier = Modifier.weight(1f),
+                                                elevation = CardDefaults.cardElevation(4.dp),
+                                                shape = RoundedCornerShape(8.dp),
+                                                colors = CardDefaults.cardColors(containerColor = Color.White)
                                             ) {
-                                                Text(text = label, fontSize = 14.sp, color = Color.Gray)
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                Text(
-                                                    text = value,
-                                                    fontSize = 20.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = Color.Black
-                                                )
+                                                Column(
+                                                    modifier = Modifier
+                                                        .padding(12.dp)
+                                                        .fillMaxWidth(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        text = label,
+                                                        fontSize = 14.sp,
+                                                        color = Color.Gray
+                                                    )
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    Text(
+                                                        text = value,
+                                                        fontSize = 20.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = Color.Black
+                                                    )
+                                                }
                                             }
                                         }
                                     }

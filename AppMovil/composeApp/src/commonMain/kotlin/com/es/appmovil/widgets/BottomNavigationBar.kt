@@ -70,7 +70,7 @@ fun BottomNavigationBar(navigator: Navigator) {
             .graphicsLayer { shadowElevation = 10f }
     ) {
         val currentScreen = navigator.lastItem
-        if(currentScreen is ResumeScreen || currentScreen is CalendarScreen) {
+        if (currentScreen is ResumeScreen || currentScreen is CalendarScreen) {
             Canvas(modifier = Modifier.matchParentSize()) {
                 val width = size.width
                 val height = size.height
@@ -80,7 +80,7 @@ fun BottomNavigationBar(navigator: Navigator) {
                 val path = Path().apply {
                     moveTo(0f, 0f)
                     lineTo((width / 2) - curveSize, 0f)
-                    quadraticBezierTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
+                    quadraticTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
                     lineTo(width, 0f)
                     lineTo(width, height)
                     lineTo(0f, height)
@@ -139,14 +139,14 @@ fun BottomNavigationBar(navigator: Navigator) {
             }
             showDialog = false
         }
-    ) {showDialog = false}
+    ) { showDialog = false }
 }
 
 @Composable
-fun DialogSession(showDialog:Boolean, onAccept:()-> Unit, onDismiss:()->  Unit) {
+fun DialogSession(showDialog: Boolean, onAccept: () -> Unit, onDismiss: () -> Unit) {
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = onDismiss ,
+            onDismissRequest = onDismiss,
             confirmButton = {
                 Button(onClick = onAccept, colors = customButtonColors()) {
                     Text("Cerrar Sesión")
@@ -158,13 +158,13 @@ fun DialogSession(showDialog:Boolean, onAccept:()-> Unit, onDismiss:()->  Unit) 
     }
 }
 
-    suspend fun signOut(navigator: Navigator) {
-        val settings = Settings()
-        supabase.auth.signOut()
-        settings.remove("access_token")
-        settings.remove("refresh_token")
-        navigator.replaceAll(LoginScreen(UserViewModel()))
-    }
+suspend fun signOut(navigator: Navigator) {
+    val settings = Settings()
+    supabase.auth.signOut()
+    settings.remove("access_token")
+    settings.remove("refresh_token")
+    navigator.replaceAll(LoginScreen(UserViewModel()))
+}
 
 fun selectScreen(navigator: Navigator): MutableState<Int> {
     val currentScreen = navigator.lastItem

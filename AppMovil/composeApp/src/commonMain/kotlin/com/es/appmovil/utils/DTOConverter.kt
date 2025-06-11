@@ -16,6 +16,7 @@ object DTOConverter {
             chkProd = chkProd
         )
     }
+
     fun TimeCodeDTO.toEntity(): TimeCode {
         return TimeCode(
             idTimeCode = idTimeCode,
