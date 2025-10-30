@@ -1,155 +1,137 @@
-## Desarrollo de la aplicación web
-### Lenguaje + Herramientas de desarrollo para la app web
+# Proyecto API Web — Spring Boot + React + Supabase + JasperSoft
 
-### Herramientas de desarrollo:
+## Herramientas de desarrollo
 
-#### React / Next.js / Vue / Angular (Single Page Applications - SPA)
-🔹 **Descripción:**
-Páginas dinámicas que se cargan en el navegador y actualizan contenido sin recargar.
+### Backend: Spring Boot
 
-✅ **Ventajas:**
-- Excelente experiencia de usuario (rápido, sin recargas).
-- Fácil conexión a APIs REST/GraphQL.
-- Amplio ecosistema de librerías y herramientas.
+**Descripción:**  
+Spring Boot es un framework de desarrollo en Java que facilita la creación de aplicaciones web y APIs REST de forma rápida, estructurada y escalable.
 
-❌ **Desventajas:**
-- Puede ser complicado de configurar para principiantes.
-- El SEO es más difícil en SPAs (excepto con Next.js o Nuxt.js).
-- Mayor consumo de memoria en el navegador.
+**Ventajas:**
+- Rápido desarrollo gracias a su configuración automática.  
+- Integración nativa con **Spring Security** (autenticación y autorización).  
+- Compatible con **Supabase (PostgreSQL)** mediante JDBC o JPA.  
+- Alta escalabilidad y rendimiento.  
+- Amplia comunidad y documentación.
 
-🔗 **Conexión a BD en la nube:** ✅ Fácil mediante API REST o GraphQL.
-
-#### Next.js / Nuxt.js / Remix (SSR - Server Side Rendering)
-🔹 **Descripción:**
-Generan las páginas en el servidor antes de enviarlas al navegador.
-
-✅ **Ventajas:**
-- Mejor SEO que las SPAs.
-- Renderizado más rápido y escalable.
-- Soporte nativo para bases de datos en la nube (Prisma, Firebase, Supabase).
-
-❌ **Desventajas:**
-- Requiere conocimientos en backend y frontend.
-- Puede ser más costoso en términos de infraestructura.
-
-🔗 **Conexión a BD en la nube:** ✅ Fácil con Prisma, Supabase, Firebase o APIs personalizadas.
-
-### Backend: Spring Boot (Java/Kotlin) o ASP .NET 8
-
-✅ **Ventajas:**
-- Alto rendimiento y soporte para concurrencia.
-- Compatible con bases de datos escalables como PostgreSQL, MongoDB.
-- Fácil integración con Docker y Kubernetes para escalabilidad.
-- ORM potente: JPA/Hibernate (Spring Boot) o Entity Framework (ASP .NET).
-
-#### Base de Datos:
-- **SQL** (PostgreSQL, MySQL, SQL Server) si la estructura de datos es relacional.
-- **NoSQL** (MongoDB, Firebase, DynamoDB) si se requieren consultas flexibles y escalabilidad horizontal.
-
-#### Infraestructura:
-- **Docker + Kubernetes** para despliegues escalables.
-- **Cloud Services** (AWS, Azure, Google Cloud) con Load Balancing y Auto Scaling.
-- **Mensajería** (Kafka, RabbitMQ) si necesitas procesar eventos de manera eficiente.
-
-### React Native + React Native Web
-Esta opción permite realizar en conjunto tanto la app web como la app móvil.
-
-✅ **Ventajas:**
-- Código compartido (~80%) entre web y móvil.
-- Ecosistema unificado en JavaScript/TypeScript.
-- Buen rendimiento en dispositivos móviles.
-- Compatible con librerías como Redux, Zustand, TanStack Query.
-
-❌ **Desventajas:**
-- No todas las librerías de React Native funcionan bien en la web.
-- Algunas optimizaciones requieren código nativo en Kotlin/Swift.
-- La Web puede sentirse menos optimizada comparada con Next.js o Vite.
-
-### Despliegue:
-1. **Backend** → Railway o Render.
-2. **Frontend** → Vercel.
-3. **Base de Datos** → Supabase (PostgreSQL) o Neon.tech.
-
-### Kubernetes:
-1. **Orquestación de contenedores:** Administra aplicaciones que se ejecutan en contenedores, asegurando que se desplieguen y actualicen correctamente.
-2. **Escalabilidad automática:** Puede escalar automáticamente las aplicaciones según la demanda de tráfico o uso de recursos.
-3. **Despliegue y gestión de aplicaciones:** Permite estrategias de despliegue progresivo como Rolling Updates o Canary deployments.
-4. **Auto-recuperación (self-healing):** Si un contenedor falla, Kubernetes puede reiniciarlo o reemplazarlo automáticamente.
-5. **Balanceo de carga y enrutamiento de tráfico:** Gestiona el tráfico entre instancias de contenedores.
-6. **Gestión de configuración y secretos:** Manejo seguro de contraseñas y claves API.
-7. **Monitoreo y registros centralizados:** Integración con sistemas como Prometheus y ELK Stack.
+**Inconvenientes:**
+- Curva de aprendizaje inicial moderada.  
+- Mayor consumo de memoria que frameworks ligeros.  
+- Configuraciones avanzadas requieren experiencia.
 
 ---
 
-### **Resumen:**
+### Frontend: React
 
-#### **Frontend:**
-- React
-- React Native
-- React Native Web
-- Nest.js
-- Vue
-- Angular
-- Nuxt.js
-- Remix
+**Descripción:**  
+React es una biblioteca de JavaScript desarrollada por Meta para construir interfaces de usuario dinámicas e interactivas.
 
-#### **Backend:**
-- Spring Boot
-- ASP .NET 8
+**Ventajas:**
+- Renderizado eficiente mediante Virtual DOM.  
+- Componentes reutilizables.  
+- Integración sencilla con APIs REST.
 
-#### **Base de Datos:**
-- MongoDB
-- Supabase
-
-#### **Infraestructura:**
-- Docker
-- Kubernetes
-- Cloud Services (AWS, Azure, Google Cloud)
-- Kafka
-- RabbitMQ
-
-### **Lenguajes utilizados:**
-
-#### **Backend (Spring Boot)**
-✅ **Lenguajes:**
-- Kotlin o Java (para la lógica del backend).
-- SQL (si usas PostgreSQL, MySQL).
-- YAML/JSON (para configuración en `application.yml` o `application.properties`).
-- Dockerfile (si lo despliegas con contenedores).
-
-#### **Frontend (Next.js con React)**
-✅ **Lenguajes:**
-- JavaScript o TypeScript (recomendado por seguridad y escalabilidad).
-- HTML + CSS (para el diseño de la interfaz).
-- TailwindCSS (opcional, para estilos más rápidos).
-
-#### **Base de Datos (PostgreSQL o MySQL)**
-✅ **Lenguajes:**
-- SQL (para consultas y estructuras de datos).
-- GraphQL (opcional si decides usarlo en lugar de REST).
-
-#### **Infraestructura y Despliegue**
-✅ **Lenguajes:**
-- Dockerfile (si usas contenedores en Docker).
-- YAML (si usas Kubernetes o CI/CD como GitHub Actions).
-- Bash/Shell (para comandos de despliegue en la nube).
+**Inconvenientes:**
+- Gestión de estado compleja en proyectos grandes.  
+- SEO limitado sin SSR (Server Side Rendering).  
+- Actualizaciones frecuentes del ecosistema.
 
 ---
 
-### **Conclusión:**
-Debido a la familiarización con **Spring Boot** para el backend, se utilizarán los lenguajes **Kotlin** para el código y **SQL** para realizar consultas con la base de datos (en caso de usar Supabase).
+### Herramienta de informes: JasperSoft
 
-Para la construcción de la app web, se utilizará **TypeScript** por su seguridad y escalabilidad en comparación con JavaScript. La interfaz se desarrollará con **HTML + TailwindCSS**, complementado con CSS convencional para mayor flexibilidad.
+**Descripción:**  
+JasperSoft (JasperReports) permite generar reportes empresariales personalizados en múltiples formatos (PDF, Excel, HTML, CSV).
 
-Tailwind cuenta con **PurgeCSS**, que elimina las clases CSS no utilizadas para optimizar el archivo final y mejorar la carga en el navegador. Si se usan clases dinámicamente, se deberá configurar manualmente para evitar su eliminación.
+**Ventajas:**
+- Informes dinámicos y exportables.  
+- Integración directa con Spring Boot.  
+- Diseño visual con JasperSoft Studio.  
 
-Para la infraestructura y despliegue, se utilizará **Docker** para la creación de contenedores y **Kubernetes** para su gestión. Esto permitirá escalar automáticamente la aplicación, agregando o eliminando instancias según la demanda de tráfico.
+**Inconvenientes:**
+- Requiere tiempo para dominar la creación de plantillas.  
+- Informes grandes pueden afectar el rendimiento.  
+- Mantenimiento adicional si cambian los modelos de datos.
 
-#### **Componente → Lenguajes principales**
+---
 
-| Componente | Lenguajes |
-|------------|----------------------------|
-| **Backend (Spring Boot)** | Kotlin, SQL, JSON/YAML |
-| **Frontend (Next.js + React + TailwindCSS)** | JavaScript / TypeScript, HTML, CSS |
-| **Base de Datos (PostgreSQL/MySQL)** | SQL |
-| **Infraestructura (Docker, CI/CD, Cloud)** | Dockerfile, YAML, Bash |
+## Seguridad en Spring Boot
+
+La seguridad del backend se gestionará mediante **Spring Security** y **JWT (JSON Web Tokens)**.
+
+**Medidas de seguridad:**
+1. **Autenticación con JWT:**  
+   - Token firmado que protege cada solicitud.
+2. **Autorización basada en roles:**  
+   - Roles: `ADMIN`, `USER`, `REPORT_VIEWER`.
+3. **Cifrado de contraseñas:**  
+   - Uso de `BCryptPasswordEncoder`.
+4. **Protecciones adicionales:**  
+   - Prevención de inyecciones SQL mediante JPA.  
+   - Validación de datos de entrada.  
+
+---
+
+## Base de datos: Supabase
+
+**Descripción:**  
+Supabase es una plataforma **BaaS (Backend as a Service)** basada en **PostgreSQL**, que proporciona autenticación, almacenamiento y APIs automáticas.
+
+**Ventajas:**
+- Totalmente compatible con PostgreSQL.  
+- Configuración rápida y sencilla.  
+- Seguridad mediante políticas **Row-Level Security (RLS)**.  
+- Entorno cloud administrado.  
+- Panel de control visual.
+
+**Inconvenientes:**
+- Dependencia total de la conexión a internet.  
+- Coste si se escala a planes superiores.
+
+**Integración:**  
+Conexión desde Spring Boot mediante **JDBC o JPA**, configurando las credenciales en el archivo `application.properties`.
+
+---
+
+## Despliegue
+
+El proyecto se desplegará modularmente:
+
+| Componente | Plataforma | Descripción |
+|-------------|-------------|-------------|
+| **Backend (Spring Boot)** | Render / Railway | API desplegada con integración a Supabase y JasperSoft. |
+| **Frontend (React)** | Vercel / Netlify | Aplicación web conectada al backend vía HTTPS. |
+| **Base de datos** | Supabase Cloud | PostgreSQL gestionado con copias de seguridad y RLS. |
+
+**Ventajas:**
+- Accesibilidad global.  
+- Escalabilidad automática.  
+- Seguridad y respaldo en la nube.  
+- Pago por uso según demanda.
+
+---
+
+## Propuesta de calendario de desarrollo
+
+| **Fase** | **Duración** | **Objetivos principales** |
+|-----------|--------------|---------------------------|
+| **1. Análisis y diseño** | 15 – 22 octubre | Requisitos, arquitectura y modelo de datos. |
+| **2. Configuración inicial** | 23 – 31 octubre | Creación del proyecto y conexión a Supabase. |
+| **3. Backend (API REST)** | 1 – 15 noviembre | Endpoints CRUD, validaciones y seguridad JWT. |
+| **4. Frontend (React)** | 16 – 30 noviembre | Interfaz, componentes e integración con API. |
+| **5. JasperSoft** | 1 – 8 diciembre | Creación de reportes y exportaciones. |
+| **6. Pruebas e integración** | 9 – 16 diciembre | Pruebas unitarias, test de carga y QA. |
+| **7. Despliegue y documentación** | 17 – 25 diciembre | Despliegue en la nube y documentación final. |
+
+---
+
+## Conclusión
+
+Este proyecto combina tecnologías modernas, seguras y escalables:
+
+- **Spring Boot** → Backend robusto y modular.  
+- **React** → Frontend dinámico e intuitivo.  
+- **Supabase** → Base de datos cloud basada en PostgreSQL.  
+- **JasperSoft** → Generación de informes empresariales.  
+
+---
