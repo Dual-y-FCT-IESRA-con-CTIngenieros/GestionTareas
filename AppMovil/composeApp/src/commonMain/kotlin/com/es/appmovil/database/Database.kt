@@ -26,8 +26,8 @@ object Database {
      * Cliente de Supabase configurado con autenticación y acceso a PostgREST.
      */
     val supabase = createSupabaseClient(
-        supabaseUrl = "https://ydbqllrkbfhbiiztytbc.supabase.co/",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkYnFsbHJrYmZoYmlpenR5dGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTgzNDksImV4cCI6MjA1ODM5NDM0OX0.tA9s6ktm3wyPLf4ynZhivu68hkA6JsUBvKeAL6tC9yM"
+        supabaseUrl = "https://yuedjjcmbwpccntupeus.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1ZWRqamNtYndwY2NudHVwZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMjk2MTksImV4cCI6MjA4NjkwNTYxOX0.OXSfwD-rm7sjKGIgy6r7Mhpvy16gEa6_s5iOWiwhX9Y"
     ) {
         install(Auth)
         install(Postgrest)
