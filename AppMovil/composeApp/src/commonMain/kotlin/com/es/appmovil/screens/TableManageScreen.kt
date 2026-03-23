@@ -316,7 +316,7 @@ class TableManageScreen : Screen {
     }
 
     /**
-     * Actualiza la tabla especificada con los datos recibidos.
+     * Actualiza la tabla especificada with los datos recibidos.
      * Ejecuta la actualización en un hilo de background y maneja el loader de pantalla completa.
      *
      * @param tableName Nombre de la tabla a actualizar.

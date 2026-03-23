@@ -415,4 +415,11 @@ object DataViewModel {
             }
         }
     }
+
+    fun setTimeCodesMock(list: List<TimeCodeDTO>) {
+        _timeCodes.value = list
+    }
+    fun setActivitiesMock(list: List<Activity>) {
+        _activities.value = list
+    }
 }

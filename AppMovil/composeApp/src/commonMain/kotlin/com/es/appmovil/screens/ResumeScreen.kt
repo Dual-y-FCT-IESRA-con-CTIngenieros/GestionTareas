@@ -1,17 +1,12 @@
 package com.es.appmovil.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -25,9 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +30,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.es.appmovil.viewmodel.CalendarViewModel
 import com.es.appmovil.viewmodel.DataViewModel.currentHours
 import com.es.appmovil.viewmodel.DataViewModel.dailyHours
-import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.viewmodel.DataViewModel.getHours
 import com.es.appmovil.viewmodel.DataViewModel.today
 import com.es.appmovil.viewmodel.DayMenuViewModel
@@ -49,7 +41,7 @@ import com.es.appmovil.widgets.DayDialog
 import com.es.appmovil.widgets.LegendButton
 import com.es.appmovil.widgets.ResumenHorasAnual
 import com.es.appmovil.widgets.ResumenHorasMensual
-import com.es.appmovil.widgets.ResumenSemana
+import com.es.appmovil.widgets.TopBar
 
 /**
  * Pantalla principal de resumen donde se muestran distintas vistas relacionadas
@@ -85,6 +77,9 @@ class ResumeScreen : Screen {
 
         MaterialTheme {
             Scaffold(
+                topBar = {
+                    TopBar(navigator, title = "Resumen", rightContent = { LegendButton(resumeViewmodel) })
+                },
                 bottomBar = {
                     BottomNavigationBar(navigator)
                 },
@@ -94,21 +89,41 @@ class ResumeScreen : Screen {
             ) {
                 getHours()
                 Column(Modifier.padding(16.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Resumen", fontWeight = FontWeight.Black, fontSize = 25.sp)
-                        LegendButton(resumeViewmodel)
+                    // Mostrar solo el texto de día y semana en formato natural
+                    val fecha = today.value
+                    val nombreDia = when (fecha.dayOfWeek.ordinal) {
+                        0 -> "Lunes"
+                        1 -> "Martes"
+                        2 -> "Miércoles"
+                        3 -> "Jueves"
+                        4 -> "Viernes"
+                        5 -> "Sábado"
+                        6 -> "Domingo"
+                        else -> fecha.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
                     }
+                    val nombreMes = when (fecha.monthNumber) {
+                        1 -> "enero"
+                        2 -> "febrero"
+                        3 -> "marzo"
+                        4 -> "abril"
+                        5 -> "mayo"
+                        6 -> "junio"
+                        7 -> "julio"
+                        8 -> "agosto"
+                        9 -> "septiembre"
+                        10 -> "octubre"
+                        11 -> "noviembre"
+                        12 -> "diciembre"
+                        else -> fecha.month.name.lowercase().replaceFirstChar { it.uppercase() }
+                    }
+                    Text(
+                        text = "$nombreDia ${fecha.dayOfMonth} de $nombreMes de ${fecha.year}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                    Spacer(Modifier.size(10.dp))
-
-                    ResumenSemana(resumeViewmodel)
-                    Spacer(Modifier.size(20.dp))
-
-                    Row {
+                    Row(Modifier.fillMaxWidth()) {
                         Column(Modifier.weight(1f)) {
                             ConteoHoras(currentHours, dailyHours, currentDay)
                             Spacer(Modifier.size(20.dp))
@@ -117,21 +132,17 @@ class ResumeScreen : Screen {
                                     canClick = false
                                     navigator.push(AnualScreen())
                                 }
-                            }
-                            ) {
+                            }) {
                                 ResumenHorasAnual(resumeViewmodel)
                             }
                         }
-
                         Spacer(Modifier.size(16.dp))
-
                         Column(Modifier.weight(1f).clickable {
                             if (canClick) {
                                 canClick = false
                                 navigator.push(CalendarScreen())
                             }
-                        }
-                        ) {
+                        }) {
                             Row {
                                 Text("Resumen mensual", fontWeight = FontWeight.SemiBold)
                                 Icon(
@@ -143,20 +154,9 @@ class ResumeScreen : Screen {
                             ResumenHorasMensual()
                         }
                     }
-
                     Spacer(Modifier.size(40.dp))
 
-                    if (employee.idRol == 2) {
-                        Button(
-                            onClick = { navigator.push(AdminScreen()) },
-                            elevation = ButtonDefaults.elevation(5.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth().height(60.dp)
-                        ) {
-                            Text("ADMINISTRAR")
-                        }
-                    }
+                    // Eliminado el botón de administración y la lógica de rol de administrador
                 }
                 DayDialog(showDialog, today.value, dayMenuViewModel, calendarViewmodel) {
                     calendarViewmodel.changeDialog(it)
@@ -165,4 +165,3 @@ class ResumeScreen : Screen {
         }
     }
 }
-

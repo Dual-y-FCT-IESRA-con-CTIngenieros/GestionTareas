@@ -105,6 +105,17 @@ class UserViewModel : ViewModel() {
      * Gestiona tanto el login como el guardado de tokens locales.
      */
     fun checkLogin() {
+        // --- MODO DESARROLLO: Saltar autenticación Supabase ---
+        // Simula login exitoso y navega directamente
+        CoroutineScope(Dispatchers.IO).launch {
+            // Puedes poner aquí un email fijo o el que se haya introducido
+            _email.value = if (_email.value.isNotBlank()) _email.value else "test@local.dev"
+            // Inicializa datos mock para evitar crash
+            inicializarDatosMock()
+            _login.value = true
+        }
+        // --- FIN MODO DESARROLLO ---
+
         // Verifica que los campos no estén vacíos
         if (username.value.isNotBlank() && passwordText.value.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -203,5 +214,24 @@ class UserViewModel : ViewModel() {
     fun resetError() {
         _loginError.value = false
         _loginErrorMessage.value = ""
+    }
+
+    /**
+     * Inicializa datos de ejemplo para evitar crash en modo desarrollo
+     * TimeCodes
+     */
+    fun inicializarDatosMock() {
+        val mockTimeCodes = listOf(
+            com.es.appmovil.model.dto.TimeCodeDTO(100, "General", 0xFF2196F3, false),
+            com.es.appmovil.model.dto.TimeCodeDTO(555, "Especial", 0xFFFFC107, true)
+        )
+        if (com.es.appmovil.viewmodel.DataViewModel.timeCodes.value.isEmpty()) {
+            com.es.appmovil.viewmodel.DataViewModel.setTimeCodesMock(mockTimeCodes)
+        }
+        if (com.es.appmovil.viewmodel.DataViewModel.activities.value.isEmpty()) {
+            com.es.appmovil.viewmodel.DataViewModel.setActivitiesMock(
+                listOf(com.es.appmovil.model.Activity(1, 100, "Actividad demo", "2026-01-01", "2026-12-31"))
+            )
+        }
     }
 }

@@ -153,6 +153,15 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
      * @param navigator Navegador para cambiar de pantalla.
      */
     private suspend fun doLogin(email: String, navigator: Navigator) {
+        // --- MODO DESARROLLO: Saltar carga real de empleado ---
+        // Si el email es el de test, no intentes cargar datos reales
+        if (email == "test@local.dev") {
+            userViewmodel.resetVar()
+            userViewmodel.resetError()
+            navigator.replaceAll(ResumeScreen())
+            return
+        }
+        // --- FIN MODO DESARROLLO ---
         withContext(Dispatchers.IO) {
             Database.getEmployee(email)
         }

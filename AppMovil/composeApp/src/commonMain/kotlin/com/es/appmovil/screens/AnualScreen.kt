@@ -40,6 +40,7 @@ import com.es.appmovil.viewmodel.DataViewModel.employee
 import com.es.appmovil.widgets.BottomNavigationBar
 import com.es.appmovil.widgets.ResumenAnual
 import com.es.appmovil.widgets.TeoricoAnual
+import com.es.appmovil.widgets.TopBar
 
 /**
  * Pantalla de Resumen Anual.
@@ -58,6 +59,7 @@ class AnualScreen : Screen {
 
         MaterialTheme {
             Scaffold(
+                topBar = { TopBar(navigator, title = "Resumen Anual") },
                 bottomBar = { BottomNavigationBar(navigator) }
             ) { innerPadding ->
                 Column(

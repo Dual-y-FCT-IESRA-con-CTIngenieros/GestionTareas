@@ -1,52 +1,33 @@
 package com.es.appmovil.widgets
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database.supabase
 import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
 import com.es.appmovil.screens.LoginScreen
 import com.es.appmovil.screens.ResumeScreen
-import com.es.appmovil.utils.customButtonColors
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.UserViewModel
 import com.russhwolf.settings.Settings
 import io.github.jan.supabase.auth.auth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.launch
 
 /**
  * Composable que renderiza la barra de navegación inferior con navegación entre pantallas.
@@ -55,120 +36,69 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
-    val selected by remember { selectScreen(navigator) }
-    val items = listOf("Home", "Calendar", "Anual", "Profile")
-    var canClick by remember { mutableStateOf(true) }
-    var showDialog by remember { mutableStateOf(false) }
-    val icons = listOf(
-        Icons.Filled.Home,
-        Icons.Filled.DateRange,
-        Icons.Filled.Notifications,
-        Icons.Filled.Person
-    )
-    val screenItems: List<Screen> = listOf(ResumeScreen(), CalendarScreen(), AnualScreen())
+    // Calcular el índice seleccionado en cada recomposición
+    val selected = when (navigator.lastItem) {
+        is ResumeScreen -> 0
+        is CalendarScreen -> 1
+        is AnualScreen -> 2
+        else -> -1
+    }
 
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(70.dp)
             .background(Color.White)
-            .graphicsLayer { shadowElevation = 10f }
+            .graphicsLayer { shadowElevation = 10f },
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val currentScreen = navigator.lastItem
-        if (currentScreen is ResumeScreen || currentScreen is CalendarScreen) {
-            Canvas(modifier = Modifier.matchParentSize()) {
-                val width = size.width
-                val height = size.height
-                val curveSize = 100f
-                val curveHeight = 140f
-
-                val path = Path().apply {
-                    moveTo(0f, 0f)
-                    lineTo((width / 2) - curveSize, 0f)
-                    quadraticTo(width / 2, curveHeight, (width / 2) + curveSize, 0f)
-                    lineTo(width, 0f)
-                    lineTo(width, height)
-                    lineTo(0f, height)
-                    close()
-                }
-                drawPath(path, color = Color.White)
+        // Calendar icon (izquierda)
+        IconButton(onClick = {
+            if (selected != 1) {
+                resetToday()
+                navigator.replaceAll(CalendarScreen())
             }
+        }) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "Calendar",
+                tint = if (selected == 1) Color(0xFFF4A900) else Color.Gray,
+                modifier = Modifier.size(28.dp)
+            )
         }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // Home icon (centro, como botón normal, solo el icono naranja)
+        IconButton(
+            onClick = {
+                if (selected != 0) {
+                    resetToday()
+                    navigator.replaceAll(ResumeScreen())
+                }
+            }
         ) {
-            items.forEachIndexed { index, item ->
-
-                IconButton(onClick = {
-                    if (selected != index) {
-                        if (canClick) {
-                            if (index == 3) {
-                                canClick = true
-                                showDialog = true
-                            } else {
-                                canClick = false
-                                if (screenItems[index] !is ResumeScreen) {
-                                    if (screenItems[index] is CalendarScreen)
-                                        resetToday()
-                                    navigator.push(screenItems[index])
-                                } else {
-                                    resetToday()
-                                    navigator.replaceAll(ResumeScreen())
-                                }
-                            }
-
-
-                        }
-                    }
-                }) {
-                    Icon(
-                        imageVector = icons[index],
-                        contentDescription = item,
-                        tint = if (selected == index) Color(0xFFF4A900) else Color.Gray,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
+            Icon(
+                imageVector = Icons.Filled.Home,
+                contentDescription = "Home",
+                tint = if (selected == 0) Color(0xFFF4A900) else Color.Gray,
+                modifier = Modifier.size(32.dp)
+            )
+        }
+        // Anual icon (derecha)
+        IconButton(onClick = {
+            if (selected != 2) {
+                navigator.replaceAll(AnualScreen())
             }
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Notifications,
+                contentDescription = "Anual",
+                tint = if (selected == 2) Color(0xFFF4A900) else Color.Gray,
+                modifier = Modifier.size(28.dp)
+            )
         }
     }
-
-    DialogSession(showDialog,
-        {
-            CoroutineScope(Dispatchers.IO).launch {
-                signOut(navigator)
-            }
-            showDialog = false
-        }
-    ) { showDialog = false }
 }
 
-/**
- * Diálogo de confirmación para cerrar sesión.
- *
- * @param showDialog Indica si el diálogo está visible.
- * @param onAccept Acción a ejecutar al confirmar.
- * @param onDismiss Acción al cancelar o cerrar el diálogo.
- */
-@Composable
-fun DialogSession(showDialog: Boolean, onAccept: () -> Unit, onDismiss: () -> Unit) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                Button(onClick = onAccept, colors = customButtonColors()) {
-                    Text("Cerrar Sesión")
-                }
-            },
-            title = { Text("Sesión") },
-            text = { Text("¿Quieres cerrar sesión?") }
-        )
-    }
-}
 
 /**
  * Realiza el cierre de sesión del usuario:
@@ -184,20 +114,4 @@ suspend fun signOut(navigator: Navigator) {
     settings.remove("access_token")
     settings.remove("refresh_token")
     navigator.replaceAll(LoginScreen(UserViewModel()))
-}
-
-/**
- * Obtiene el índice de la pantalla actual para mantener el icono seleccionado.
- *
- * @param navigator Controlador de navegación actual.
- * @return Estado mutable con el índice de la pantalla seleccionada.
- */
-fun selectScreen(navigator: Navigator): MutableState<Int> {
-    val currentScreen = navigator.lastItem
-    return when (currentScreen) {
-        is ResumeScreen -> mutableStateOf(0)
-        is CalendarScreen -> mutableStateOf(1)
-        is AnualScreen -> mutableStateOf(2)
-        else -> mutableStateOf(-1)
-    }
 }
