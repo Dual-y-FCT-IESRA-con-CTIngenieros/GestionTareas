@@ -101,19 +101,41 @@ class DayMenuViewModel {
         val indexedValue = getIndexCode(code)
 
         try {
-            onWorkOrder(workOrderTimeCodeDTO.value[indexedValue].projects.first())
-            onWorkSelected(workOrderTimeCodeDTO.value[indexedValue].projects.first())
+            // Protegemos accesos por índice: workOrderTimeCodeDTO puede no tener suficientes entradas
+            val workDto = workOrderTimeCodeDTO.value.getOrNull(indexedValue)
+            val workProjects = workDto?.projects.orEmpty()
+            if (workProjects.isNotEmpty()) {
+                onWorkOrder(workProjects.first())
+                onWorkSelected(workProjects.first())
+            } else {
+                onWorkOrder("")
+                onWorkSelected(null)
+            }
         } catch (e: Exception) {
-            print(e.message) // Puede que no haya workOrder disponible
+            // Puede que no haya workOrder disponible o ocurra otro fallo; dejamos valores por defecto
+            onWorkOrder("")
+            onWorkSelected(null)
         }
 
-        val a = activityTimeCode.value[indexedValue].projects.first()
-        val idActivity = DataViewModel.activities.value
-            .find { act -> act.idActivity.toString() == a.split("-")[0].trim() }
-        val activityInt = idActivity?.idActivity ?: 0
+        try {
+            val activityProjects = activityTimeCode.value.getOrNull(indexedValue)?.projects.orEmpty()
+            if (activityProjects.isNotEmpty()) {
+                val a = activityProjects.first()
+                val idActivity = DataViewModel.activities.value
+                    .find { act -> act.idActivity.toString() == a.split("-")[0].trim() }
+                val activityInt = idActivity?.idActivity ?: 0
 
-        onActivity(activityInt)
-        onActivitySelected(activityTimeCode.value[indexedValue].projects.first())
+                onActivity(activityInt)
+                onActivitySelected(activityProjects.first())
+            } else {
+                onActivity(0)
+                onActivitySelected(null)
+            }
+        } catch (e: Exception) {
+            // En caso de error, limpiamos selección de actividad
+            onActivity(0)
+            onActivitySelected(null)
+        }
     }
 
     /**

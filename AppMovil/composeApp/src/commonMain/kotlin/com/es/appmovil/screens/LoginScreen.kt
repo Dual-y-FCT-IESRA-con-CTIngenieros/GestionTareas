@@ -158,7 +158,7 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
         if (email == "test@local.dev") {
             userViewmodel.resetVar()
             userViewmodel.resetError()
-            navigator.replaceAll(ResumeScreen())
+            navigator.replaceAll(HomeScreen())
             return
         }
         // --- FIN MODO DESARROLLO ---
@@ -167,7 +167,7 @@ class LoginScreen(private val userViewmodel: UserViewModel) : Screen {
         }
         userViewmodel.resetVar()
         userViewmodel.resetError()
-        navigator.replaceAll(ResumeScreen())
+        navigator.replaceAll(HomeScreen())
     }
 
     /**

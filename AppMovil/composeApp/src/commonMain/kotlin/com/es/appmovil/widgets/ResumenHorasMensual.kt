@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -104,7 +105,7 @@ fun ResumenHorasMensual() {
  */
 @Composable
 fun PieInfo(data: List<Pie>) {
-    LazyColumn(Modifier.padding(bottom = 20.dp)) {
+    LazyColumn(Modifier.fillMaxHeight().padding(bottom = 20.dp)) {
         items(data.size) {
             if (data[it].data != 0.0) {
                 Row(

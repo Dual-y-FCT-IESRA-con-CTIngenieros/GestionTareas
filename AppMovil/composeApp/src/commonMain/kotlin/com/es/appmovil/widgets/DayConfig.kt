@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -72,6 +73,7 @@ fun DayConfigDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight()
             ) {
                 items(activities.size) { index ->
                     val activity = activities.sortedBy { it.idTimeCode }[index]
@@ -225,8 +227,46 @@ fun EditableActivityCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DayConfig(
+    showDialog: Boolean,
+    day: LocalDate,
+    calendarViewModel: CalendarViewModel,
+    dayMenuViewModel: DayMenuViewModel,
+    onChangeDialog: (Boolean) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val activities: List<EmployeeActivity> = calendarViewModel.getActivitiesForDate(day)
+    val activitiesTimeCodes by dayMenuViewModel.activityTimeCode.collectAsState()
+    val workOrdersTimeCodes by dayMenuViewModel.workOrderTimeCodeDTO.collectAsState()
 
 
+    if (showDialog) {
+        ModalBottomSheet(
+            onDismissRequest = { onChangeDialog(false) },
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxHeight() // fillMaxSize no está disponible, usar fillMaxHeight
+            ) {
+                items(activities.size) { index ->
+                    val activity = activities.sortedBy { it.idTimeCode }[index]
 
+                    EditableActivityCard(
+                        activity = activity,
+                        day,
+                        calendarViewModel,
+                        workOrdersTimeCodes,
+                        activitiesTimeCodes,
+                        { onChangeDialog(false) }, {}
+                    )
 
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
+            }
+        }
+    }
+}

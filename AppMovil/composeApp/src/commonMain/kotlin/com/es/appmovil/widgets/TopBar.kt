@@ -43,7 +43,8 @@ fun TopBar(
                 Icon(Icons.Filled.Logout, contentDescription = "Cerrar sesión", tint = Color(0xFFF4A900))
             }
         }
-        Text(title, fontWeight = FontWeight.Black, fontSize = 22.sp, color = Color.Black)
+        // Título grande y en color naranja para ajustarse al mockup
+        Text(title, fontWeight = FontWeight.Black, fontSize = 34.sp, color = Color(0xFFF4A900))
         if (rightContent != null) {
             rightContent()
         } else {

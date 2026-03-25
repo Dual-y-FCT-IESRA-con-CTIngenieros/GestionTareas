@@ -2,10 +2,12 @@ package com.es.appmovil.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -13,6 +15,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,10 +23,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.es.appmovil.database.Database.supabase
-import com.es.appmovil.screens.AnualScreen
 import com.es.appmovil.screens.CalendarScreen
 import com.es.appmovil.screens.LoginScreen
-import com.es.appmovil.screens.ResumeScreen
+import com.es.appmovil.screens.HomeScreen
+import com.es.appmovil.screens.ResumenScreen
 import com.es.appmovil.viewmodel.DataViewModel.resetToday
 import com.es.appmovil.viewmodel.UserViewModel
 import com.russhwolf.settings.Settings
@@ -31,70 +34,122 @@ import io.github.jan.supabase.auth.auth
 
 /**
  * Composable que renderiza la barra de navegación inferior con navegación entre pantallas.
- *
- * @param navigator Controlador de navegación de Voyager.
+ * Diseño adaptado al mockup: fondo blanco con borde redondeado superior y icono seleccionado resaltado.
  */
 @Composable
 fun BottomNavigationBar(navigator: Navigator) {
-    // Calcular el índice seleccionado en cada recomposición
     val selected = when (navigator.lastItem) {
-        is ResumeScreen -> 0
-        is CalendarScreen -> 1
-        is AnualScreen -> 2
+        is ResumenScreen -> 0
+        is HomeScreen -> 1
+        is CalendarScreen -> 2
         else -> -1
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
-            .background(Color.White)
-            .graphicsLayer { shadowElevation = 10f },
+            .height(80.dp)
+            .background(color = Color.White, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+            .graphicsLayer { shadowElevation = 8f },
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Calendar icon (izquierda)
-        IconButton(onClick = {
-            if (selected != 1) {
-                resetToday()
-                navigator.replaceAll(CalendarScreen())
-            }
-        }) {
-            Icon(
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = "Calendar",
-                tint = if (selected == 1) Color(0xFFF4A900) else Color.Gray,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-        // Home icon (centro, como botón normal, solo el icono naranja)
+        // Resumen icon (izquierda)
         IconButton(
             onClick = {
                 if (selected != 0) {
                     resetToday()
-                    navigator.replaceAll(ResumeScreen())
+                    navigator.replaceAll(ResumenScreen())
                 }
             }
         ) {
-            Icon(
-                imageVector = Icons.Filled.Home,
-                contentDescription = "Home",
-                tint = if (selected == 0) Color(0xFFF4A900) else Color.Gray,
-                modifier = Modifier.size(32.dp)
-            )
+            if (selected == 0) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                        .graphicsLayer { shadowElevation = 8f },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Notifications,
+                        contentDescription = "Resumen",
+                        tint = Color(0xFFF4A900),
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.Notifications,
+                    contentDescription = "Resumen",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
         }
-        // Anual icon (derecha)
+
+        // Home icon (centro)
         IconButton(onClick = {
-            if (selected != 2) {
-                navigator.replaceAll(AnualScreen())
+            if (selected != 1) {
+                resetToday()
+                navigator.replaceAll(HomeScreen())
             }
         }) {
-            Icon(
-                imageVector = Icons.Filled.Notifications,
-                contentDescription = "Anual",
-                tint = if (selected == 2) Color(0xFFF4A900) else Color.Gray,
-                modifier = Modifier.size(28.dp)
-            )
+            if (selected == 1) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Color.White, shape = RoundedCornerShape(24.dp))
+                        .graphicsLayer { shadowElevation = 10f },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Home,
+                        contentDescription = "Home",
+                        tint = Color(0xFFF4A900),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Home",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+
+        // Calendar icon (derecha)
+        IconButton(onClick = {
+            if (selected != 2) {
+                resetToday()
+                navigator.replaceAll(CalendarScreen())
+            }
+        }) {
+            if (selected == 2) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                        .graphicsLayer { shadowElevation = 8f },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Calendar",
+                        tint = Color(0xFFF4A900),
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Calendar",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -193,16 +194,32 @@ fun Calendar(
                     calendarViewmodel.generarBarrasPorDia(date)
                 }
 
-                val boxModifier = if (currentDate == currentToday.value) {
-                    otherMonthModifier.border(3.dp, Color(0xFFF5B014))
-                } else if (currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
-                else otherMonthModifier
+                // Construir tarjeta blanca con borde y pequeño indicador si hay actividad
+                val cellModifier = if (currentDate == currentToday.value) {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(3.dp, Color(0xFFF5B014), RoundedCornerShape(12.dp)).background(Color.White)
+                } else if (currentDate == date) {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(2.dp, Color(0xFFDDDDDD), RoundedCornerShape(12.dp)).background(Color.White)
+                } else {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(12.dp)).background(Color.White)
+                }
 
                 Box(
-                    modifier = boxModifier.background(color),
+                    modifier = cellModifier.clickable {
+                        date = currentDate
+                        if (tieneMenosDe8Horas(currentDate, actividades)) if (checkUnblockDate(date, startUnblockDate, endUnblockDate)) calendarViewmodel.changeDialog(true)
+                        calendarViewmodel.generarBarrasPorDia(date)
+                    },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = ultimoDia.toString(), fontSize = 16.sp)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = ultimoDia.toString(), fontSize = 16.sp, color = Color.Black)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        if (actividad != null) {
+                            Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(color))
+                        } else {
+                            Spacer(modifier = Modifier.size(6.dp))
+                        }
+                    }
                 }
             }
 
@@ -220,38 +237,27 @@ fun Calendar(
                 val color =
                     actividad?.let { colorPorTimeCode(it.idTimeCode, timeCodes) } ?: Color.LightGray
 
-                val modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(50))
-                    .padding(4.dp)
-                    .background(color)
-                    .clickable {
-                        date = currentDate
+                // Celda mes actual: tarjeta blanca con borde
+                val isToday = currentDate == currentToday.value
+                val isSelected = currentDate == date
+                val cellSize = 56.dp
+                val cellBase = Modifier.size(cellSize).clip(RoundedCornerShape(12.dp)).background(Color.White)
+                val cellWithBorder = when {
+                    isToday -> cellBase.border(3.dp, Color(0xFFF5B014), RoundedCornerShape(12.dp))
+                    isSelected -> cellBase.border(2.dp, Color(0xFFCCCCCC), RoundedCornerShape(12.dp))
+                    else -> cellBase.border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(12.dp))
+                }
 
-                        if (tieneMenosDe8Horas(
-                                currentDate,
-                                actividades
-                            )
-                        ) if (checkUnblockDate(
-                                date,
-                                startUnblockDate,
-                                endUnblockDate
-                            )
-                        ) calendarViewmodel.changeDialog(true)
-
-                        calendarViewmodel.generarBarrasPorDia(date)
+                Box(modifier = cellWithBorder.clickable {
+                    date = currentDate
+                    if (tieneMenosDe8Horas(currentDate, actividades)) if (checkUnblockDate(date, startUnblockDate, endUnblockDate)) calendarViewmodel.changeDialog(true)
+                    calendarViewmodel.generarBarrasPorDia(date)
+                }, contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = dayActualMonth.toString(), fontSize = 16.sp, color = Color.Black)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (actividad != null) Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(color)) else Spacer(modifier = Modifier.size(6.dp))
                     }
-
-                val boxModifier = if (currentDate == currentToday.value) {
-                    modifier.border(3.dp, Color(0xFFF5B014))
-                } else if (currentDate == date) modifier.border(2.dp, Color.Black)
-                else modifier
-
-                Box(
-                    modifier = boxModifier,
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = dayActualMonth.toString(), fontSize = 16.sp)
                 }
             }
 
@@ -275,40 +281,41 @@ fun Calendar(
                         colorPorTimeCode(it.idTimeCode, timeCodes)
                     } ?: Color.LightGray
 
-                otherMonthModifier = otherMonthModifier.clickable {
-                    date = LocalDate(
-                        fechaActual.year,
-                        fechaActual.monthNumber.plus(1),
-                        dayNextMonth
-                    )
-                    if (tieneMenosDe8Horas(
-                            currentDate,
-                            actividades
-                        )
-                    ) if (checkUnblockDate(
-                            date,
-                            startUnblockDate,
-                            endUnblockDate
-                        )
-                    ) calendarViewmodel.changeDialog(true)
-
-                    calendarViewmodel.generarBarrasPorDia(date)
-                }.background(color)
-
-                val boxModifier = if (currentDate == currentToday.value) {
-                    otherMonthModifier.border(3.dp, Color(0xFFF5B014))
-                } else if (currentDate == date) otherMonthModifier.border(2.dp, Color.Black)
-                else otherMonthModifier
+                val cellModifierNext = if (currentDate == currentToday.value) {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(3.dp, Color(0xFFF5B014), RoundedCornerShape(12.dp)).background(Color.White)
+                } else if (currentDate == date) {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(2.dp, Color(0xFFDDDDDD), RoundedCornerShape(12.dp)).background(Color.White)
+                } else {
+                    Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(12.dp)).background(Color.White)
+                }
 
                 Box(
-                    modifier = boxModifier,
+                    modifier = cellModifierNext.clickable {
+                        date = currentDate
+                        if (tieneMenosDe8Horas(
+                                currentDate,
+                                actividades
+                            )
+                        ) if (checkUnblockDate(
+                                date,
+                                startUnblockDate,
+                                endUnblockDate
+                            )
+                        ) calendarViewmodel.changeDialog(true)
+
+                        calendarViewmodel.generarBarrasPorDia(date)
+                    },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = dayNextMonth.toString(), fontSize = 16.sp)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = dayNextMonth.toString(), fontSize = 16.sp, color = Color.Black)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        if (actividad != null) Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(color)) else Spacer(modifier = Modifier.size(6.dp))
+                    }
                 }
-            }
-        }
-    }
+             }
+         }
+     }
 }
 
 /**
