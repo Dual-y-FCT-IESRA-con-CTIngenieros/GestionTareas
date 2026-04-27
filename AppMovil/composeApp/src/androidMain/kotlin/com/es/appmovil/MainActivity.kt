@@ -1,32 +1,20 @@
 package com.es.appmovil
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.enableEdgeToEdge
+import com.es.appmovil.navigation.AppNavigation
+import com.es.appmovil.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        AppContextHolder.context = applicationContext
-
+        enableEdgeToEdge()
         setContent {
-            App()
+            AppTheme {
+                AppNavigation()
+            }
         }
     }
-}
-
-@SuppressLint("StaticFieldLeak")
-object AppContextHolder {
-    lateinit var context: Context
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
 }

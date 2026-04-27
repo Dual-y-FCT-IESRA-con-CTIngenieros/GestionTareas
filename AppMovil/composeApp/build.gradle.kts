@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version "2.1.20"
 }
 
 kotlin {
@@ -33,7 +32,16 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("io.ktor:ktor-client-okhttp:2.3.0")
+            // Retrofit + OkHttp
+            implementation("com.squareup.retrofit2:retrofit:2.11.0")
+            implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+            implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+            // Token JWT cifrado
+            implementation("androidx.security:security-crypto:1.1.0-alpha06")
+            // Navigation Compose
+            implementation("androidx.navigation:navigation-compose:2.8.9")
+            // ViewModel Compose
+            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -44,27 +52,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            // Extensión para los iconos
             implementation(compose.materialIconsExtended)
             implementation(compose.material3)
-            // Librería voyager para la navegación
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.transitions)
-            // Librería para supabase
-            implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
-            implementation("io.github.jan-tennert.supabase:postgrest-kt")
-            implementation("io.github.jan-tennert.supabase:auth-kt")
-            implementation("io.github.jan-tennert.supabase:realtime-kt")
-            implementation("io.ktor:ktor-client-cio:3.1.2")
-            // Libreria para graficos
-            implementation ("io.github.ehsannarmani:compose-charts:0.1.2")
-
-            // Multiplatform settings para guardar la sesión
-            implementation("com.russhwolf:multiplatform-settings:1.3.0")
         }
 
         iosMain.dependencies {
-            implementation("io.ktor:ktor-client-darwin:2.3.0")
         }
     }
 }
@@ -79,6 +71,13 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        // 10.0.2.2  → localhost del PC visto desde el emulador Android
+        // 192.168.68.60 → IP local del PC en la red WiFi (para dispositivo físico)
+        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8081/api/\"")
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildFeatures {
+        buildConfig = true
     }
     packaging {
         resources {
@@ -88,6 +87,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            buildConfigField("String", "API_BASE_URL", "\"https://tu-api-produccion.com/api/\"")
         }
     }
     compileOptions {
@@ -100,4 +100,3 @@ dependencies {
     implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
 }
-
