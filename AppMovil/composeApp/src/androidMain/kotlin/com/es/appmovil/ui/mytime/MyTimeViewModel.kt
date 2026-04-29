@@ -23,6 +23,9 @@ data class MyTimeUiState(
     val timeCodes: List<TimeCode> = emptyList(),
     val activities: List<Activity> = emptyList(),
     val error: String? = null,
+    // Balance de horas (objetivoAnual viene del backend: horasJornada * 224)
+    val objetivoAnual: Int = 1792,
+    val horasJornada: Int = 8,
     // Formulario
     val editingRecord: TimeRecord? = null,
     val formSuccess: Boolean = false,
@@ -34,7 +37,11 @@ class MyTimeViewModel(
     private val repository: TimeRecordRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MyTimeUiState())
+    private val _uiState = MutableStateFlow(MyTimeUiState(
+        // Inicializar desde prefs como fallback antes de que llegue la respuesta de la API
+        horasJornada = tokenManager.getHorasJornada(),
+        objetivoAnual = tokenManager.getHorasTotalesAnuales()
+    ))
     val uiState: StateFlow<MyTimeUiState> = _uiState.asStateFlow()
 
     val idEmployee: Int get() = tokenManager.getIdEmployee()
@@ -48,22 +55,29 @@ class MyTimeViewModel(
     fun loadAllData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true, error = null)
-            val recordsDeferred = async { repository.getRecordsByEmployee(idEmployee) }
-            val workOrdersDeferred = async { repository.getWorkOrders() }
-            val timeCodesDeferred = async { repository.getTimeCodes() }
-            val activitiesDeferred = async { repository.getActivities() }
 
-            val records = recordsDeferred.await().getOrElse { emptyList() }
+            val recordsDeferred      = async { repository.getRecordsByEmployee(idEmployee) }
+            val workOrdersDeferred   = async { repository.getWorkOrders() }
+            val timeCodesDeferred    = async { repository.getTimeCodes() }
+            val activitiesDeferred   = async { repository.getActivities() }
+            // Balance desde API: objetivoAnual = horasJornada * 224 (no se calcula en local)
+            val balanceDeferred      = async { repository.getHoursBalance(idEmployee) }
+
+            val records    = recordsDeferred.await().getOrElse { emptyList() }
             val workOrders = workOrdersDeferred.await().getOrElse { emptyList() }
-            val timeCodes = timeCodesDeferred.await().getOrElse { emptyList() }
+            val timeCodes  = timeCodesDeferred.await().getOrElse { emptyList() }
             val activities = activitiesDeferred.await().getOrElse { emptyList() }
+            val balance    = balanceDeferred.await().getOrNull()
 
             _uiState.value = _uiState.value.copy(
-                loading = false,
-                records = records.sortedByDescending { it.date },
-                workOrders = workOrders,
-                timeCodes = timeCodes,
-                activities = activities
+                loading      = false,
+                records      = records.sortedByDescending { it.date },
+                workOrders   = workOrders,
+                timeCodes    = timeCodes,
+                activities   = activities,
+                // Si la API devolvió balance, usamos sus valores; si no, mantenemos el fallback de prefs
+                objetivoAnual = balance?.objetivoAnual ?: tokenManager.getHorasTotalesAnuales(),
+                horasJornada  = tokenManager.getHorasJornada()
             )
         }
     }
@@ -133,4 +147,5 @@ class MyTimeViewModel(
         }
     }
 }
+
 

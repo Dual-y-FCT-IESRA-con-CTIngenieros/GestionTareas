@@ -293,11 +293,18 @@ fun FormSection(
 
 @Composable
 fun SummarySection(viewModel: MyTimeViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
     val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
     var trimestral by remember { mutableStateOf(false) }
-    val summary = remember(viewModel.uiState.collectAsState().value.records) {
+    val summary = remember(uiState.records) {
         viewModel.computeAnnualSummary(currentYear)
     }
+
+    val totalYear    = summary.sumOf { it.hours.toDouble() }.toFloat()
+    val objetivoAnual = uiState.objetivoAnual   // viene del backend: horasJornada * 224
+    val horasJornada  = uiState.horasJornada
+    val diferencia    = totalYear - objetivoAnual
+    val progreso      = if (objetivoAnual > 0) (totalYear / objetivoAnual).coerceIn(0f, 1f) else 0f
 
     Column(
         modifier = Modifier
@@ -307,7 +314,66 @@ fun SummarySection(viewModel: MyTimeViewModel) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("Resumen $currentYear", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        // titleMedium → 18 sp, naranja corporativo (AppTypography)
+
+        // ── Tarjeta de balance ──
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            "Horas registradas",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            "%.1f h".format(totalYear),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            "Objetivo anual",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            "$objetivoAnual h  (${horasJornada}h/día × 224)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+                LinearProgressIndicator(
+                    progress = { progreso },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = if (diferencia >= 0) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.error,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                val diferenciaColor = if (diferencia >= 0) MaterialTheme.colorScheme.primary
+                                      else MaterialTheme.colorScheme.error
+                val diferenciaTexto = if (diferencia >= 0)
+                    "+%.1f h sobre el objetivo".format(diferencia)
+                else
+                    "%.1f h por debajo del objetivo".format(diferencia)
+                Text(
+                    diferenciaTexto,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = diferenciaColor,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
 
         // Toggle Anual / Trimestral
         Row(
@@ -326,13 +392,6 @@ fun SummarySection(viewModel: MyTimeViewModel) {
             )
         }
 
-        val totalYear = summary.sumOf { it.hours.toDouble() }.toFloat()
-        Text(
-            "Total año: %.1f h".format(totalYear),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
-        )
 
         if (!trimestral) {
             // Vista anual: grid 2 columnas

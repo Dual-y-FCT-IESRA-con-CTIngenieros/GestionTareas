@@ -1,6 +1,7 @@
 package com.es.appmovil.data.repository
 
 import com.es.appmovil.data.model.Activity
+import com.es.appmovil.data.model.HoursBalance
 import com.es.appmovil.data.model.TimeCode
 import com.es.appmovil.data.model.TimeRecord
 import com.es.appmovil.data.model.WorkOrder
@@ -34,6 +35,15 @@ class TimeRecordRepository(private val api: ApiService) {
 
     suspend fun getActivities(): Result<List<Activity>> = runCatching {
         api.getActivities()
+    }
+
+    /**
+     * Obtiene el balance de horas del empleado.
+     * objetivoAnual es calculado por el backend como horasJornada * 224.
+     * NO se usa ninguna lógica local AIRBUS/214 jornadas.
+     */
+    suspend fun getHoursBalance(idEmployee: Int): Result<HoursBalance> = runCatching {
+        api.getHoursBalance(idEmployee)
     }
 }
 

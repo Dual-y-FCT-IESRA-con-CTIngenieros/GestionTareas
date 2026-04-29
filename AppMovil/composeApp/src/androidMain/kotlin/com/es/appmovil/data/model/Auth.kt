@@ -11,6 +11,8 @@ data class LoginResponse(
     val email: String,
     val nombre: String,
     val apellidos: String,
-    val idRol: Int
+    val idRol: Int,
+    val horasJornada: Int = 8,
+    val horasTotalesAnuales: Int = 1792   // fallback: 8 * 224
 )
 

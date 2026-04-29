@@ -30,6 +30,8 @@ class TokenManager(context: Context) {
             .putString("apellidos", user.apellidos)
             .putString("email", user.email)
             .putInt("idRol", user.idRol)
+            .putInt("horasJornada", user.horasJornada)
+            .putInt("horasTotalesAnuales", user.horasTotalesAnuales)
             .apply()
     }
 
@@ -38,6 +40,10 @@ class TokenManager(context: Context) {
     fun getApellidos(): String? = prefs.getString("apellidos", null)
     fun getEmail(): String? = prefs.getString("email", null)
     fun getIdRol(): Int = prefs.getInt("idRol", -1)
+    /** Horas por jornada del empleado (fallback 8 si aún no se ha guardado). */
+    fun getHorasJornada(): Int = prefs.getInt("horasJornada", 8)
+    /** Objetivo anual calculado por backend (horasJornada * 224). Fallback 1792. */
+    fun getHorasTotalesAnuales(): Int = prefs.getInt("horasTotalesAnuales", 1792)
 
     fun clearUser() {
         prefs.edit()
@@ -46,6 +52,8 @@ class TokenManager(context: Context) {
             .remove("apellidos")
             .remove("email")
             .remove("idRol")
+            .remove("horasJornada")
+            .remove("horasTotalesAnuales")
             .apply()
     }
 }
