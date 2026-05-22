@@ -23,10 +23,23 @@ data class MyTimeUiState(
     val timeCodes: List<TimeCode> = emptyList(),
     val activities: List<Activity> = emptyList(),
     val error: String? = null,
-    // Balance de horas (objetivoAnual viene del backend: horasJornada * 224)
-    val objetivoAnual: Int = 1792,
+    // ── Balance enriquecido (viene del backend) ──
+    val horasEstandar: Float = 0f,
+    val horasExtra: Float = 0f,
+    val permisosRetribuidos: Float = 0f,
+    val otrasHoras: Float = 0f,
+    val totalParaEmpleado: Float = 0f,
+    val totalConExtra: Float = 0f,
+    val jornadasAnuales: Int = 224,
     val horasJornada: Int = 8,
-    // Formulario
+    val objetivoAnual: Float = 1792f,
+    val arrastreHoras: Int = 0,
+    val balance: Float = 0f,
+    val horasPorCodigo: Map<String, Float> = emptyMap(),
+    // ── Actividades filtradas por el TimeCode seleccionado en el formulario ──
+    val filteredActivities: List<Activity> = emptyList(),
+    val loadingActivities: Boolean = false,
+    // ── Formulario ──
     val editingRecord: TimeRecord? = null,
     val formSuccess: Boolean = false,
     val formError: String? = null
@@ -38,9 +51,8 @@ class MyTimeViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyTimeUiState(
-        // Inicializar desde prefs como fallback antes de que llegue la respuesta de la API
         horasJornada = tokenManager.getHorasJornada(),
-        objetivoAnual = tokenManager.getHorasTotalesAnuales()
+        objetivoAnual = tokenManager.getHorasTotalesAnuales().toFloat()
     ))
     val uiState: StateFlow<MyTimeUiState> = _uiState.asStateFlow()
 
@@ -70,14 +82,24 @@ class MyTimeViewModel(
             val balance    = balanceDeferred.await().getOrNull()
 
             _uiState.value = _uiState.value.copy(
-                loading      = false,
-                records      = records.sortedByDescending { it.date },
-                workOrders   = workOrders,
-                timeCodes    = timeCodes,
-                activities   = activities,
-                // Si la API devolvió balance, usamos sus valores; si no, mantenemos el fallback de prefs
-                objetivoAnual = balance?.objetivoAnual ?: tokenManager.getHorasTotalesAnuales(),
-                horasJornada  = tokenManager.getHorasJornada()
+                loading               = false,
+                records               = records.sortedByDescending { it.date },
+                workOrders            = workOrders,
+                timeCodes             = timeCodes,
+                activities            = activities,
+                // Campos del balance enriquecido — desde la API, sin cálculos locales
+                horasEstandar         = balance?.horasEstandar         ?: _uiState.value.horasEstandar,
+                horasExtra            = balance?.horasExtra             ?: _uiState.value.horasExtra,
+                permisosRetribuidos   = balance?.permisosRetribuidos    ?: _uiState.value.permisosRetribuidos,
+                otrasHoras            = balance?.otrasHoras             ?: _uiState.value.otrasHoras,
+                totalParaEmpleado     = balance?.totalParaEmpleado      ?: _uiState.value.totalParaEmpleado,
+                totalConExtra         = balance?.totalConExtra          ?: _uiState.value.totalConExtra,
+                jornadasAnuales       = balance?.jornadasAnuales        ?: _uiState.value.jornadasAnuales,
+                horasJornada          = balance?.horasJornada           ?: tokenManager.getHorasJornada(),
+                objetivoAnual         = balance?.objetivoAnual          ?: tokenManager.getHorasTotalesAnuales().toFloat(),
+                arrastreHoras         = balance?.arrastreHoras          ?: _uiState.value.arrastreHoras,
+                balance               = balance?.balance                ?: _uiState.value.balance,
+                horasPorCodigo        = balance?.horasPorCodigo         ?: _uiState.value.horasPorCodigo
             )
         }
     }
@@ -134,6 +156,25 @@ class MyTimeViewModel(
 
     fun clearFormError() {
         _uiState.value = _uiState.value.copy(formError = null)
+    }
+
+    /**
+     * Carga las actividades disponibles para el TimeCode seleccionado en el formulario.
+     * Si idTimeCode es null o -1 limpia la lista.
+     */
+    fun loadActivitiesByTimeCode(idTimeCode: Int?) {
+        viewModelScope.launch {
+            if (idTimeCode == null || idTimeCode == -1) {
+                _uiState.value = _uiState.value.copy(filteredActivities = emptyList())
+                return@launch
+            }
+            _uiState.value = _uiState.value.copy(loadingActivities = true)
+            val result = repository.getActivitiesByTimeCode(idTimeCode)
+            _uiState.value = _uiState.value.copy(
+                filteredActivities = result.getOrElse { emptyList() },
+                loadingActivities  = false
+            )
+        }
     }
 
     /** Calcula el resumen anual agrupado por mes para el año dado */

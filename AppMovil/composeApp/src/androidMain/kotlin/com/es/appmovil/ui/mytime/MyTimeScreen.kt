@@ -33,6 +33,7 @@ import com.es.appmovil.data.model.TimeRecord
 
 import java.util.Calendar
 
+
 // ─────────────────────────────────────────
 // Pantalla principal
 // ─────────────────────────────────────────
@@ -106,7 +107,8 @@ fun MyTimeScreen(
                                 if (uiState.editingRecord != null) viewModel.updateRecord(record)
                                 else viewModel.createRecord(record)
                             },
-                            onCancelEdit = { viewModel.cancelEdit() }
+                            onCancelEdit = { viewModel.cancelEdit() },
+                            onTimecodeChanged = { viewModel.loadActivitiesByTimeCode(it) }
                         )
                         1 -> SummarySection(viewModel = viewModel)
                         2 -> HistorySection(
@@ -133,7 +135,8 @@ fun FormSection(
     uiState: MyTimeUiState,
     idEmployee: Int,
     onSave: (TimeRecord) -> Unit,
-    onCancelEdit: () -> Unit
+    onCancelEdit: () -> Unit,
+    onTimecodeChanged: (Int?) -> Unit
 ) {
     val context = LocalContext.current
     val editing = uiState.editingRecord
@@ -146,6 +149,19 @@ fun FormSection(
     var comment by remember(editing) { mutableStateOf(editing?.comment ?: "") }
 
     var formError by remember { mutableStateOf<String?>(null) }
+
+    // Cuando cambia el TimeCode, recargar actividades y limpiar actividad seleccionada
+    LaunchedEffect(selectedTC) {
+        selectedAct = -1
+        onTimecodeChanged(if (selectedTC == -1) null else selectedTC)
+    }
+
+    // Al cargar en modo edición, precargar actividades del TC del registro
+    LaunchedEffect(editing) {
+        if (editing?.idTimeCode != null) {
+            onTimecodeChanged(editing.idTimeCode)
+        }
+    }
 
     // Mostrar éxito temporal
     LaunchedEffect(uiState.formSuccess) {
@@ -171,12 +187,11 @@ fun FormSection(
             text = if (editing != null) "✏️ Editando registro" else "Registrar Horas",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
-            // titleMedium → 18 sp, naranja corporativo (AppTypography)
         )
 
         // ── Fecha ──
         OutlinedTextField(
-            value = displayDate(date),   // muestra dd/MM/yyyy; internamente sigue siendo YYYY-MM-DD
+            value = displayDate(date),
             onValueChange = {},
             label = { Text("Fecha") },
             readOnly = true,
@@ -225,14 +240,30 @@ fun FormSection(
             onSelect = { selectedTC = it?.toIntOrNull() ?: -1 }
         )
 
-        // ── Actividad ──
-        DropdownField(
-            label = "Actividad (opcional)",
-            options = uiState.activities.map { it.idActivity.toString() to it.desc },
-            selectedKey = if (selectedAct == -1) null else selectedAct.toString(),
-            nullable = true,
-            onSelect = { selectedAct = it?.toIntOrNull() ?: -1 }
-        )
+        // ── Actividad (filtrada por TimeCode seleccionado) ──
+        if (uiState.loadingActivities) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                Text("Cargando actividades…", style = MaterialTheme.typography.bodySmall)
+            }
+        } else {
+            val activityOptions = if (selectedTC == -1) {
+                uiState.activities.map { it.idActivity.toString() to it.desc }
+            } else {
+                uiState.filteredActivities.map { it.idActivity.toString() to it.desc }
+            }
+            DropdownField(
+                label = "Actividad (opcional)",
+                options = activityOptions,
+                selectedKey = if (selectedAct == -1) null else selectedAct.toString(),
+                nullable = true,
+                onSelect = { selectedAct = it?.toIntOrNull() ?: -1 }
+            )
+        }
 
         // ── Comentario ──
         OutlinedTextField(
@@ -296,15 +327,21 @@ fun SummarySection(viewModel: MyTimeViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
     var trimestral by remember { mutableStateOf(false) }
+    var showDesglose by remember { mutableStateOf(false) }
     val summary = remember(uiState.records) {
         viewModel.computeAnnualSummary(currentYear)
     }
 
-    val totalYear    = summary.sumOf { it.hours.toDouble() }.toFloat()
-    val objetivoAnual = uiState.objetivoAnual   // viene del backend: horasJornada * 224
-    val horasJornada  = uiState.horasJornada
-    val diferencia    = totalYear - objetivoAnual
-    val progreso      = if (objetivoAnual > 0) (totalYear / objetivoAnual).coerceIn(0f, 1f) else 0f
+    val objetivoAnual     = uiState.objetivoAnual
+    val totalParaEmpleado = uiState.totalParaEmpleado
+    val horasExtra        = uiState.horasExtra
+    val horasEstandar     = uiState.horasEstandar
+    val permisosRetrib    = uiState.permisosRetribuidos
+    val balance           = uiState.balance
+    val horasJornada      = uiState.horasJornada
+    val jornadasAnuales   = uiState.jornadasAnuales
+
+    val progreso = if (objetivoAnual > 0f) (totalParaEmpleado / objetivoAnual).coerceIn(0f, 1f) else 0f
 
     Column(
         modifier = Modifier
@@ -315,24 +352,26 @@ fun SummarySection(viewModel: MyTimeViewModel) {
     ) {
         Text("Resumen $currentYear", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
 
-        // ── Tarjeta de balance ──
+        // ── Tarjeta de balance enriquecido ──
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+                // Fila principal: computable vs objetivo
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
                         Text(
-                            "Horas registradas",
+                            "Total computable",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            "%.1f h".format(totalYear),
+                            "%.1f h".format(totalParaEmpleado),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -345,33 +384,86 @@ fun SummarySection(viewModel: MyTimeViewModel) {
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            "$objetivoAnual h  (${horasJornada}h/día × 224)",
+                            "%.0f h  (${horasJornada}h × $jornadasAnuales jornadas)".format(objetivoAnual),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
+
+                // Barra de progreso
                 LinearProgressIndicator(
                     progress = { progreso },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp),
-                    color = if (diferencia >= 0) MaterialTheme.colorScheme.primary
+                    color = if (balance >= 0f) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.error,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
-                val diferenciaColor = if (diferencia >= 0) MaterialTheme.colorScheme.primary
-                                      else MaterialTheme.colorScheme.error
-                val diferenciaTexto = if (diferencia >= 0)
-                    "+%.1f h sobre el objetivo".format(diferencia)
+
+                // Saldo
+                val saldoColor = if (balance >= 0f) MaterialTheme.colorScheme.primary
+                                 else MaterialTheme.colorScheme.error
+                val saldoTexto = if (balance >= 0f)
+                    "+%.1f h sobre el objetivo".format(balance)
                 else
-                    "%.1f h por debajo del objetivo".format(diferencia)
-                Text(
-                    diferenciaTexto,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = diferenciaColor,
-                    fontWeight = FontWeight.SemiBold
-                )
+                    "%.1f h por debajo del objetivo".format(balance)
+                Text(saldoTexto, style = MaterialTheme.typography.bodySmall,
+                    color = saldoColor, fontWeight = FontWeight.SemiBold)
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                // Fila horas estándar + permisos
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Trabajo estándar", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text("%.1f h".format(horasEstandar), style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Permisos retribuidos", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text("%.1f h".format(permisosRetrib), style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+                // Horas extra (informativo, no computa en objetivo)
+                if (horasExtra > 0f) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Horas extra (informativo)", style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("+%.1f h".format(horasExtra), style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+
+                // Desglose por código (expandible)
+                if (uiState.horasPorCodigo.isNotEmpty()) {
+                    TextButton(
+                        onClick = { showDesglose = !showDesglose },
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            if (showDesglose) "▲ Ocultar desglose" else "▼ Ver desglose por código",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (showDesglose) {
+                        uiState.horasPorCodigo.forEach { (nombre, horas) ->
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("• $nombre", style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("%.1f h".format(horas), style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
             }
         }
 

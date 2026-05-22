@@ -17,12 +17,22 @@ class TimeRecordRepository(private val api: ApiService) {
         api.createActivity(record)
     }
 
+    /**
+     * Actualiza un registro por ID (PUT /employee-activities/{id}).
+     * Requiere que record.id no sea nulo.
+     */
     suspend fun updateRecord(record: TimeRecord): Result<TimeRecord> = runCatching {
-        api.updateActivity(record)
+        val id = record.id ?: error("No se puede actualizar un registro sin ID")
+        api.updateActivityById(id, record)
     }
 
+    /**
+     * Elimina un registro por ID (DELETE /employee-activities/{id}).
+     * Requiere que record.id no sea nulo.
+     */
     suspend fun deleteRecord(record: TimeRecord): Result<Unit> = runCatching {
-        api.deleteActivity(record)
+        val id = record.id ?: error("No se puede eliminar un registro sin ID")
+        api.deleteActivityById(id)
     }
 
     suspend fun getWorkOrders(): Result<List<WorkOrder>> = runCatching {
@@ -38,12 +48,20 @@ class TimeRecordRepository(private val api: ApiService) {
     }
 
     /**
-     * Obtiene el balance de horas del empleado.
-     * objetivoAnual es calculado por el backend como horasJornada * 224.
-     * NO se usa ninguna lógica local AIRBUS/214 jornadas.
+     * Actividades disponibles para un código de tiempo concreto.
+     * GET /api/activities/by-timecode/{idTimeCode}
      */
-    suspend fun getHoursBalance(idEmployee: Int): Result<HoursBalance> = runCatching {
-        api.getHoursBalance(idEmployee)
+    suspend fun getActivitiesByTimeCode(idTimeCode: Int): Result<List<Activity>> = runCatching {
+        api.getActivitiesByTimeCode(idTimeCode)
+    }
+
+    /**
+     * Obtiene el balance de horas enriquecido del empleado.
+     * objetivoAnual = horasJornada * jornadasAnuales (Config, no hardcodeado).
+     * @param year año a consultar; null = año actual (default del backend)
+     */
+    suspend fun getHoursBalance(idEmployee: Int, year: Int? = null): Result<HoursBalance> = runCatching {
+        api.getHoursBalance(idEmployee, year)
     }
 }
 

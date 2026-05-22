@@ -12,11 +12,12 @@ import com.es.appmovil.data.model.TimeRecord
 import com.es.appmovil.data.model.UpdateEmployeeRequest
 import com.es.appmovil.data.model.WorkOrder
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -40,9 +41,12 @@ interface ApiService {
     @PUT("employees")
     suspend fun updateEmployee(@Body request: UpdateEmployeeRequest): Employee
 
-    /** Balance de horas: objetivoAnual = horasJornada * 224 (calculado en backend) */
+    /** Balance de horas enriquecido: desglose por cód. tiempo + objetivo desde Config */
     @GET("employees/{id}/hours-balance")
-    suspend fun getHoursBalance(@Path("id") idEmployee: Int): HoursBalance
+    suspend fun getHoursBalance(
+        @Path("id") idEmployee: Int,
+        @Query("year") year: Int? = null
+    ): HoursBalance
 
     // ────────── Registros de horas ──────────
     @GET("employee-activities")
@@ -54,11 +58,13 @@ interface ApiService {
     @POST("employee-activities")
     suspend fun createActivity(@Body record: TimeRecord): TimeRecord
 
-    @PUT("employee-activities")
-    suspend fun updateActivity(@Body record: TimeRecord): TimeRecord
+    /** Editar por ID (nuevo endpoint, reunión 21/05/2026) */
+    @PUT("employee-activities/{id}")
+    suspend fun updateActivityById(@Path("id") id: Long, @Body record: TimeRecord): TimeRecord
 
-    @HTTP(method = "DELETE", path = "employee-activities", hasBody = true)
-    suspend fun deleteActivity(@Body record: TimeRecord)
+    /** Eliminar por ID (nuevo endpoint, reunión 21/05/2026) */
+    @DELETE("employee-activities/{id}")
+    suspend fun deleteActivityById(@Path("id") id: Long)
 
     // ────────── Órdenes de trabajo ──────────
     @GET("workorders")
@@ -71,5 +77,9 @@ interface ApiService {
     // ────────── Actividades ──────────
     @GET("activities")
     suspend fun getActivities(): List<Activity>
+
+    /** Actividades filtradas por código de tiempo (para el formulario de registro) */
+    @GET("activities/by-timecode/{idTimeCode}")
+    suspend fun getActivitiesByTimeCode(@Path("idTimeCode") idTimeCode: Int): List<Activity>
 }
 
